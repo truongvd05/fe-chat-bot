@@ -1,13 +1,16 @@
+import { lazy } from 'react';
+import { HashRouter, Route, Routes } from "react-router-dom";
+
 import AuthLayout from "@/layouts/AuthLayout";
 import ChatLayout from "@/layouts/ChatLayout";
-import ForgotPassword from "@/page/Auth/ForgotPassword";
-import Login from "@/page/Auth/Login";
-import Register from "@/page/Auth/Register";
-import ResetPassword from "@/page/Auth/ResetPassword";
-import VerifyEmail from "@/page/Auth/VerifyEmail";
-import Chat from "@/page/Chat";
 import Home from "@/page/Home";
-import { HashRouter, Route, Routes } from "react-router-dom";
+
+const Login = lazy(() => import("@/page/Auth/Login"))
+const Register = lazy(() => import("@/page/Auth/Register"))
+const ResetPassword = lazy(() => import("@/page/Auth/ResetPassword"))
+const VerifyEmail = lazy(() => import("@/page/Auth/VerifyEmail"))
+const ForgotPassword = lazy(() => import("@/page/Auth/ForgotPassword"))
+const Chat = lazy(() => import("@/page/Chat"))
 
 function AppRoutes() {
     return (

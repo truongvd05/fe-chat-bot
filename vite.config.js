@@ -4,11 +4,11 @@ import path from "path";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-    plugins: [react(), tailwindcss()],
-    base: "/chat/",
-    resolve: {
-        alias: {
-            "@": path.resolve(__dirname, "src"),
-        },
+  plugins: [react(), tailwindcss()],
+  base: "/fe-chat-bot/",
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "src"),
     },
+  },
 });
