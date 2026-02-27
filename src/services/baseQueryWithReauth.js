@@ -38,7 +38,6 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
         if (refreshResult.data) {
           localStorage.setItem("access_token", refreshResult.data.access_token);
         }
-
         // retry request cũ
         result = await baseQuery(args, api, extraOptions);
       } catch (err) {

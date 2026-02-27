@@ -26,8 +26,20 @@ export const userApi = createApi({
       }),
       invalidatesTags: ["User"],
     }),
+    findUser: builder.query({
+      query: (q) => ({
+        url: `user/search`,
+        params: { q },
+      }),
+    }),
   }),
 });
 
-export const { useGetUserQuery, useLogoutMutation, useChangePasswordMutation } =
-  userApi;
+export const {
+  useGetUserQuery,
+  useLogoutMutation,
+  useChangePasswordMutation,
+  useFindUserQuery,
+  // lazy
+  useLazyFindUserQuery,
+} = userApi;

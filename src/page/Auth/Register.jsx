@@ -96,6 +96,7 @@ function Register() {
             checkEmail.cancel();
         };
     }, [checkEmail]);
+    
     return (
         <Card className="w-full max-w-sm m-auto">
             <CardHeader>

@@ -7,7 +7,7 @@ export const conversationApi = createApi({
   tagTypes: ["Conversation"],
   endpoints: (builder) => ({
     getConversations: builder.query({
-      query: () => "/conversation",
+      query: () => "/conversation/",
       providesTags: ["Conversation"],
     }),
     getBotConversation: builder.query({

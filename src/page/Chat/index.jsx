@@ -12,13 +12,17 @@ function Chat() {
     const bottomRef = useRef(null)
     const { data: conversationData, isLoading: conversatonLoading, error: conversationError } = useGetBotConversationQuery(conversationId)
     const { data: messageData, isLoading: messageLoading, error: messageError } = useGetMessageQuery(conversationId)
-    const [ sendMessage, {isLoading: sendMessaeLoading, error: sendMessageError}] = useSendBotMessageMutation()
+    const [ sendBotMessage, {isLoading: sendMessaeLoading, error: sendMessageError}] = useSendBotMessageMutation()
 
     const [content, setContent] = useState("")
-
+    
     const handleSendMessage = async () => {
         try {
-            await sendMessage({conversationId, content}).unwrap()
+            if(conversationData.type === "BOT") {
+                await sendBotMessage({conversationId, content}).unwrap()
+            } else {
+
+            }
             setContent("")
         } catch(err) {
             console.log("Error:", err)
@@ -41,7 +45,6 @@ function Chat() {
         })
         event.onmessage = (e) => {
             const data = JSON.parse(e.data);
-            console.log("New message:", data);
             if (data.type === "bot_stream") {
                 dispatch(
                     messageApi.util.updateQueryData(

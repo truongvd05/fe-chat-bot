@@ -3,10 +3,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import Skeleton from "./Skeleton";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useEffect } from "react";
+import AddFriend from "./AddFriend";
 
 function Conversation({ type, activeId, setActiveId  }) {
     const {theme} = useTheme()
-
     const {conversationId} = useParams()
     useEffect(() => {
         if (conversationId) {
@@ -31,31 +31,34 @@ function Conversation({ type, activeId, setActiveId  }) {
     
     const conversations = type === "bots" ? botData : chatData;
     if(isLoading) return <Skeleton/>
-    if (!conversations?.length) return <p> chưa có đoạn chat nào </p>;
-    
-    return (conversations.map((item)=> {
-                return (
-                    <div key={item.id}
-                    
-                    onClick={() => {
-                        setActiveId(item.id)
-                        navigate(`/chat/${item.id}`)
-                    }}
-                    className={`rounded-sm cursor-pointer
-                        ${theme === "light" ? "hover:bg-gray-300 text-black" : "hover:bg-gray-500 text-white"}
-                        ${activeId === item.id ? "bg-gray-400" : ""} py-[3px] px-[5px] w-full h-15`
-                            }>
-                        <div className="flex items-center">
-                            <img src="" alt="" />
-                            <div className="flex flex-col gap-2 flex-1">
-                                <p>{item.title}</p>
-                                {item.lastMessage && <p>{item.lastMessage}</p>}
-                            </div>
+    return (
+    <div>
+        {type === "chat" && <AddFriend/>}
+        {!conversations?.length && (
+            <p>Chưa có đoạn chat nào</p>
+        )}
+        {(conversations.map((item)=> {
+            return (
+                <div key={item.id}
+                onClick={() => {
+                    setActiveId(item.id)
+                    navigate(`/chat/${item.id}`)
+                }}
+                className={`rounded-sm cursor-pointer
+                    ${theme === "light" ? "hover:bg-gray-300 text-black" : "hover:bg-gray-500 text-white"}
+                    ${activeId === item.id ? "bg-gray-400" : ""} py-[3px] px-[5px] w-full h-15`
+                        }>
+                    <div className="flex items-center">
+                        <div className="flex flex-col gap-2 flex-1">
+                            <p>{item.title}</p>
+                            {item.lastMessage && <p>{item.lastMessage}</p>}
                         </div>
                     </div>
-                )
-            })
-    )
+                </div>
+            )
+        })
+        )}
+    </div>
+)
 }
-
 export default Conversation
