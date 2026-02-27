@@ -6,18 +6,16 @@ import { selectUser } from "@/feature/User/userSelector"
 function ChatLayout(){
     const navigate = useNavigate()
     const user = useSelector(selectUser)
-    console.log(user);
-    
     if(!user?.user) {
         navigate("/login")
     }
     return (
-    <div className="flex h-full">
+    <div className="flex min-h-screen">
         <div className="fixed top-0 bottom-0 w-[280px] border-r flex overflow-auto">
             <Sidebar/>
         </div>
 
-        <div className="flex-1 flex flex-col ml-[280px] mr-[280px] relative m-auto">
+        <div className="flex-1 flex flex-col ml-[280px] mr-[280px] ">
             <div className="sticky top-0 flex border-b pt-1 pb-5 bg-background">
                 <h1 onClick={()=> navigate("/home")}
                 className=" ml-auto mr-auto text-center

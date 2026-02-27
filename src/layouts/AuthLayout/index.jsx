@@ -8,7 +8,9 @@ function AuthLayout() {
         return <Navigate to="/login" replace/>
     }
     return (
-        <div className="h-full flex"><Outlet/></div>
+        <div className="h-screen flex">
+            <Outlet/>
+        </div>
     )
 }
 

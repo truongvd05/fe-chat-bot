@@ -1,11 +1,19 @@
 import { useGetBotConversationsQuery, useGetConversationsQuery } from "@/feature/Conversation/conversationApi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Skeleton from "./Skeleton";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useEffect } from "react";
 
 function Conversation({ type, activeId, setActiveId  }) {
-    const {theme, setTheme} = useTheme()
-    
+    const {theme} = useTheme()
+
+    const {conversationId} = useParams()
+    useEffect(() => {
+        if (conversationId) {
+            setActiveId(conversationId);
+        }
+    }, [conversationId, setActiveId]);
+
     const navigate = useNavigate()
     const { data: botData,
         isLoading: botLoading,
@@ -28,6 +36,7 @@ function Conversation({ type, activeId, setActiveId  }) {
     return (conversations.map((item)=> {
                 return (
                     <div key={item.id}
+                    
                     onClick={() => {
                         setActiveId(item.id)
                         navigate(`/chat/${item.id}`)

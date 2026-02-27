@@ -10,7 +10,7 @@ function Sidebar() {
     return (
         <>
             <div className="py-[30px] px-[5px] w-[20%]  flex flex-col justify-between gap-2 items-center">
-                <NavigationRall setType={setType} />
+                <NavigationRall setType={setType} type={type} />
             </div>
             <div className="py-[30px] px-[5px] flex-1 flex flex-col gap-2 items-center">
                 <Conversation type={type} activeId={conversationId} setActiveId={setConversationId}/>

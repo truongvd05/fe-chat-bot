@@ -12,9 +12,9 @@ export const messageApi = createApi({
         { type: "Message", id: conversationId },
       ],
     }),
-    sendMessage: builder.mutation({
+    sendBotMessage: builder.mutation({
       query: ({ conversationId, content }) => ({
-        url: `/message/conversations/${conversationId}`,
+        url: `/message/bot/conversations/${conversationId}`,
         method: "POST",
         body: { content },
       }),
@@ -29,7 +29,12 @@ export const messageApi = createApi({
             "getMessage",
             conversationId,
             (draft) => {
-              draft.push({ id: tempId, content, isSending: true });
+              draft.push({
+                id: tempId,
+                content,
+                isSending: true,
+                role: "user",
+              });
             },
           ),
         );
@@ -43,7 +48,10 @@ export const messageApi = createApi({
               (draft) => {
                 const index = draft.findIndex((m) => m.id === tempId);
                 if (index !== -1) {
-                  draft[index] = newMessage;
+                  draft[index] = {
+                    ...newMessage,
+                    role: "user",
+                  };
                 }
               },
             ),
@@ -62,7 +70,7 @@ export const messageApi = createApi({
         body: { content },
       }),
       async onQueryStarted(
-        { messageId, content },
+        { messageId, content, conversationId },
         { dispatch, queryFulfilled },
       ) {
         const result = dispatch(
@@ -100,4 +108,4 @@ export const messageApi = createApi({
   }),
 });
 
-export const { useGetMessageQuery, useSendMessageMutation } = messageApi;
+export const { useGetMessageQuery, useSendBotMessageMutation } = messageApi;

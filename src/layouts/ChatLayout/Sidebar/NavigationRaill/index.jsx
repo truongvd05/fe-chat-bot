@@ -11,14 +11,14 @@ import {
 import NavIcon from "./NavIcon"
 import { useTheme } from "@/contexts/ThemeContext"
 
-function NavigationRall({ setType }) {
+function NavigationRall({ setType, type }) {
     const {theme, setTheme} = useTheme()
 return (
     <>
         <div className="flex flex-col gap-2">
-            <NavIcon icon="fa-regular fa-comment" onClick={() => setType("chat")}/>
-            <NavIcon icon="fa-brands fa-bots" onClick={() => setType("bots")}/>
-        </div>
+            <NavIcon icon="fa-regular fa-comment" active={type === "chat"} onClick={() => setType("chat")}/>
+            <NavIcon icon="fa-brands fa-bots" active={type === "bots"} onClick={()  => setType("bots")}/>
+        </div>  
         <div className="flex flex-col gap-2">
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
