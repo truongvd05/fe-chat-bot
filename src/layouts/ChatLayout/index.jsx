@@ -8,6 +8,7 @@ function ChatLayout(){
     const user = useSelector(selectUser)
     if(!user?.user) {
         navigate("/login")
+        return
     }
     return (
     <div className="flex min-h-screen">

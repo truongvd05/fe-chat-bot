@@ -37,7 +37,7 @@ function Conversation({ type, activeId, setActiveId  }) {
         {!conversations?.length && (
             <p>Chưa có đoạn chat nào</p>
         )}
-        {(conversations.map((item)=> {
+        {conversations && (conversations.map((item)=> {
             return (
                 <div key={item.id}
                 onClick={() => {
