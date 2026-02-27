@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from "react-router-dom"
+import { Navigate, Outlet, useNavigate } from "react-router-dom"
 import Sidebar from "./Sidebar"
 import { useSelector } from "react-redux"
 import { selectUser } from "@/feature/User/userSelector"
@@ -7,8 +7,7 @@ function ChatLayout(){
     const navigate = useNavigate()
     const user = useSelector(selectUser)
     if(!user?.user) {
-        navigate("/login")
-        return
+        return <Navigate to="/login" replace/>
     }
     return (
     <div className="flex min-h-screen">
