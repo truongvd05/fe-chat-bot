@@ -2,13 +2,22 @@ import { Navigate, Outlet, useNavigate } from "react-router-dom"
 import Sidebar from "./Sidebar"
 import { useSelector } from "react-redux"
 import { selectUser } from "@/feature/User/userSelector"
+import { useEffect } from "react"
+import { connectSocket } from "@/socket/socket"
 
 function ChatLayout(){
     const navigate = useNavigate()
     const user = useSelector(selectUser)
+    const access_token = localStorage.getItem("access_token")
     if(!user?.user) {
         return <Navigate to="/login" replace/>
     }
+    useEffect(() => {
+        if(access_token){
+            connectSocket(access_token)
+        }
+    }, [access_token])
+    
     return (
     <div className="flex min-h-screen">
         <div className="fixed top-0 bottom-0 w-[280px] border-r flex overflow-auto">

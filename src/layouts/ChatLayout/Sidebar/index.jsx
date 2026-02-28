@@ -4,8 +4,8 @@ import NavigationRall from "./NavigationRaill"
 
 
 function Sidebar() {
-    const [type, setType] = useState("bots");
-    const [conversationId, setConversationId] = useState(null)
+    const url = location.hash.split("/")[1]
+    const [type, setType] = useState(url);
 
     return (
         <>
@@ -13,7 +13,7 @@ function Sidebar() {
                 <NavigationRall setType={setType} type={type} />
             </div>
             <div className="py-[30px] px-[5px] flex-1 flex flex-col gap-2 items-center">
-                <Conversation type={type} activeId={conversationId} setActiveId={setConversationId}/>
+                <Conversation type={type} />
             </div>
         </>
     )

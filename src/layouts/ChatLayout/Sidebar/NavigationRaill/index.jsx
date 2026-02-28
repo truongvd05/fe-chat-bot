@@ -10,14 +10,39 @@ import {
 } from "@/components/ui/dropdown-menu"
 import NavIcon from "./NavIcon"
 import { useTheme } from "@/contexts/ThemeContext"
+import { useNavigate } from "react-router-dom"
+import { useLogoutMutation } from "@/feature/User/userApi"
 
 function NavigationRall({ setType, type }) {
+    const navigate = useNavigate()
     const {theme, setTheme} = useTheme()
+    const [ logout, {isLoading, error}] = useLogoutMutation()
+
+    const refresh_token = localStorage.getItem("refresh_token")
+
+    const handleLogout = async () => {
+        if(!refresh_token) return
+        try {
+            await logout().unwrap()
+            localStorage.clear()
+            navigate("/login")
+        } catch (err) {
+            console.log(err);
+        }
+    }
 return (
     <>
         <div className="flex flex-col gap-2">
-            <NavIcon icon="fa-regular fa-comment" active={type === "chat"} onClick={() => setType("chat")}/>
-            <NavIcon icon="fa-brands fa-bots" active={type === "bots"} onClick={()  => setType("bots")}/>
+            <NavIcon icon="fa-regular fa-comment" active={type === "chat"}
+            onClick={() => {
+                setType("chat")
+                navigate("/chat")
+            }}/>
+            <NavIcon icon="fa-brands fa-bots" active={type === "bots"}
+            onClick={()  => {
+                setType("bots")
+                navigate("/bots")
+            }}/>
         </div>  
         <div className="flex flex-col gap-2">
             <DropdownMenu>
@@ -35,7 +60,7 @@ return (
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>GitHub</DropdownMenuItem>
                     <DropdownMenuItem>Support</DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleLogout}>
                         <DropDownText text="Log out" red>
                             <i className="fa-solid fa-arrow-right-from-bracket"></i>
                         </DropDownText>

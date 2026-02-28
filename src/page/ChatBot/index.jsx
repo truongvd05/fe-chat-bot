@@ -2,11 +2,11 @@ import { useGetBotConversationQuery } from "@/feature/Conversation/conversationA
 import { messageApi, useGetMessageQuery, useSendBotMessageMutation } from "@/feature/Message/messageApi";
 import { useParams } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea"
-import Message from "./Message";
+import Message from "../../components/Message";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 
-function Chat() {
+function ChatBot() {
     const dispatch = useDispatch()
     const { conversationId } = useParams()
     const bottomRef = useRef(null)
@@ -18,16 +18,14 @@ function Chat() {
     
     const handleSendMessage = async () => {
         try {
-            if(conversationData.type === "BOT") {
-                await sendBotMessage({conversationId, content}).unwrap()
-            } else {
-
-            }
+            await sendBotMessage({conversationId, content}).unwrap()
             setContent("")
         } catch(err) {
             console.log("Error:", err)
         }
     }
+    console.log(messageData);
+    
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messageData]);
@@ -81,12 +79,13 @@ function Chat() {
                 <div className="flex flex-col flex-1 gap-4 pb-30">  
                     {messageData?.map((message) => {
                         return (
-                            <div ref={bottomRef} key={message.id} className={`${message.role === "user" ? "" : "border-b border-t"}`}>
-                                <Message message={message} right={message.role === "user"}/>
+                            <div  key={message.id} className={`${message.role === "user" ? "" : "border-b border-t"}`}>
+                                <Message message={message} right={message.role === "user"} user={message.role === "user"} />
                             </div>
                         )
                     })}
                 </div>
+                <div ref={bottomRef}></div>
             </div>
             <div className="sticky bottom-10 w-[80%] mr-auto ml-auto relative">
                 <Textarea id="textarea-message"
@@ -107,4 +106,4 @@ function Chat() {
     )
 }
 
-export default Chat 
+export default ChatBot 

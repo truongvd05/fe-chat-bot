@@ -22,6 +22,14 @@ export const conversationApi = createApi({
       query: (conversationId) => `/conversation/${conversationId}`,
       providesTags: (result, error, id) => [{ type: "Conversation", id }],
     }),
+    createDirectConversation: builder.mutation({
+      query: (targetUserId) => ({
+        url: `/conversation/direct`,
+        method: "POST",
+        body: { targetUserId },
+      }),
+      invalidatesTags: [{ type: "Conversation" }],
+    }),
   }),
 });
 
@@ -30,6 +38,7 @@ export const {
   useGetBotConversationsQuery,
   useGetConversationQuery,
   useGetConversationsQuery,
+  useCreateDirectConversationMutation,
   // lazy
   useLazyGetBotConversationQuery,
   useLazyGetBotConversationsQuery,

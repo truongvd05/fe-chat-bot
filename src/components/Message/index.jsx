@@ -1,15 +1,14 @@
 import { useTheme } from "@/contexts/ThemeContext"
 
-function Message({message, right, key}) {
-    const {theme, setTheme} = useTheme()
-    
+function Message({message, right, user}) {
+    const {theme} = useTheme()
     return (
-        <div key={key} className={`
-        ${right ? "flex justify-end ml-auto" : "" } 
+        <div className={`
+        ${right ? "flex justify-end ml-auto" : "flex" } 
         w-[80%] whitespace-pre-wrap break-words
         `}>
             <p className={`
-                ${right && theme === "light" ? "bg-olive-100 " : ""}
+                ${user && theme === "light" ? "bg-olive-100 " : ""}
                 ${right ? "border border-white" : ""}
                 px-2 py-3 rounded-2xl
                 `}>
