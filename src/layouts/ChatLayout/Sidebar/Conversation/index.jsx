@@ -2,9 +2,11 @@ import { useGetBotConversationsQuery, useGetConversationsQuery } from "@/feature
 import { useNavigate, useParams } from "react-router-dom";
 import Skeleton from "./Skeleton";
 import { useTheme } from "@/contexts/ThemeContext";
-import AddFriend from "./AddFriend";
+import AddFriend from "./IconFriend";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/feature/User/userSelector";
+import IconNewBots from "./IconNewBots";
+import IconFriend from "./IconFriend";
 
 function Conversation({ type  }) {
     const {user} = useSelector(selectUser)
@@ -30,17 +32,18 @@ function Conversation({ type  }) {
     
     if(isLoading) return <Skeleton/>
     return (
-    <div>
-        {type === "chat" && <AddFriend/>}
+    <div className="w-full">
+        {type === "chat" ? <IconFriend/> : <IconNewBots/>}
         {!conversations?.length && (
             <p>Chưa có đoạn chat nào</p>
         )}
         {(conversations?.map((item)=> {
+            const otherUser = item.participants?.find(p => p.user.id !== user.id)
             return (
                 <div key={item.id}
                 onClick={() => {
                     if(type === "chat") {
-                        navigate(`/${type}/${item.id}?u=${item.participants[0].user.id}`)
+                        navigate(`/${type}/${item.id}?u=${otherUser?.id}`)
                     } else {
                         navigate(`/${type}/${item.id}`)
                     }
@@ -51,7 +54,7 @@ function Conversation({ type  }) {
                         }>
                     <div className="flex items-center">
                         <div className="flex flex-col gap-2 flex-1">
-                            {type === "chat" ? <p>{item.participants[0].user.email}</p>  : <p>{item.title}</p>}
+                            <p> {type === "chat" ? otherUser?.user.name || otherUser?.user.email  : item.title}</p>
                             {item.lastMessage?.content && <p className="text-sm opacity-70">
                                 {(item.lastMessage.user?.id === user.id) ?  "Bạn" : item.lastMessage.user?.name ?? item.lastMessage.user?.email}: {item.lastMessage.content}</p>}
                         </div>

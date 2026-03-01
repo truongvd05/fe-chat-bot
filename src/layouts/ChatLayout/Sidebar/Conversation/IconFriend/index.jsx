@@ -10,14 +10,13 @@ import {
 } from "@/components/ui/dialog"
 
 import debounce from "lodash.debounce";
-import * as yup from "yup"
 import { Input } from "@/components/ui/input";
 import { useEffect, useMemo, useState } from "react";
 import { useLazyFindUserQuery } from "@/feature/User/userApi";
 import { useCreateDirectConversationMutation } from "@/feature/Conversation/conversationApi";
 
 
-function AddFriend() {
+function IconFriend() {
   const [triggerFindUser, { data, isLoading, error }] = useLazyFindUserQuery();
   const [ createDirectConversation, {isLoading: createDirectLoading, error: createDirectError}] = useCreateDirectConversationMutation()
   const [active, setActive] = useState(null)
@@ -55,7 +54,7 @@ function AddFriend() {
 
   return (
     <Dialog>
-      <DialogTrigger><i className="fa-solid fa-user-plus"></i></DialogTrigger>
+      <DialogTrigger className="hover:bg-amber-100 p-2 rounded-lg"><i className="fa-solid fa-user-plus"></i></DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Tìm bạn</DialogTitle>
@@ -99,4 +98,4 @@ function AddFriend() {
   );
 }
 
-export default AddFriend;
+export default IconFriend;

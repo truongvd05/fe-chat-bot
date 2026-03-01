@@ -6,6 +6,8 @@ import ChatLayout from "@/layouts/ChatLayout";
 import Home from "@/page/Home";
 import ChatEmpty from '../ChatEmpty';
 import ChatUser from '@/page/ChatUser';
+import { useSelector } from 'react-redux';
+import { selectUser } from '@/feature/User/userSelector';
 
 const Login = lazy(() => import("@/page/Auth/Login"))
 const Register = lazy(() => import("@/page/Auth/Register"))
@@ -15,6 +17,10 @@ const ForgotPassword = lazy(() => import("@/page/Auth/ForgotPassword"))
 const ChatBot = lazy(() => import("@/page/ChatBot"))
 
 function AppRoutes() {
+    const user = useSelector(selectUser)
+    if(!user) {
+        return <Navigate to="/login" replace/>
+    }
     return (
     <HashRouter>
         <Routes>

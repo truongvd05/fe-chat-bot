@@ -1,33 +1,31 @@
 import { useGetConversationQuery } from "@/feature/Conversation/conversationApi"
-import { useGetMessageQuery, useSendMessageMutation } from "@/feature/Message/messageApi"
+import { useGetMessageQuery } from "@/feature/Message/messageApi"
 import { useEffect, useRef, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
-import { useParams, useSearchParams } from "react-router-dom"
+import { useSelector } from "react-redux"
+import { useParams } from "react-router-dom"
 import { Textarea } from "@/components/ui/textarea"
 import Message from "@/components/Message"
 import { selectUser } from "@/feature/User/userSelector"
 import { getSocket } from "@/socket/socket"
+import { useSocket } from "@/contexts/SocketContext"
 
 function ChatUser() {
+    const socket = useSocket();
     const {user} = useSelector(selectUser)
     const { conversationId } = useParams()
     const bottomRef = useRef(null)
     const [content, setContent] = useState("")
-    const [searchParams, setSearchParams] = useSearchParams();
     const [messages, setMessages] = useState([]);
     
-    const { data: conversationData, isLoading: conversatonLoading, error: conversationError } = useGetConversationQuery(conversationId)
+    const { data: conversationData, isLoading: conversatonLoading, error: conversationError } = useGetConversationQuery(conversationId, {refetchOnMountOrArgChange: true})
     const { data: messageData, isLoading: messageLoading, error: messageError } = useGetMessageQuery(conversationId)
-    const [ sendMessage, {isLoading: sendMessaeLoading, error: sendMessageError}] = useSendMessageMutation()
-    console.log(messages);
-    
     const handleSendMessage = async () => {
-        const socket = getSocket();
-        console.log("Socket:", socket);
-
         try {
+            if (!conversationData) return
+            if (!["DIRECT", "GROUP"].includes(conversationData.type)) return
             if(!conversationId || !content) return
             const socket = getSocket()
+            if (!socket) return;
             socket.emit("send_message", {
                 conversationId,
                 content
@@ -39,31 +37,27 @@ function ChatUser() {
     }
     useEffect(() => {
         if (messageData) {
-            setMessages(messageData);
-        }
-    }, [messageData]);
+        setMessages(messageData);
+    }
+    }, [messageData, conversationId]);
 
     useEffect(() => {
-        const socket = getSocket();
         if (!socket) return;
-
-        socket.on("receive_message", (message) => {
+        const handleReceiveMessage = (message) => {
             if (message.conversationId === conversationId) {
-                setMessages((prev) => [...prev, message]);
+                setMessages((prev) => [...prev, message])
             }
-            console.log(message);
-        });
-
+        }
+        socket.on("receive_message", handleReceiveMessage);
         return () => {
-            socket.off("receive_message");
+            socket.off("receive_message", handleReceiveMessage);
         };
-    }, [conversationId]);
+    }, [conversationId, socket]);
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
     if(!conversationData || messageLoading) return
-    
     return (
         <>
             <div className="px-2 py-2 flex-1 h-full">
@@ -84,8 +78,12 @@ function ChatUser() {
                 onChange={(e)=> { setContent(e.target.value)}}
                 className="overflow-hidden px-5 h-16 text-lg rounded-3xl" placeholder="Enter text"/>
                 <button
+                disabled={
+                    !content.trim() ||
+                    !conversationData ||
+                    !["DIRECT", "GROUP"].includes(conversationData.type)
+                }
                 onClick={handleSendMessage}
-                disabled={!content}
                 className="p-3 absolute right-5 top-1/2 -translate-y-1/2
                 disabled:opacity-40
                 disabled:cursor-not-allowed"

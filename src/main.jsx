@@ -6,12 +6,15 @@ import { persistor, store } from './store/store'
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { PersistGate } from 'redux-persist/integration/react'
 import { ThemeProvider } from './contexts/ThemeContext'
+import { SocketProvider } from './contexts/SocketContext'
 
 createRoot(document.getElementById('root')).render(
     <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
             <ThemeProvider>
-                <App />
+                <SocketProvider>
+                    <App />
+                </SocketProvider>
             </ThemeProvider>
         </PersistGate>
     </Provider>

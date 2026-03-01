@@ -1,5 +1,5 @@
 import { setupListeners } from "@reduxjs/toolkit/query";
-import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import { persistReducer, persistStore } from "redux-persist";
 
 import { userApi } from "@/feature/User/userApi";
@@ -8,6 +8,7 @@ import storage from "redux-persist/lib/storage";
 import { authApi } from "@/feature/Auth/authApi";
 import { conversationApi } from "@/feature/Conversation/conversationApi";
 import { messageApi } from "@/feature/Message/messageApi";
+import onlineReducer from "@/feature/onlineUsers/onlineUsersSlice";
 
 const userPersistConfig = {
   key: "user",
@@ -23,6 +24,7 @@ export const store = configureStore({
     [conversationApi.reducerPath]: conversationApi.reducer,
     [messageApi.reducerPath]: messageApi.reducer,
     user: persistedUserReducer,
+    online: onlineReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
