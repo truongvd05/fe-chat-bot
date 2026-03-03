@@ -21,13 +21,7 @@ function VerifyEmail() {
             setLoading(true)
             setError(false)
             try {
-                const res = await VerifyEmail({token}).unwrap();
-                console.log(res);
-                // setTimeout(() => {
-                //     navigate("/login", {
-                //         state: { verified: true }
-                //     })
-                // }, 5000)
+                await VerifyEmail({token}).unwrap();
                 setSuccess(res.success)
             } catch (err) {
                 console.log(err);

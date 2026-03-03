@@ -34,6 +34,7 @@ export const messageApi = createApi({
                 content,
                 isSending: true,
                 role: "user",
+                status: "sending",
               });
             },
           ),
@@ -51,6 +52,7 @@ export const messageApi = createApi({
                   draft[index] = {
                     ...newMessage,
                     role: "user",
+                    status: "sent",
                   };
                 }
               },

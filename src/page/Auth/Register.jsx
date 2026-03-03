@@ -14,6 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRegisterMutation, useValidateEmailMutation } from "@/feature/Auth/authApi";
 import debounce from "lodash.debounce";
 import { NavLink, useNavigate } from "react-router-dom";
+import PasswordInput from "@/components/PasswordInput";
 
 const schema = yup.object({
     username: yup.string().min(3, "tên ít nhất 3 kí tự").required("Tên người dùng là bắt buộc"),
@@ -111,10 +112,18 @@ function Register() {
                         {isCheckingEmail && <i className="fa-solid fa-spinner absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-gray-400"></i>}
                     </div>
                     {errors.email && <span className="text-red-500 text-sm">{errors.email.message}</span>}
-                    <Input type="password" autoComplete="new-password" placeholder="Mật khẩu" {...register("password", { required: true })}/>
-                    {errors.password && <span className="text-red-500 text-sm">{errors.password.message}</span>}
-                    <Input type="password" autoComplete="new-password" placeholder="Xác nhận mật khẩu" {...register("password_confirmation", { required: true })}/>
-                    {errors.password_confirmation && <span className="text-red-500 text-sm">{errors.password_confirmation.message}</span>}
+                    <PasswordInput
+                        placeholder="Mật khẩu cũ"
+                        autoComplete="password"
+                        register={register("password")}
+                        error={errors.password}
+                    />
+                    <PasswordInput
+                        placeholder="Mật khẩu cũ"
+                        autoComplete="new-password"
+                        register={register("password_confirmation")}
+                        error={errors.password_confirmation}
+                    />
                 </div>
                 {errors.root && <p className="text-red-500">{errors.root.message || "Đã có lỗi xảy ra"}</p>}
                 {isRegisterLoading && <i className="fa-solid fa-spinner animate-spin text-gray-400"></i>}

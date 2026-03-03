@@ -2,7 +2,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -17,14 +16,14 @@ import { useCreateDirectConversationMutation } from "@/feature/Conversation/conv
 
 
 function IconFriend() {
-  const [triggerFindUser, { data, isLoading, error }] = useLazyFindUserQuery();
+  const [triggerFindUser, { data, isLoading, isError, error }] = useLazyFindUserQuery();
   const [ createDirectConversation, {isLoading: createDirectLoading, error: createDirectError}] = useCreateDirectConversationMutation()
   const [active, setActive] = useState(null)
   const [value, setValue] = useState("")
 
   const handleAdd = async (targetUserId) => {
     try {
-      const res = await createDirectConversation(targetUserId).unwrap()
+      await createDirectConversation(targetUserId).unwrap()
     } catch (err) {
       console.log(err);
     }
@@ -57,13 +56,12 @@ function IconFriend() {
       <DialogTrigger className="hover:bg-amber-100 p-2 rounded-lg"><i className="fa-solid fa-user-plus"></i></DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Tìm bạn</DialogTitle>
-          <DialogDescription>
-             Nhập tên người dùng để tìm kiếm và gửi lời mời kết bạn.
-          </DialogDescription>
+          <DialogTitle>Tìm kiếm bạn bè.</DialogTitle>
         </DialogHeader>
             <Input value={value} onChange={(e)=> setValue(e.target.value)} type="text" autoComplete="name" placeholder="Tên người dùng"/>
-            {data?.length === 0  && <span className="text-red-500 text-sm">Không tìm thấy</span>}
+            {isLoading && (<span className="text-sm text-gray-500">Đang tìm...</span>)}
+            {!isLoading && isError && <span className="text-red-500 text-sm">{error?.data?.message || "Có lỗi xảy ra"}</span>}
+            {!isLoading && !isError && data?.length === 0 &&  <span className="text-red-500 text-sm">Không tìm thấy</span>}
             {data && data.map((user)=> {
               return (
               <div key={user.id}
@@ -71,7 +69,8 @@ function IconFriend() {
               className={`cursor-pointer hover:bg-amber-50 px-3 py-3
               ${active === user.id ? "bg-amber-100" : ""}
               `}>
-                  {user.email}
+                  <p>{user.name || "undefined"} </p>
+                  <p>{user.email}</p>
               </div>
               )
             })}

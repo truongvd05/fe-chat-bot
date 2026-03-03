@@ -1,6 +1,7 @@
 import baseQuery from "./baseQuery";
 import { logOut } from "@/feature/User/userSlice";
 import { Mutex } from "async-mutex";
+import { toast } from "sonner";
 
 const mutex = new Mutex();
 
@@ -8,6 +9,10 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
   await mutex.waitForUnlock();
 
   let result = await baseQuery(args, api, extraOptions);
+
+  if (result.error && result.error.status !== 401) {
+    toast.error("Lỗi không xác định");
+  }
 
   // access token hết hạn
   if (result.error && result.error?.status === 401) {

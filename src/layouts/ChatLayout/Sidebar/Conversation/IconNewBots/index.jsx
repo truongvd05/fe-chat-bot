@@ -20,11 +20,9 @@ function IconNewBots() {
   const [value, setValue] = useState("")
   const [ createDirectConversation, {isLoading, error}] = useCreateBotConversationMutation()
 
-  const handleCreate = async (title) => {
+  const handleCreate = async () => {
     try {
-      const res = await createDirectConversation({title}).unwrap()
-      console.log(res);
-      
+      await createDirectConversation(value).unwrap()
     } catch (err) {
       console.log(err);
     }
@@ -33,7 +31,7 @@ function IconNewBots() {
   return (
     <Dialog>
       <DialogTrigger className="hover:bg-amber-100 p-2 rounded-lg">
-        <i class="fa-solid fa-plus"></i>
+        <i className="fa-solid fa-plus"></i>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

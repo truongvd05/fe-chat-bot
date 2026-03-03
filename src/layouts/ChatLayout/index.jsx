@@ -4,6 +4,7 @@ import { useSelector } from "react-redux"
 import { selectUser } from "@/feature/User/userSelector"
 import { useEffect } from "react"
 import { connectSocket } from "@/socket/socket"
+import User from "@/components/User"
 
 function ChatLayout(){
     const navigate = useNavigate()
@@ -19,22 +20,18 @@ function ChatLayout(){
     }, [access_token])
     
     return (
-    <div className="flex  min-h-screen">
-        <div className="fixed md:hidden lg:flex top-0 bottom-0 w-[280px] border-r flex overflow-auto ">
+    <div className="flex  min-h-screen overflow-x-hidden">
+        <div className="fixed flex top-0 bottom-0 w-[280px]">
             <Sidebar/>
         </div>
 
-        <div className="flex-1 flex flex-col md:ml-[60px] md:mr-[60px] lg:ml-[280px] lg:mr-[280px] ">
-            <div className="sticky top-0 flex border-b pt-1 pb-5 bg-background">
-                <h1 onClick={()=> navigate("/home")}
-                className=" ml-auto mr-auto text-center
-                cursor-pointer">
-                CHATBOT</h1>
-            </div>
+        <div className="flex-1 flex flex-col ml-[60px] mr-[60px] lg:ml-[280px] lg:mr-[280px] min-w-0">
             <Outlet/>
         </div>
 
-        <div className="fixed md:hidden lg:flex right-0 top-0 bottom-0 w-[280px] border-l">Right Sidebar</div>
+        <div className="fixed hidden lg:block right-0 top-0 bottom-0 w-[280px] border-l">
+            <User/>
+        </div>
     </div>
     )
 }

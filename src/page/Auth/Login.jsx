@@ -15,6 +15,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "@/feature/Auth/authApi";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/feature/User/userSlice";
+import PasswordInput from "@/components/PasswordInput";
 
 const schema = yup.object({
     email: yup.string().required("Vui lòng nhập Email"),
@@ -24,23 +25,12 @@ const schema = yup.object({
 function Login() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    const [showPassword, setShowPassword] = useState(false);
     const {
         register,
         handleSubmit,
         setError,
-        watch,
-        clearErrors,
         formState: { errors },
-    } = useForm({resolver: yupResolver(schema)});
-
-    const emailValue = watch("email")
-    const passwordValue  = watch("password")
-    useEffect(() => {
-        if(errors.err) {
-            clearErrors("err")
-        }
-    }, [emailValue, passwordValue])
+    } = useForm({resolver: yupResolver(schema), mode: "onSubmit", reValidateMode: "onChange" });
 
     const [login, {isLoading, error}] = useLoginMutation();
     
@@ -72,15 +62,12 @@ function Login() {
                 <div className="flex flex-col w-[80%] m-auto gap-2">
                     <Input type="email" autoComplete="username" placeholder="Email" {...register("email", {required: true})}/>
                     {errors.email && <span className="text-red-500 text-sm">{errors.email.message}</span>}
-                    <div className="relative w-[100%] m-auto cursor-pointer">
-                        <Input type={showPassword ? "text" : "password"} autoComplete="current-password" placeholder="password" {...register("password", { required: true })}/>
-                        <div
-                        type="button"
-                        onClick={() => setShowPassword(prev => !prev)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500"
-                    >{showPassword ? <i className="fa-solid fa-eye-slash w-2"></i> : <i className="fa-solid fa-eye"></i>}</div>
-                    </div>
-                    {errors.password && <span className="text-red-500 text-sm">{errors.password.message}</span>}
+                    <PasswordInput
+                        placeholder="Password"
+                        autoComplete="Password"
+                        register={register("password")}
+                        error={errors.password}
+                        />
                 </div>
                 {errors.err && <span className="text-red-500 text-sm">{errors.err.message}</span>}
                 <Button disabled={isLoading} className="block" type="submit">Đăng nhập</Button>

@@ -1,7 +1,7 @@
-import { useGetConversationQuery } from "@/feature/Conversation/conversationApi"
-import { useGetMessageQuery } from "@/feature/Message/messageApi"
+import { conversationApi, useGetConversationQuery } from "@/feature/Conversation/conversationApi"
+import { messageApi, useGetMessageQuery } from "@/feature/Message/messageApi"
 import { useEffect, useRef, useState } from "react"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { useParams } from "react-router-dom"
 import { Textarea } from "@/components/ui/textarea"
 import Message from "@/components/Message"
@@ -10,15 +10,21 @@ import { getSocket } from "@/socket/socket"
 import { useSocket } from "@/contexts/SocketContext"
 
 function ChatUser() {
+    const dispatch = useDispatch()
     const socket = useSocket();
     const {user} = useSelector(selectUser)
     const { conversationId } = useParams()
     const bottomRef = useRef(null)
     const [content, setContent] = useState("")
-    const [messages, setMessages] = useState([]);
-    
-    const { data: conversationData, isLoading: conversatonLoading, error: conversationError } = useGetConversationQuery(conversationId, {refetchOnMountOrArgChange: true})
+    const { data: conversationData, isLoading: conversatonLoading, error: conversationError } =
+    useGetConversationQuery(conversationId, {
+        refetchOnMountOrArgChange: true,
+        refetchOnReconnect: true,
+        refetchOnFocus: true
+    })
     const { data: messageData, isLoading: messageLoading, error: messageError } = useGetMessageQuery(conversationId)
+
+    // xử lí khi gửi message
     const handleSendMessage = async () => {
         try {
             if (!conversationData) return
@@ -35,18 +41,18 @@ function ChatUser() {
             console.log("Error:", err)
         }
     }
-    useEffect(() => {
-        if (messageData) {
-        setMessages(messageData);
-    }
-    }, [messageData, conversationId]);
 
+    // xử lí nhận message từ socket
     useEffect(() => {
         if (!socket) return;
         const handleReceiveMessage = (message) => {
-            if (message.conversationId === conversationId) {
-                setMessages((prev) => [...prev, message])
-            }
+            dispatch(messageApi.util.updateQueryData(
+                "getMessage",
+                message.conversationId,
+                (draft) => {
+                    draft.push(message)
+                }
+            ))
         }
         socket.on("receive_message", handleReceiveMessage);
         return () => {
@@ -54,15 +60,43 @@ function ChatUser() {
         };
     }, [conversationId, socket]);
 
+    // xử lí update unread về 0 khi click message
+    useEffect(() => {
+        if (!conversationId || !user?.id) return;
+        dispatch(conversationApi.util.updateQueryData(
+            "getConversations",
+            undefined,
+            (draft) => {
+                const conversation = draft.find(
+                (c) => c.id === conversationId
+                );
+
+                if (!conversation) return;
+
+                const me = conversation.participants.find(
+                (p) => p.user?.id === user.id
+                );
+
+                me.unreadCount = 0;
+            }
+        ))
+    })
+
+    // scroll xuống cuối khi chat
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
-    if(!conversationData || messageLoading) return
+    }, [messageData]);
+    if (!conversationData || messageLoading) {
+        return <div>Loading...</div>
+    }
+    const other = conversationData.participants.find(u => u.id !== user.id)
+    
     return (
         <>
             <div className="px-2 py-2 flex-1 h-full">
+                <p className="text-2xl py-2 border-b mb-5">{other.user?.name}</p>
                 <div className="flex flex-col flex-1 gap-4 pb-30">  
-                    {messages?.map((message) => {
+                    {messageData?.map((message) => {
                         return (
                             <div key={message.id}>
                                 <Message message={message} right={message.userId === user?.id} user={user}/>
