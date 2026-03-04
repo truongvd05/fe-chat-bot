@@ -1,9 +1,13 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { connectSocket, disconnectSocket } from "@/socket/socket";
+import { useSelector } from "react-redux";
+import { selectUser } from "@/feature/User/userSelector";
 
 const SocketContext = createContext(null);
 
 export const SocketProvider = ({ children }) => {
+    const user = useSelector(selectUser)
+    
     const [socket, setSocket] = useState(null);
     const token = localStorage.getItem("access_token");
 
@@ -35,7 +39,7 @@ export const SocketProvider = ({ children }) => {
             disconnectSocket();
             setSocket(null);
         };
-    }, [token]);
+    }, [token, user]);
 
     return (
         <SocketContext.Provider value={socket}>

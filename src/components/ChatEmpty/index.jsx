@@ -1,6 +1,6 @@
 function ChatEmpty() {
     return (
-        <h1 className="text-center">Bạn chưa chọn đoạn chat nào</h1>
+        <h1 className="text-centergit">Bạn chưa chọn đoạn chat nào</h1>
     )
 }
 
