@@ -9,7 +9,7 @@ import IconFriend from "./IconFriend";
 import { useEffect } from "react";
 import { useSocket } from "@/contexts/SocketContext";
 
-function Conversation({ type  }) {
+function Conversation({ type, setIsOpen }) {
     const socket = useSocket()
     const dispatch = useDispatch()
     const {user} = useSelector(selectUser)
@@ -67,7 +67,6 @@ function Conversation({ type  }) {
             socket.off("conversation_updated", handleReceiveConversation);
         };
     }, [conversationId, socket]);
-
     if(isLoading) return <Skeleton/>
     return (
     <div className="w-full">
@@ -85,11 +84,12 @@ function Conversation({ type  }) {
                 const unreadCount = item.participants?.find(p => p.user?.id === user.id)
                 otheruser = otherParticipant?.user;
                 count = unreadCount?.unreadCount
+                
             }
-            
             return (
                 <div key={item.id}
                 onClick={() => {
+                    setIsOpen(false)
                     if(type === "chat") {
                         navigate(`/${type}/${item.id}`)
                     } else {
@@ -109,7 +109,7 @@ function Conversation({ type  }) {
                             {item.lastMessage?.content && 
                             <p className="text-sm opacity-70 truncate w-45">
                                 {type === "bots" && (item.lastMessage?.userId === user.id ?  "Bạn" : item?.lastMessage?.role)}
-                                {(type === "user" && item.lastMessage?.userId) === user.id ? "Bạn" 
+                                {type === "chat" && item.lastMessage?.userId === user.id ? "Bạn" 
                                     : item.lastMessage.user?.name}
                                     : {item.lastMessage.content}
                                 </p>}

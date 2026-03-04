@@ -86,21 +86,21 @@ function ChatBot() {
                 </div>
                 <div ref={bottomRef}></div>
             </div>
-            <div className="sticky bottom-10 max-w-[80%] mr-auto ml-auto relative">
+            <div className="bottom-10 w-[80%] mr-auto ml-auto relative max-h-[150px] ">
                 <Textarea id="textarea-message"
                 value={content}
                 onChange={(e)=> { setContent(e.target.value)}}
-                className="w-full min-w-0 resize-none break-all [overflow-wrap:anywhere] px-5 h-16 text-lg rounded-3xl"
+                className="px-5 text-lg rounded-3xl pr-[50px] min-h-[40px] max-h-[150px]"
                 placeholder="Enter text"/>
-                    <button
-                    onClick={handleSendMessage}
-                    disabled={!content}
-                    className="p-3 absolute right-5 top-1/2 -translate-y-1/2 
-                    disabled:opacity-40 
-                    disabled:cursor-not-allowed"
-                    >
-                        <i className="fa-regular fa-paper-plane"></i>
-                    </button>
+                <button
+                onClick={handleSendMessage}
+                disabled={!content}
+                className="p-2 absolute right-5 top-1/2 -translate-y-1/2  
+                disabled:opacity-40 
+                disabled:cursor-not-allowed h-full"
+                >
+                    <i className="fa-regular fa-paper-plane"></i>
+                </button>
             </div>
         </>
     )

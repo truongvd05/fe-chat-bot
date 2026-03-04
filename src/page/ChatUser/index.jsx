@@ -89,7 +89,7 @@ function ChatUser() {
     if (!conversationData || messageLoading) {
         return <div>Loading...</div>
     }
-    const other = conversationData.participants.find(u => u.id !== user.id)
+    const other = conversationData.participants.find(u => u.user.id !== user.id)
     
     return (
         <>
@@ -106,11 +106,12 @@ function ChatUser() {
                     <div ref={bottomRef}></div>
                 </div>
             </div>
-            <div className="sticky bottom-10 w-[80%] mr-auto ml-auto relative">
+            <div className="bottom-10 w-[80%] mr-auto ml-auto relative">
                 <Textarea id="textarea-message"
                 value={content}
                 onChange={(e)=> { setContent(e.target.value)}}
-                className="overflow-hidden px-5 h-16 text-lg rounded-3xl" placeholder="Enter text"/>
+                className="overflow-hidden px-5 h-16 text-lg rounded-3xl pr-15"
+                placeholder="Enter text"/>
                 <button
                 disabled={
                     !content.trim() ||
@@ -118,7 +119,7 @@ function ChatUser() {
                     !["DIRECT", "GROUP"].includes(conversationData.type)
                 }
                 onClick={handleSendMessage}
-                className="p-3 absolute right-5 top-1/2 -translate-y-1/2
+                className="p-2 absolute right-2 top-1/2 -translate-y-1/2
                 disabled:opacity-40
                 disabled:cursor-not-allowed"
                 >
