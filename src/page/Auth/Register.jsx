@@ -15,6 +15,7 @@ import { useRegisterMutation, useValidateEmailMutation } from "@/feature/Auth/au
 import debounce from "lodash.debounce";
 import { NavLink, useNavigate } from "react-router-dom";
 import PasswordInput from "@/components/PasswordInput";
+import ReCAPTCHA from "react-google-recaptcha"
 
 const schema = yup.object({
     username: yup.string().min(3, "tên ít nhất 3 kí tự").required("Tên người dùng là bắt buộc"),
@@ -34,21 +35,38 @@ function Register() {
     } = useForm({ resolver: yupResolver(schema) });
 
     const [toast, setToast] = useState(false)
+    const [captchaToken, setCaptchaToken] = useState(null)
     const navigate = useNavigate()
     
     const [registerUser, {
         isLoading: isRegisterLoading,
         error: isErrorRegister
     }] = useRegisterMutation();
-    const [validateEmail, {isLoading: isCheckingEmail }] = useValidateEmailMutation()
+
+    const [ validateEmail, {
+        isLoading: isEmailLoading,
+        isSuccess: isEmailValid,
+        isError: isEmailError,
+        error: emailError,
+        data: emailData
+    }
+    ] = useValidateEmailMutation()
 
     const onSubmit = async (data) => {
+        if (!captchaToken) {
+            setError("root", {
+                type: "manual",
+                message: "Vui lòng xác minh captcha"
+            })
+            return
+        }
         try {
             const res = await registerUser({
                 name: data.username,
                 email: data.email,
                 password: data.password,
-                confirm_password: data.password_confirmation
+                confirm_password: data.password_confirmation,
+                captchaToken
             }).unwrap();
 
             console.log(res);
@@ -81,7 +99,7 @@ function Register() {
             } catch (err) {
                 setError("email", {
                     type: "manual",
-                    message: err.data.error || "email không hợp lệ",
+                    message: "email không hợp lệ",
                 });
             }
         }, 800);
@@ -104,29 +122,39 @@ function Register() {
                 <CardTitle className="m-auto">Register</CardTitle>
             </CardHeader>
             <form className="flex flex-col items-center gap-2" onSubmit={handleSubmit(onSubmit)}>
-                <div className="flex flex-col w-[80%] m-auto gap-2">
-                    <Input type="text" autoComplete="username" placeholder="Tên người dùng" {...register("username", { required: true })}/>
-                    {errors.username && <span className="text-red-500 text-sm">{errors.username.message}</span>}
-                    <div className="relative">
-                        <Input autoComplete="email" type="email" placeholder="Email" {...register("email", { required: true })}/>
-                        {isCheckingEmail && <i className="fa-solid fa-spinner absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-gray-400"></i>}
+                <fieldset disabled={isRegisterLoading} 
+                className={`w-full flex flex-col items-center gap-2 
+                    ${isRegisterLoading ? "opacity-70" : ""}`}
+                    >
+                    <div className="flex flex-col w-[80%] m-auto gap-2">
+                        <Input type="text" autoComplete="username" placeholder="Tên người dùng" {...register("username", { required: true })}/>
+                        {errors.username && <span className="text-red-500 text-sm">{errors.username.message}</span>}
+                        <div className="relative">
+                            <Input autoComplete="email" type="email" placeholder="Email" {...register("email", { required: true })}/>
+                            {isEmailLoading && <i className="fa-solid fa-spinner absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-gray-400"></i>}
+                            {isEmailValid && <i className="fa-solid fa-check absolute right-3 top-1/2 -translate-y-1/2 text-green-500"></i>}
+                        </div>
+                        {emailError && <span className="text-red-500 text-sm">{errors.email.message}</span>}
+                        <PasswordInput
+                            placeholder="Mật khẩu"
+                            autoComplete="password"
+                            register={register("password")}
+                            error={errors.password}
+                        />
+                        <PasswordInput
+                            placeholder="Nhập lại mật khẩu"
+                            autoComplete="new-password"
+                            register={register("password_confirmation")}
+                            error={errors.password_confirmation}
+                        />
                     </div>
-                    {errors.email && <span className="text-red-500 text-sm">{errors.email.message}</span>}
-                    <PasswordInput
-                        placeholder="Mật khẩu"
-                        autoComplete="password"
-                        register={register("password")}
-                        error={errors.password}
-                    />
-                    <PasswordInput
-                        placeholder="Nhập lại mật khẩu"
-                        autoComplete="new-password"
-                        register={register("password_confirmation")}
-                        error={errors.password_confirmation}
-                    />
-                </div>
+                </fieldset>
                 {errors.root && <p className="text-red-500">{errors.root.message || "Đã có lỗi xảy ra"}</p>}
                 {isRegisterLoading && <i className="fa-solid fa-spinner animate-spin text-gray-400"></i>}
+                <ReCAPTCHA
+                    sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                    onChange={(token) => setCaptchaToken(token)}
+                    />
                 <Button disabled={isRegisterLoading} className="block" type="submit">Đăng kí</Button>
             </form>
             <CardFooter className=" flex flex-col"> 

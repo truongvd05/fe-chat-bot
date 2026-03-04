@@ -59,18 +59,22 @@ function Login() {
                 <CardTitle className="m-auto">Log in with your account</CardTitle>
             </CardHeader>
             <form className="flex flex-col items-center gap-2" onSubmit={handleSubmit(onSubmit)}>
-                <div className="flex flex-col w-[80%] m-auto gap-2">
-                    <Input type="email" autoComplete="username" placeholder="Email" {...register("email", {required: true})}/>
-                    {errors.email && <span className="text-red-500 text-sm">{errors.email.message}</span>}
-                    <PasswordInput
-                        placeholder="Password"
-                        autoComplete="Password"
-                        register={register("password")}
-                        error={errors.password}
-                        />
-                </div>
-                {errors.err && <span className="text-red-500 text-sm">{errors.err.message}</span>}
-                <Button disabled={isLoading} className="block" type="submit">Đăng nhập</Button>
+                <fieldset disabled={isLoading}
+                className={`w-full flex flex-col items-center gap-2 ${
+                isLoading ? "opacity-70" : ""}`}>
+                    <div className="flex flex-col w-[80%] m-auto gap-2">
+                        <Input type="email" autoComplete="username" placeholder="Email" {...register("email", {required: true})}/>
+                        {errors.email && <span className="text-red-500 text-sm">{errors.email.message}</span>}
+                        <PasswordInput
+                            placeholder="Password"
+                            autoComplete="Password"
+                            register={register("password")}
+                            error={errors.password}
+                            />
+                    </div>
+                    {errors.err && <span className="text-red-500 text-sm">{errors.err.message}</span>}
+                    <Button disabled={isLoading} className="block" type="submit">Đăng nhập</Button>
+                </fieldset>
             </form>
             <CardFooter className=" flex flex-col">
                 <NavLink className="" to="/forgot-password">Forgot PassWord?</NavLink>
