@@ -113,13 +113,13 @@ function Register() {
                     </div>
                     {errors.email && <span className="text-red-500 text-sm">{errors.email.message}</span>}
                     <PasswordInput
-                        placeholder="Mật khẩu cũ"
+                        placeholder="Mật khẩu"
                         autoComplete="password"
                         register={register("password")}
                         error={errors.password}
                     />
                     <PasswordInput
-                        placeholder="Mật khẩu cũ"
+                        placeholder="Nhập lại mật khẩu"
                         autoComplete="new-password"
                         register={register("password_confirmation")}
                         error={errors.password_confirmation}
