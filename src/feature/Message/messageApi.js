@@ -7,7 +7,10 @@ export const messageApi = createApi({
   tagTypes: ["Message"],
   endpoints: (builder) => ({
     getMessage: builder.query({
-      query: (conversationId) => `/message/conversations/${conversationId}`,
+      query: ({ conversationId, c }) => ({
+        url: `/message/conversations/${conversationId}`,
+        params: { c },
+      }),
       providesTags: (result, error, conversationId) => [
         { type: "Message", id: conversationId },
       ],
@@ -164,4 +167,6 @@ export const {
   useGetMessageQuery,
   useSendBotMessageMutation,
   useSendMessageMutation,
+  // lazy
+  useLazyGetMessageQuery,
 } = messageApi;

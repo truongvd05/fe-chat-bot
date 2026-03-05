@@ -5,14 +5,17 @@ import { Textarea } from "@/components/ui/textarea"
 import Message from "../../components/Message";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
+import useLoadMessages from "@/hoock/useLoadMessages";
 
 function ChatBot() {
     const dispatch = useDispatch()
     const { conversationId } = useParams()
     const bottomRef = useRef(null)
+    const topRef = useRef(null)
     const { data: conversationData, isLoading: conversatonLoading, error: conversationError } = useGetBotConversationQuery(conversationId)
-    const { data: messageData, isLoading: messageLoading, error: messageError } = useGetMessageQuery(conversationId)
+    const { data: messageData, isLoading: messageLoading, error: messageError } = useGetMessageQuery({conversationId})
     const [ sendBotMessage, {isLoading: sendMessaeLoading, error: sendMessageError}] = useSendBotMessageMutation()
+    const {loadMore} = useLoadMessages(conversationId, messageData)
 
     const [content, setContent] = useState("")
     
@@ -20,15 +23,30 @@ function ChatBot() {
         try {
             await sendBotMessage({conversationId, content}).unwrap()
             setContent("")
+            scrollBottom()
         } catch(err) {
             console.log("Error:", err)
         }
     }
-    
-    useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messageData]);
 
+    const scrollBottom = () => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+    useEffect(() => {
+        scrollBottom()
+    }, []);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY === 0) {
+                loadMore()
+            }
+        }
+        window.addEventListener("scroll", handleScroll)
+        return () => {
+            window.removeEventListener("scroll", handleScroll)
+        }
+    }, [])
 
     useEffect(() => {
         const token = localStorage.getItem("access_token")
@@ -73,7 +91,7 @@ function ChatBot() {
     }, [conversationId])
     return (
         <>
-            <div className="px-2 py-2 flex-1 h-full">
+            <div ref={topRef} className="px-2 py-2 flex-1 h-full">
                 <p className="text-2xl py-2">{conversationData?.title}</p>
                 <div className="flex flex-col flex-1 gap-4 pb-30">  
                     {messageData?.map((message) => {

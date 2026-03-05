@@ -8,6 +8,7 @@ import Message from "@/components/Message"
 import { selectUser } from "@/feature/User/userSelector"
 import { getSocket } from "@/socket/socket"
 import { useSocket } from "@/contexts/SocketContext"
+import useLoadMessages from "@/hoock/useLoadMessages"
 
 function ChatUser() {
     const dispatch = useDispatch()
@@ -15,15 +16,17 @@ function ChatUser() {
     const {user} = useSelector(selectUser)
     const { conversationId } = useParams()
     const bottomRef = useRef(null)
+    const topRef = useRef(null)
     const [content, setContent] = useState("")
+
     const { data: conversationData, isLoading: conversatonLoading, error: conversationError } =
     useGetConversationQuery(conversationId, {
         refetchOnMountOrArgChange: true,
         refetchOnReconnect: true,
         refetchOnFocus: true
     })
-    const { data: messageData, isLoading: messageLoading, error: messageError } = useGetMessageQuery(conversationId)
-
+    const { data: messageData, isLoading: messageLoading, error: messageError } = useGetMessageQuery({conversationId})
+    const {loadMore} = useLoadMessages(conversationId, messageData)
     // xử lí khi gửi message
     const handleSendMessage = async () => {
         try {
@@ -53,6 +56,10 @@ function ChatUser() {
                     draft.push(message)
                 }
             ))
+            // scroll xuống bot nếu là người gửi
+            if(message.userId === user?.id){
+                scrollBottom()
+            }
         }
         socket.on("receive_message", handleReceiveMessage);
         return () => {
@@ -80,12 +87,28 @@ function ChatUser() {
                 me.unreadCount = 0;
             }
         ))
-    })
+    },  [conversationId, user?.id])
 
     // scroll xuống cuối khi chat
     useEffect(() => {
+        scrollBottom()
+    }, [conversationId]);
+    const scrollBottom = () => {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messageData]);
+    }
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY === 0) {
+                loadMore()
+            }
+        }
+        window.addEventListener("scroll", handleScroll)
+        return () => {
+            window.removeEventListener("scroll", handleScroll)
+        }
+    }, [])
+
     if (!conversationData || messageLoading) {
         return <div>Loading...</div>
     }
@@ -93,7 +116,7 @@ function ChatUser() {
     
     return (
         <>
-            <div className="px-2 py-2 flex-1 h-full">
+            <div ref={topRef} className="px-2 py-2 flex-1 h-full">
                 <p className="text-2xl py-2 border-b mb-5">{other.user?.name}</p>
                 <div className="flex flex-col flex-1 gap-4 pb-30">  
                     {messageData?.map((message) => {
