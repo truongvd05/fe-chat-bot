@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 
 export default function useLoadMessages(conversationId, messages) {
   const dispatch = useDispatch();
-  // dùng ref tránh closure
+  // dùng ref để tránh closure
   const messagesRef = useRef(messages);
   const hasMoreRef = useRef(true);
   const loadingRef = useRef(false);

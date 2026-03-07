@@ -20,7 +20,7 @@ function ChatLayout(){
         return <Navigate to="/login" replace/>
     }
     return (
-    <div className="flex min-h-screen overflow-x-hidden overflow-y-auto">
+    <div className="flex min-h-screen overflow-x-hidden">
         <div className="fixed flex top-0 bottom-0 w-[280px]">
             <Sidebar/>
         </div>

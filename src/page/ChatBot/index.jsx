@@ -64,11 +64,12 @@ function ChatBot() {
                 dispatch(
                     messageApi.util.updateQueryData(
                         "getMessage",
-                        conversationId,
+                        {conversationId},
                         (draft) => {
                             const last = draft[draft.length - 1];
                             if (last?.role === "bot") {
                                 last.content += data.content;
+                                scrollBottom()
                             } else {
                                 draft.push({
                                     id: Date.now(),
@@ -104,11 +105,11 @@ function ChatBot() {
                 </div>
                 <div ref={bottomRef}></div>
             </div>
-            <div className="bottom-10 w-[80%] mr-auto ml-auto relative max-h-[150px] ">
+            <div className="bottom-10 w-[80%] mr-auto ml-auto relative max-h-37.5 ">
                 <Textarea id="textarea-message"
                 value={content}
                 onChange={(e)=> { setContent(e.target.value)}}
-                className="px-5 text-lg rounded-3xl pr-[50px] min-h-[40px] max-h-[150px]"
+                className="px-5 text-lg rounded-3xl pr-12.5 min-h-10 max-h-37.5"
                 placeholder="Enter text"/>
                 <button
                 onClick={handleSendMessage}

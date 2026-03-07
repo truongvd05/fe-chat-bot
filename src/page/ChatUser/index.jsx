@@ -9,6 +9,7 @@ import { selectUser } from "@/feature/User/userSelector"
 import { getSocket } from "@/socket/socket"
 import { useSocket } from "@/contexts/SocketContext"
 import useLoadMessages from "@/hoock/useLoadMessages"
+import MessageSkeleton from "@/components/MessageSkeleton"
 
 function ChatUser() {
     const dispatch = useDispatch()
@@ -27,6 +28,7 @@ function ChatUser() {
     })
     const { data: messageData, isLoading: messageLoading, error: messageError } = useGetMessageQuery({conversationId})
     const {loadMore} = useLoadMessages(conversationId, messageData)
+
     // xử lí khi gửi message
     const handleSendMessage = async () => {
         try {
@@ -44,19 +46,23 @@ function ChatUser() {
             console.log("Error:", err)
         }
     }
-
+    
     // xử lí nhận message từ socket
     useEffect(() => {
         if (!socket) return;
         const handleReceiveMessage = (message) => {
+            if (message.conversationId !== conversationId) return
             dispatch(messageApi.util.updateQueryData(
                 "getMessage",
-                message.conversationId,
+                {conversationId: message.conversationId},
                 (draft) => {
-                    draft.push(message)
+                    const exists = draft.some(m => m.id === message.id)
+                    if (!exists) {
+                        draft.push(message)
+                    }
                 }
             ))
-            // scroll xuống bot nếu là người gửi
+            // scroll xuống bottom nếu là người gửi
             if(message.userId === user?.id){
                 scrollBottom()
             }
@@ -65,7 +71,7 @@ function ChatUser() {
         return () => {
             socket.off("receive_message", handleReceiveMessage);
         };
-    }, [conversationId, socket]);
+    }, [conversationId, socket, user?.id, dispatch]);
 
     // xử lí update unread về 0 khi click message
     useEffect(() => {
@@ -89,7 +95,7 @@ function ChatUser() {
         ))
     },  [conversationId, user?.id])
 
-    // scroll xuống cuối khi chat
+    // scroll xuống cuối khi lần đầu vao chat
     useEffect(() => {
         scrollBottom()
     }, [conversationId]);
@@ -97,6 +103,7 @@ function ChatUser() {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }
 
+    // gán sự kiên scroll
     useEffect(() => {
         const handleScroll = () => {
             if (window.scrollY === 0) {
@@ -107,13 +114,20 @@ function ChatUser() {
         return () => {
             window.removeEventListener("scroll", handleScroll)
         }
-    }, [])
+    }, [loadMore])
 
     if (!conversationData || messageLoading) {
-        return <div>Loading...</div>
+        return (
+            <>
+                <MessageSkeleton />
+                <MessageSkeleton right />
+                <MessageSkeleton />
+                <MessageSkeleton right />
+                <MessageSkeleton />
+            </>
+        )
     }
     const other = conversationData.participants.find(u => u.user.id !== user.id)
-    
     return (
         <>
             <div ref={topRef} className="px-2 py-2 flex-1 h-full">
@@ -129,25 +143,27 @@ function ChatUser() {
                     <div ref={bottomRef}></div>
                 </div>
             </div>
-            <div className="bottom-10 w-[80%] mr-auto ml-auto relative">
-                <Textarea id="textarea-message"
-                value={content}
-                onChange={(e)=> { setContent(e.target.value)}}
-                className="overflow-hidden px-5 h-16 text-lg rounded-3xl pr-15"
-                placeholder="Enter text"/>
-                <button
-                disabled={
-                    !content.trim() ||
-                    !conversationData ||
-                    !["DIRECT", "GROUP"].includes(conversationData.type)
-                }
-                onClick={handleSendMessage}
-                className="p-2 absolute right-2 top-1/2 -translate-y-1/2
-                disabled:opacity-40
-                disabled:cursor-not-allowed"
-                >
-                    <i className="fa-regular fa-paper-plane"></i>
-                </button>
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[50%] z-[0]">
+                <div className="relative">
+                    <Textarea id="textarea-message"
+                    value={content}
+                    onChange={(e)=> { setContent(e.target.value)}}
+                    className="overflow-hidden px-5 h-16 text-lg rounded-3xl pr-15"
+                    placeholder="Enter text"/>
+                    <button
+                    disabled={
+                        !content.trim() ||
+                        !conversationData ||
+                        !["DIRECT", "GROUP"].includes(conversationData.type)
+                    }
+                    onClick={handleSendMessage}
+                    className="p-2 absolute right-2 top-1/2 -translate-y-1/2
+                    disabled:opacity-40
+                    disabled:cursor-not-allowed"
+                    >
+                        <i className="fa-regular fa-paper-plane"></i>
+                    </button>
+                </div>
             </div>
         </>
     )

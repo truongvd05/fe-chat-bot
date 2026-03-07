@@ -10,24 +10,23 @@ function Sidebar() {
     const {theme} = useTheme()
     return (
         <>
-            {<div>
-                <button
-                    onClick={() => setIsOpen(true)}
-                    className={`lg:hidden text-xl cursor-pointer p-2 top-0 ${isOpen ? "hidden" : "block"}`}>
-                    <i className="fa-solid fa-align-justify"></i>
-                </button>
-            </div>}
+            {<button
+                onClick={() => setIsOpen(true)}
+                className={`lg:hidden inline text-xl cursor-pointer p-2 top-0 ${isOpen ? "hidden" : "flex"}`}>
+                <i className="fa-solid fa-align-justify"></i>
+            </button>}
             {isOpen && <div onClick={() => setIsOpen(false)} className={`
-                fixed inset-0 bg-black/40 z-[1] lg:hidden
+                fixed inset-0 bg-black/40 z-[10] lg:hidden
             `}/>}
-            <div className={`fixed lg:static top-0 left-0 h-full z-[2] ${theme === "dark" ? "bg-neutral-700" : "bg-white"}
+            <div className={`fixed lg:static top-0 left-0 h-full z-[11]
+            ${theme === "dark" ? "bg-neutral-700" : "bg-white"}
             transform transition-transform duration-300
              ${isOpen ? "translate-x-0" : "-translate-x-full"}
              lg:translate-x-0
              w-[280px]
             `}>
                 <div className="py-[30px] px-[5px] h-full flex overflow-auto">
-                    {isOpen && <div className="z-[3] fixed right-5 top-5">
+                    {isOpen && <div className="z-[12] fixed right-5 top-5">
                         <i onClick={() => setIsOpen(false)}
                         className="mr-auto fa-solid fa-xmark cursor-pointer py-2
                         hover:bg-amber-100 rounded-2xl

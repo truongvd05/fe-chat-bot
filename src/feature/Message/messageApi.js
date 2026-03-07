@@ -30,7 +30,7 @@ export const messageApi = createApi({
         const result = dispatch(
           messageApi.util.updateQueryData(
             "getMessage",
-            conversationId,
+            { conversationId },
             (draft) => {
               draft.push({
                 id: tempId,
@@ -48,7 +48,7 @@ export const messageApi = createApi({
           dispatch(
             messageApi.util.updateQueryData(
               "getMessage",
-              conversationId,
+              { conversationId },
               (draft) => {
                 const index = draft.findIndex((m) => m.id === tempId);
                 if (index !== -1) {
@@ -82,7 +82,7 @@ export const messageApi = createApi({
         const result = dispatch(
           messageApi.util.updateQueryData(
             "getMessage",
-            conversationId,
+            { conversationId },
             (draft) => {
               draft.push({
                 id: tempId,
@@ -99,7 +99,7 @@ export const messageApi = createApi({
           dispatch(
             messageApi.util.updateQueryData(
               "getMessage",
-              conversationId,
+              { conversationId },
               (draft) => {
                 const index = draft.findIndex((m) => m.id === tempId);
                 if (index !== -1) {
@@ -131,7 +131,7 @@ export const messageApi = createApi({
         const result = dispatch(
           messageApi.util.updateQueryData(
             "getMessage",
-            conversationId,
+            { conversationId },
             (draft) => {
               const message = draft.find((m) => m.id === messageId);
               if (message) {
@@ -146,7 +146,7 @@ export const messageApi = createApi({
           dispatch(
             messageApi.util.updateQueryData(
               "getMessage",
-              conversationId,
+              { conversationId },
               (draft) => {
                 const index = draft.findIndex((m) => m.id === messageId);
                 if (index !== -1) {
