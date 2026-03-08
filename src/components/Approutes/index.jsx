@@ -1,5 +1,5 @@
     import { lazy } from 'react';
-    import { HashRouter, Route, Routes } from "react-router-dom";
+    import { BrowserRouter, Route, Routes } from "react-router-dom";
 
     import AuthLayout from "@/layouts/AuthLayout";
     import ChatLayout from "@/layouts/ChatLayout";
@@ -18,7 +18,7 @@
 
     function AppRoutes() {
         return (
-        <HashRouter>
+        <BrowserRouter>
             <Routes>
                 <Route element={<ChatLayout/>}>
                     <Route path="/" element={<Home/>}/>
@@ -42,7 +42,7 @@
                 </Route>
                 <Route path='/profile' element={<Profile/>}/>
             </Routes>
-        </HashRouter>
+        </BrowserRouter>
         )
     }
 
