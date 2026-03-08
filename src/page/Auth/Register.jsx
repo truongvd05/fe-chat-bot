@@ -115,7 +115,8 @@ function Register() {
             checkEmail.cancel();
         };
     }, [checkEmail]);
-    
+    const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+    console.log("siteKey:", siteKey);
     return (
         <Card className="w-full max-w-sm m-auto">
             <CardHeader>
@@ -151,10 +152,9 @@ function Register() {
                 </fieldset>
                 {errors.root && <p className="text-red-500">{errors.root.message || "Đã có lỗi xảy ra"}</p>}
                 {isRegisterLoading && <i className="fa-solid fa-spinner animate-spin text-gray-400"></i>}
-                <ReCAPTCHA
-                    sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
-                    onChange={(token) => setCaptchaToken(token)}
-                    />
+                {siteKey && (<ReCAPTCHA
+                        sitekey={siteKey}
+                        onChange={(token) => setCaptchaToken(token)}/>)}
                 <Button disabled={isRegisterLoading} className="block" type="submit">Đăng kí</Button>
             </form>
             <CardFooter className=" flex flex-col"> 
