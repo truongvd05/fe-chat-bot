@@ -152,9 +152,9 @@ function Register() {
                 </fieldset>
                 {errors.root && <p className="text-red-500">{errors.root.message || "Đã có lỗi xảy ra"}</p>}
                 {isRegisterLoading && <i className="fa-solid fa-spinner animate-spin text-gray-400"></i>}
-                {siteKey && (<ReCAPTCHA
+                {siteKey ? (<ReCAPTCHA
                         sitekey={siteKey}
-                        onChange={(token) => setCaptchaToken(token)}/>)}
+                        onChange={(token) => setCaptchaToken(token)}/>) : <p>captcha loading...</p>}
                 <Button disabled={isRegisterLoading} className="block" type="submit">Đăng kí</Button>
             </form>
             <CardFooter className=" flex flex-col"> 
