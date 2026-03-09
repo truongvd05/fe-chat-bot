@@ -15,7 +15,6 @@ import { useRegisterMutation, useValidateEmailMutation } from "@/feature/Auth/au
 import debounce from "lodash.debounce";
 import { NavLink, useNavigate } from "react-router-dom";
 import PasswordInput from "@/components/PasswordInput";
-import ReCAPTCHA from "react-google-recaptcha"
 
 const schema = yup.object({
     username: yup.string().min(3, "tên ít nhất 3 kí tự").required("Tên người dùng là bắt buộc"),
