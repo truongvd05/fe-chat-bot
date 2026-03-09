@@ -34,7 +34,6 @@ function Register() {
     } = useForm({ resolver: yupResolver(schema) });
 
     const [toast, setToast] = useState(false)
-    const [captchaToken, setCaptchaToken] = useState(null)
     const navigate = useNavigate()
     
     const [registerUser, {
@@ -52,20 +51,12 @@ function Register() {
     ] = useValidateEmailMutation()
 
     const onSubmit = async (data) => {
-        if (!captchaToken) {
-            setError("root", {
-                type: "manual",
-                message: "Vui lòng xác minh captcha"
-            })
-            return
-        }
         try {
             const res = await registerUser({
                 name: data.username,
                 email: data.email,
                 password: data.password,
                 confirm_password: data.password_confirmation,
-                captchaToken
             }).unwrap();
 
             console.log(res);
