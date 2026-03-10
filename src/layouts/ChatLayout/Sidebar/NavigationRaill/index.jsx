@@ -16,7 +16,7 @@ import { useDispatch } from "react-redux"
 import { logOut } from "@/feature/User/userSlice"
 
 function NavigationRall({ setType, type }) {
-    const { socket } = useSocket();
+    const socket = useSocket();
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const {theme, setTheme} = useTheme()
