@@ -52,7 +52,6 @@ function Login() {
             localStorage.setItem("access_token", result.token.access_token)
             localStorage.setItem("refresh_token", result.token.refresh_token)
             dispatch(setUser(result.user))
-            navigate("/home")
         } catch (err) {
             console.log("Login failed:", err);
             setError("err", {

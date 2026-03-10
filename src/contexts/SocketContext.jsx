@@ -8,9 +8,9 @@ const SocketContext = createContext(null);
 export const SocketProvider = ({ children }) => {
     const user = useSelector(selectUser)
     const [socket, setSocket] = useState(null);
+    const token = localStorage.getItem("access_token");
     
     useEffect(() => {
-        const token = localStorage.getItem("access_token");
         if (!user || !token) return;
 
         const s = connectSocket(token);
@@ -36,7 +36,7 @@ export const SocketProvider = ({ children }) => {
             s.disconnect();
             setSocket(null);
         };
-    }, [user?.id]);
+    }, [user, token]);
 
     return (
         <SocketContext.Provider value={socket}>
