@@ -24,7 +24,7 @@ const schema = yup.object({
 })
 
 function Login() {
-    const {user} = useSelector(selectUser())
+    const {user} = useSelector(selectUser)
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const {
@@ -37,9 +37,10 @@ function Login() {
     const [login, {isLoading, error}] = useLoginMutation();
 
     useEffect(() => {
-        if(!user) return
-        navigate("/home")
-    }, user?.id)
+        if (user) {
+            navigate("/home")
+        }
+    }, [user, navigate])
 
     const onSubmit = async (data) => {
         try {
