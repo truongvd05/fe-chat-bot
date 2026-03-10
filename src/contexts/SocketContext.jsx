@@ -6,7 +6,7 @@ import { selectUser } from "@/feature/User/userSelector";
 const SocketContext = createContext(null);
 
 export const SocketProvider = ({ children }) => {
-    const user = useSelector(selectUser)
+    const {user} = useSelector(selectUser)
     const [socket, setSocket] = useState(null);
     
     useEffect(() => {
