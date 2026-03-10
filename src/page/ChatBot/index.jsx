@@ -52,7 +52,7 @@ function ChatBot() {
         const token = localStorage.getItem("access_token")
         if(!conversationId) return;
         const event = new EventSource(
-            `${import.meta.env.VITE_BASE_URL}/////conversation/${conversationId}/stream?token=${token}`,
+            `${import.meta.env.VITE_BASE_URL}/conversation/${conversationId}/stream?token=${token}`,
             { withCredentials: true }
         )
         event.addEventListener("connected", (e) => {
