@@ -20,7 +20,7 @@ function NavigationRall({ setType, type }) {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const {theme, setTheme} = useTheme()
-    const [ loglogoutApiout, {isLoading, error}] = useLogoutMutation()
+    const [ logoutApi, {isLoading, error}] = useLogoutMutation()
 
     const refresh_token = localStorage.getItem("refresh_token")
 
