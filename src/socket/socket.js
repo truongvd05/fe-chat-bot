@@ -4,8 +4,12 @@ let socket;
 
 export const connectSocket = (token) => {
   if (socket && socket.connected) return socket;
+
+  // Cleanup trước khi tạo mới
   if (socket) {
+    socket.removeAllListeners();
     socket.disconnect();
+    socket = null;
   }
 
   socket = io(import.meta.env.VITE_BASE_URL_SOCKET, {
@@ -22,7 +26,8 @@ export const getSocket = () => socket;
 
 export const disconnectSocket = () => {
   if (socket) {
+    socket.removeAllListeners(); // clear hết listeners
     socket.disconnect();
-    socket = null;
+    socket = null; // set null để connectSocket tạo mới được
   }
 };

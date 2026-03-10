@@ -14,6 +14,7 @@ import { useLogoutMutation } from "@/feature/User/userApi"
 import { useSocket } from "@/contexts/SocketContext"
 import { useDispatch } from "react-redux"
 import { logOut } from "@/feature/User/userSlice"
+import { disconnectSocket } from "@/socket/socket"
 
 function NavigationRall({ setType, type }) {
     const socket = useSocket();
@@ -27,7 +28,7 @@ function NavigationRall({ setType, type }) {
     const handleLogout = async () => {
         if(!refresh_token) return
         try {
-            socket?.disconnect();
+            disconnectSocket()
             await logoutApi().unwrap()
             dispatch(logOut());
             localStorage.removeItem("access_token")
