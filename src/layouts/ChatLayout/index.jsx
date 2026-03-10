@@ -16,7 +16,7 @@ function ChatLayout(){
         }
     }, [user?.id])
 
-    if(!user?.user) {
+    if(!user) {
         return <Navigate to="/login" replace/>
     }
     return (
