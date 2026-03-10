@@ -41,6 +41,7 @@ function ChatUser() {
                 conversationId,
                 content
             })
+            scrollBottom()
             setContent("")
         } catch(err) {
             console.log("Error:", err)
