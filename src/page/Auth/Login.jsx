@@ -7,15 +7,16 @@ import {
 
 import * as yup from "yup"
 import { yupResolver } from "@hookform/resolvers/yup"
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "@/feature/Auth/authApi";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "@/feature/User/userSlice";
 import PasswordInput from "@/components/PasswordInput";
+import { selectUser } from "@/feature/User/userSelector";
 
 const schema = yup.object({
     email: yup.string().required("Vui lòng nhập Email"),
@@ -23,6 +24,7 @@ const schema = yup.object({
 })
 
 function Login() {
+    const {user} = useSelector(selectUser())
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const {
@@ -33,7 +35,12 @@ function Login() {
     } = useForm({resolver: yupResolver(schema), mode: "onSubmit", reValidateMode: "onChange" });
 
     const [login, {isLoading, error}] = useLoginMutation();
-    
+
+    useEffect(() => {
+        if(!user) return
+        navigate("/home")
+    }, user?.id)
+
     const onSubmit = async (data) => {
         try {
             const result  = await login({

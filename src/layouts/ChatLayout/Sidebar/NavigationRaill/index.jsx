@@ -4,7 +4,6 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -14,6 +13,7 @@ import { useNavigate } from "react-router-dom"
 import { useLogoutMutation } from "@/feature/User/userApi"
 import { useSocket } from "@/contexts/SocketContext"
 import { useDispatch } from "react-redux"
+import { logOut } from "@/feature/User/userSlice"
 
 function NavigationRall({ setType, type }) {
     const { socket } = useSocket();
@@ -29,7 +29,7 @@ function NavigationRall({ setType, type }) {
         try {
             socket?.disconnect();
             await logoutApi().unwrap()
-            dispatch(logout());
+            dispatch(logOut());
             localStorage.removeItem("access_token")
             localStorage.removeItem("refresh_token")
             navigate("/login")
