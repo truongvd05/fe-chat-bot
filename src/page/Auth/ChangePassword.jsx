@@ -38,7 +38,8 @@ function ChangePassword() {
         try {
             await changePassword(formData).unwrap()
             dispatch(logOut())
-            localStorage.clear()
+            localStorage.removeItem("access_token")
+            localStorage.removeItem("refresh_token")
         } catch (err) {
             console.log(err);
         }

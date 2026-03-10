@@ -23,7 +23,8 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
         if (!refresh_token) {
           console.log("NO REFRESH TOKEN");
           api.dispatch(logOut());
-          localStorage.clear();
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("refresh_token");
           return result;
         }
         // gọi refresh token
@@ -47,7 +48,8 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
         result = await baseQuery(args, api, extraOptions);
       } catch (err) {
         api.dispatch(logOut());
-        localStorage.clear();
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
       } finally {
         release();
       }

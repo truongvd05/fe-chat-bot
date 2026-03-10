@@ -12,8 +12,12 @@ import NavIcon from "./NavIcon"
 import { useTheme } from "@/contexts/ThemeContext"
 import { useNavigate } from "react-router-dom"
 import { useLogoutMutation } from "@/feature/User/userApi"
+import { useSocket } from "@/contexts/SocketContext"
+import { useDispatch } from "react-redux"
 
 function NavigationRall({ setType, type }) {
+    const { socket } = useSocket();
+    const dispatch = useDispatch()
     const navigate = useNavigate()
     const {theme, setTheme} = useTheme()
     const [ logout, {isLoading, error}] = useLogoutMutation()
@@ -23,8 +27,11 @@ function NavigationRall({ setType, type }) {
     const handleLogout = async () => {
         if(!refresh_token) return
         try {
+            socket?.disconnect();
+            dispatch(logout());
             await logout().unwrap()
-            localStorage.clear()
+            localStorage.removeItem("access_token")
+            localStorage.removeItem("refresh_token")
             navigate("/login")
         } catch (err) {
             console.log(err);
