@@ -26,6 +26,7 @@ export const getSocket = () => socket;
 
 export const disconnectSocket = () => {
   if (socket) {
+    console.log("disconnect socket");
     socket.removeAllListeners(); // clear hết listeners
     socket.disconnect();
     socket = null; // set null để connectSocket tạo mới được

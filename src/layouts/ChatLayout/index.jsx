@@ -7,14 +7,14 @@ import { connectSocket } from "@/socket/socket"
 import User from "@/components/User"
 
 function ChatLayout(){
-    const user = useSelector(selectUser)
-    const access_token = localStorage.getItem("access_token")
-
+    const {user} = useSelector(selectUser)
+    
     useEffect(() => {
+        const access_token = localStorage.getItem("access_token")
         if(access_token){
             connectSocket(access_token)
         }
-    }, [access_token])
+    }, [user?.id])
 
     if(!user?.user) {
         return <Navigate to="/login" replace/>
