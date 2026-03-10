@@ -20,7 +20,7 @@ function NavigationRall({ setType, type }) {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const {theme, setTheme} = useTheme()
-    const [ logout, {isLoading, error}] = useLogoutMutation()
+    const [ loglogoutApiout, {isLoading, error}] = useLogoutMutation()
 
     const refresh_token = localStorage.getItem("refresh_token")
 
@@ -28,8 +28,8 @@ function NavigationRall({ setType, type }) {
         if(!refresh_token) return
         try {
             socket?.disconnect();
+            await logoutApi().unwrap()
             dispatch(logout());
-            await logout().unwrap()
             localStorage.removeItem("access_token")
             localStorage.removeItem("refresh_token")
             navigate("/login")
