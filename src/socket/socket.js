@@ -18,6 +18,7 @@ export const connectSocket = (token) => {
     },
     withCredentials: true,
   });
+  console.log("connect socket");
 
   return socket;
 };
