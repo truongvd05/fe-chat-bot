@@ -10,7 +10,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 
   let result = await baseQuery(args, api, extraOptions);
 
-  if (result.error && result.error.status !== 401) {
+  if (result.error && result.error.status >= 500) {
     toast.error("Lỗi không xác định");
   }
 
@@ -20,6 +20,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
     if (!mutex.isLocked()) {
       const release = await mutex.acquire();
       try {
+        const refresh_token = localStorage.getItem("refresh_token");
         if (!refresh_token) {
           console.log("NO REFRESH TOKEN");
           api.dispatch(logOut());
@@ -43,9 +44,13 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
         // refresh thành công
         if (refreshResult.data) {
           localStorage.setItem("access_token", refreshResult.data.access_token);
+          // retry request cũ
+          result = await baseQuery(args, api, extraOptions);
+        } else {
+          api.dispatch(logOut());
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("refresh_token");
         }
-        // retry request cũ
-        result = await baseQuery(args, api, extraOptions);
       } catch (err) {
         api.dispatch(logOut());
         localStorage.removeItem("access_token");
