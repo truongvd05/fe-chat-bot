@@ -1,12 +1,9 @@
 import { fetchBaseQuery } from "@reduxjs/toolkit/query";
 
-// router ko cần token
-const PUBLIC_ROUTES = ["/auth/login", "/auth/refresh", "/auth/register"];
-
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_BASE_URL,
-  prepareHeaders: (Headers) => {
-    const token = localStorage.getItem("access_token");
+  prepareHeaders: (Headers, { getState }) => {
+    const token = getState().user.accessToken;
     if (token) {
       Headers.set("authorization", `Bearer ${token}`);
     }

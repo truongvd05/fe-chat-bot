@@ -4,12 +4,14 @@ import { useParams } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea"
 import Message from "../../components/Message";
 import { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import useLoadMessages from "@/hoock/useLoadMessages";
+import { selectTOken } from "@/feature/User/userSelector";
 
 function ChatBot() {
     const dispatch = useDispatch()
     const { conversationId } = useParams()
+    const token = useSelector(selectTOken)
     const bottomRef = useRef(null)
     const topRef = useRef(null)
     const { data: conversationData, isLoading: conversatonLoading, error: conversationError } = useGetBotConversationQuery(conversationId)
@@ -49,8 +51,8 @@ function ChatBot() {
     }, [])
 
     useEffect(() => {
-        const token = localStorage.getItem("access_token")
         if(!conversationId) return;
+
         const event = new EventSource(
             `${import.meta.env.VITE_BASE_URL}conversation/${conversationId}/stream?token=${token}`,
             { withCredentials: true }
@@ -82,14 +84,15 @@ function ChatBot() {
                 );
             }
         }
-        event.onerror = (err) => {
+        // xử lí token hết hạn thì kết nối lại SSE
+        event.onerror = async (err) => {
             console.error("SSE error", err);
             event.close();
         }
         return () => {
             event.close()
         }
-    }, [conversationId])
+    }, [conversationId, token])
     return (
         <>
             <div ref={topRef} className="px-2 py-2 flex-1 h-full">

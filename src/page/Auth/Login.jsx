@@ -49,9 +49,7 @@ function Login() {
                 password: data.password
             }).unwrap();
             console.log("Login success:", result);
-            localStorage.setItem("access_token", result.token.access_token)
-            localStorage.setItem("refresh_token", result.token.refresh_token)
-            dispatch(setUser(result.user))
+            dispatch(setUser(result))
         } catch (err) {
             console.log("Login failed:", err);
             setError("err", {

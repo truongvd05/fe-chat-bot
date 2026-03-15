@@ -1,5 +1,5 @@
 import baseQuery from "./baseQuery";
-import { logOut } from "@/feature/User/userSlice";
+import { logOut, setAccessToken } from "@/feature/User/userSlice";
 import { fetchBaseQuery } from "@reduxjs/toolkit/query";
 import { Mutex } from "async-mutex";
 import { toast } from "sonner";
@@ -25,15 +25,12 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
     // không có api refresh thì lock
     if (!mutex.isLocked()) {
       const release = await mutex.acquire();
-      console.log("release:", release);
       if (release) {
         try {
           const refresh_token = localStorage.getItem("refresh_token");
           if (!refresh_token) {
             console.log("NO REFRESH TOKEN");
             api.dispatch(logOut());
-            localStorage.removeItem("access_token");
-            localStorage.removeItem("refresh_token");
             return result;
           }
 
@@ -51,21 +48,14 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
           console.log("refreshResult:", refreshResult);
           // refresh thành công
           if (refreshResult.data) {
-            localStorage.setItem(
-              "access_token",
-              refreshResult.data.data.access_token,
-            );
+            api.dispatch(setAccessToken(refreshResult.data.data.access_token));
             // retry request cũ
             result = await baseQuery(args, api, extraOptions);
           } else {
             api.dispatch(logOut());
-            localStorage.removeItem("access_token");
-            localStorage.removeItem("refresh_token");
           }
         } catch (err) {
           api.dispatch(logOut());
-          localStorage.removeItem("access_token");
-          localStorage.removeItem("refresh_token");
         } finally {
           release();
         }
