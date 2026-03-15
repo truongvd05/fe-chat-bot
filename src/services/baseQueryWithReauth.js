@@ -16,6 +16,10 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 
   let result = await baseQuery(args, api, extraOptions);
 
+  console.log("result.error:", result.error);
+  console.log("result.error?.status:", result.error?.status);
+  console.log("type:", typeof result.error?.status);
+
   if (result.error && result.error.status >= 500) {
     toast.error("Lỗi không xác định");
   }
