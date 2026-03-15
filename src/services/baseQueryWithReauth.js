@@ -19,6 +19,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
     // không có api refresh thì lock
     if (!mutex.isLocked()) {
       const release = await mutex.acquire();
+      console.log("release:", release);
       if (release) {
         try {
           const refresh_token = localStorage.getItem("refresh_token");
@@ -42,7 +43,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
             extraOptions,
           );
 
-          console.log(refreshResult);
+          console.log("refreshResult:", JSON.stringify(refreshResult));
           // refresh thành công
           if (refreshResult.data) {
             localStorage.setItem(
