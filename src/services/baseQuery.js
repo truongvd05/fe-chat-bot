@@ -1,5 +1,8 @@
 import { fetchBaseQuery } from "@reduxjs/toolkit/query";
 
+// router ko cần token
+const PUBLIC_ROUTES = ["/auth/login", "/auth/refresh", "/auth/register"];
+
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_BASE_URL,
   prepareHeaders: (Headers) => {
@@ -23,7 +26,5 @@ const baseQuery = async (args, api, extraOptions) => {
   }
   return result;
 };
-
-console.log("refreshResult:", JSON.stringify(refreshResult));
 
 export default baseQuery;

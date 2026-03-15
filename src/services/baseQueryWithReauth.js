@@ -1,9 +1,15 @@
 import baseQuery from "./baseQuery";
 import { logOut } from "@/feature/User/userSlice";
+import { fetchBaseQuery } from "@reduxjs/toolkit/query";
 import { Mutex } from "async-mutex";
 import { toast } from "sonner";
 
 const mutex = new Mutex();
+
+const publicQuery = fetchBaseQuery({
+  baseUrl: import.meta.env.VITE_BASE_URL,
+  credentials: "include",
+});
 
 const baseQueryWithReauth = async (args, api, extraOptions) => {
   await mutex.waitForUnlock();
@@ -32,8 +38,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
           }
 
           // gọi refresh token
-          console.log("refresh token");
-          const refreshResult = await baseQuery(
+          const refreshResult = await publicQuery(
             {
               url: "/auth/refresh",
               method: "POST",
@@ -43,12 +48,12 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
             extraOptions,
           );
 
-          console.log("refreshResult:", JSON.stringify(refreshResult));
+          console.log("refreshResult:", refreshResult);
           // refresh thành công
           if (refreshResult.data) {
             localStorage.setItem(
               "access_token",
-              refreshResult.data.access_token,
+              refreshResult.data.data.access_token,
             );
             // retry request cũ
             result = await baseQuery(args, api, extraOptions);
