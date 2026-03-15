@@ -24,4 +24,6 @@ const baseQuery = async (args, api, extraOptions) => {
   return result;
 };
 
+console.log("refreshResult:", JSON.stringify(refreshResult));
+
 export default baseQuery;
