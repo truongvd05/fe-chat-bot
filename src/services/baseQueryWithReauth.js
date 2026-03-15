@@ -25,40 +25,38 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
     // không có api refresh thì lock
     if (!mutex.isLocked()) {
       const release = await mutex.acquire();
-      if (release) {
-        try {
-          const refresh_token = localStorage.getItem("refresh_token");
-          if (!refresh_token) {
-            console.log("NO REFRESH TOKEN");
-            api.dispatch(logOut());
-            return result;
-          }
-
-          // gọi refresh token
-          const refreshResult = await publicQuery(
-            {
-              url: "/auth/refresh",
-              method: "POST",
-              body: { refresh_token },
-            },
-            api,
-            extraOptions,
-          );
-
-          console.log("refreshResult:", refreshResult);
-          // refresh thành công
-          if (refreshResult.data) {
-            api.dispatch(setAccessToken(refreshResult.data.data.access_token));
-            // retry request cũ
-            result = await baseQuery(args, api, extraOptions);
-          } else {
-            api.dispatch(logOut());
-          }
-        } catch (err) {
+      try {
+        const refresh_token = localStorage.getItem("refresh_token");
+        if (!refresh_token) {
+          console.log("NO REFRESH TOKEN");
           api.dispatch(logOut());
-        } finally {
-          release();
+          return result;
         }
+
+        // gọi refresh token
+        const refreshResult = await publicQuery(
+          {
+            url: "/auth/refresh",
+            method: "POST",
+            body: { refresh_token },
+          },
+          api,
+          extraOptions,
+        );
+
+        console.log("refreshResult:", refreshResult);
+        // refresh thành công
+        if (refreshResult.data) {
+          api.dispatch(setAccessToken(refreshResult.data.data.access_token));
+          // retry request cũ
+          result = await baseQuery(args, api, extraOptions);
+        } else {
+          api.dispatch(logOut());
+        }
+      } catch (err) {
+        api.dispatch(logOut());
+      } finally {
+        release();
       }
     } else {
       // nếu đang refresh thì api khác đợi
