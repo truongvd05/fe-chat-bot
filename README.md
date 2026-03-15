@@ -1,12 +1,63 @@
-# React + Vite
+FE Chat Bot
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend for a real-time AI chat application built with React.
+The application supports real-time messaging using Server-Sent Events (SSE) and Socket.IO, authentication with JWT + refresh token, and a modern UI.
 
-Currently, two official plugins are available:
+Demo
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Production:
+https://chatdemo.site
 
-## Expanding the ESLint configuration
+Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Real-time chat using Server-Sent Events (SSE)
+WebSocket connection with Socket.IO
+JWT authentication
+Automatic refresh token handling
+Chat conversation management
+Modern responsive UI
+Optimized API handling using RTK Query
+Global state management with Redux Toolkit
+
+Tech Stack
+
+Frontend
+React
+Vite
+Redux Toolkit
+RTK Query
+Socket.IO client
+TailwindCSS
+
+Backend communication
+REST API
+SSE (Server Sent Events)
+WebSocket (Socket.IO)
+
+Deployment
+Nginx
+Cloudflare
+PM2 (backend)
+
+src
+├── api
+│ ├── baseQuery.js
+│ ├── baseQueryWithReauth.js
+│
+├── components
+│
+├── context
+│ └── SocketContext.jsx
+│
+├── feature
+│ └── user
+│
+├── pages
+│
+├── services
+│
+├── utils
+│
+└── main.jsx
+
+✍️ Author: TruongVD
