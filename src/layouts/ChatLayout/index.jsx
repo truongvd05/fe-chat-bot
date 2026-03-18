@@ -11,16 +11,16 @@ function ChatLayout(){
         return <Navigate to="/login" replace/>
     }
     return (
-    <div className="flex min-h-screen overflow-x-hidden">
-        <div className="fixed flex top-0 bottom-0 w-[280px]">
+    <div className="min-h-screen overflow-x-hidden">
+        <div className="fixed top-0 bottom-0 w-70 z-10">
             <Sidebar/>
         </div>
 
-        <div className="flex-1 flex flex-col ml-[60px] mr-[60px] lg:ml-[280px] md:mr-[100px]  lg:mr-[150px] xl:mr-[280px] min-w-0 border-r border-l">
+        <div className="flex-1 flex flex-col md:mr-25 md:ml-25 lg:ml-70  lg:mr-37.5 xl:mr-70 min-w-0 border-r border-l pb-30 ">
             <Outlet/>
         </div>
 
-        <div className="fixed right-0 top-0 bottom-0 z-[0]">
+        <div className="fixed right-0 top-0 bottom-0 z-0">
             <User/>
         </div>
     </div>

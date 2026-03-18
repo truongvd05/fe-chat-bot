@@ -96,7 +96,7 @@ function ChatBot() {
     return (
         <>
             <div ref={topRef} className="px-2 py-2 flex-1 h-full">
-                <p className="text-2xl py-2">{conversationData?.title}</p>
+                <p className="fixed ml-10 md:ml-1 text-2xl py-2">{conversationData?.title}</p>
                 <div className="flex flex-col flex-1 gap-4 pb-30">  
                     {messageData?.map((message) => {
                         return (
@@ -108,7 +108,7 @@ function ChatBot() {
                 </div>
                 <div ref={bottomRef}></div>
             </div>
-            <div className="bottom-10 w-[80%] mr-auto ml-auto relative max-h-37.5 ">
+            <div className="fixed bottom-10 left-1/2 -translate-x-1/2 w-[70%] md:w-[50%] lg:w-[40%] max-h-37.5 ">
                 <Textarea id="textarea-message"
                 value={content}
                 onChange={(e)=> { setContent(e.target.value)}}

@@ -100,6 +100,7 @@ function ChatUser() {
     useEffect(() => {
         scrollBottom()
     }, [conversationId]);
+    
     const scrollBottom = () => {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }
@@ -131,20 +132,20 @@ function ChatUser() {
     const other = conversationData.participants.find(u => u.user.id !== user.id)
     return (
         <>
-            <div ref={topRef} className="px-2 py-2 flex-1 h-full">
-                <p className="text-2xl py-2 border-b mb-5">{other.user?.name}</p>
-                <div className="flex flex-col flex-1 gap-4 pb-30">  
+            <div ref={topRef} className="px-2 py-2 flex-1">
+                <p className="fixed ml-10 md:ml-1 text-2xl py-2 border-b mb-5 top-1">{other.user?.name}</p>
+                <div className="flex flex-col flex-1 gap-4">  
                     {messageData?.map((message) => {
-                        return (
-                            <div key={message.id}>
-                                <Message message={message} right={message.userId === user?.id} user={user}/>
-                            </div>
-                        )
-                    })}
-                    <div ref={bottomRef}></div>
-                </div>
+                            return (
+                                <div key={message.id}>
+                                    <Message message={message} right={message.userId === user?.id} user={user}/>
+                                </div>
+                            )
+                        })}
+                        <div ref={bottomRef}></div>
+                    </div>
             </div>
-            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[50%] z-[0]">
+            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[70%] md:w-[50%] lg:w-[40%]">
                 <div className="relative">
                     <Textarea id="textarea-message"
                     value={content}

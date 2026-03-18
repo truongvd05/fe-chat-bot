@@ -16,7 +16,7 @@ import { useDispatch } from "react-redux"
 import { logOut } from "@/feature/User/userSlice"
 import { disconnectSocket } from "@/socket/socket"
 
-function NavigationRall({ setType, type }) {
+function NavigationRall({ type }) {
     const socket = useSocket();
     const dispatch = useDispatch()
     const navigate = useNavigate()
@@ -42,15 +42,9 @@ return (
     <>
         <div className="flex flex-col gap-2">
             <NavIcon icon="fa-regular fa-comment" active={type === "chat"}
-            onClick={() => {
-                setType("chat")
-                navigate("/chat")
-            }}/>
+            onClick={() => { navigate("/chat") }}/>
             <NavIcon icon="fa-brands fa-bots" active={type === "bots"}
-            onClick={()  => {
-                setType("bots")
-                navigate("/bots")
-            }}/>
+            onClick={()  => { navigate("/bots") }}/>
         </div>  
         <div className="flex flex-col gap-2">
             <DropdownMenu>
