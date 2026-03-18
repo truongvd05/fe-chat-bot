@@ -134,7 +134,7 @@ function ChatUser() {
         <>
             <div ref={topRef} className="px-2 py-2 flex-1">
                 <p className="fixed ml-10 md:ml-1 text-2xl py-2 border-b mb-5 top-1">{other.user?.name}</p>
-                <div className="flex flex-col flex-1 gap-4">  
+                <div className="flex flex-col flex-1 gap-4 pt-15">  
                     {messageData?.map((message) => {
                             return (
                                 <div key={message.id}>
