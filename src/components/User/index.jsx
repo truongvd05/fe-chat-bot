@@ -7,10 +7,8 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import DropDownText from "@/layouts/ChatLayout/Sidebar/NavigationRaill/DropDownText";
 import { useNavigate } from "react-router-dom";
 
 function User() {
@@ -29,14 +27,6 @@ function User() {
           <DropdownMenuGroup>
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuItem onClick={() => navigate("/profile")}>Profile</DropdownMenuItem>
-          </DropdownMenuGroup>
-          <DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <DropDownText text="Log out" red>
-                  <i className="fa-solid fa-arrow-right-from-bracket"></i>
-              </DropDownText>
-            </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>

@@ -37,20 +37,26 @@ export default function useLoadMessages(conversationId, messages) {
         conversationId,
         c: oldestMessage.createdAt,
       }).unwrap();
+
       // hêt message
       if (oldMessages.length < 10) {
         hasMoreRef.current = false;
       }
+
+      // check trùng key
+      const existingIds = new Set(messagesRef.current.map((m) => m.id));
+      const uniqueMessages = oldMessages.filter((m) => !existingIds.has(m.id));
 
       dispatch(
         messageApi.util.updateQueryData(
           "getMessage",
           { conversationId },
           (draft) => {
-            draft.unshift(...oldMessages);
+            draft.unshift(...uniqueMessages);
           },
         ),
       );
+      return uniqueMessages.length;
     } catch (err) {
       console.log(err);
     } finally {

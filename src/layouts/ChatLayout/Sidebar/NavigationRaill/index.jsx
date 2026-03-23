@@ -38,6 +38,11 @@ function NavigationRall({ type }) {
             console.log(err);
         }
     }
+
+    const handleGitHub = () => {
+        window.open("https://github.com/truongvd05", "_blank");
+    }
+    
 return (
     <>
         <div className="flex flex-col gap-2">
@@ -56,12 +61,7 @@ return (
                     <DropdownMenuItem onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
                         {theme === "light" ? "dark" : "light"}
                     </DropdownMenuItem>
-                    <DropdownMenuItem>Profile</DropdownMenuItem>
-                    <DropdownMenuItem>Settings</DropdownMenuItem>
                     </DropdownMenuGroup>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>GitHub</DropdownMenuItem>
-                    <DropdownMenuItem>Support</DropdownMenuItem>
                     <DropdownMenuItem onClick={handleLogout}>
                         <DropDownText text="Log out" red>
                             <i className="fa-solid fa-arrow-right-from-bracket"></i>

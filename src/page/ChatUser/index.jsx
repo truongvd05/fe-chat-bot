@@ -1,6 +1,6 @@
 import { conversationApi, useGetConversationQuery } from "@/feature/Conversation/conversationApi"
 import { messageApi, useGetMessageQuery } from "@/feature/Message/messageApi"
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useParams } from "react-router-dom"
 import { Textarea } from "@/components/ui/textarea"
@@ -10,15 +10,34 @@ import { getSocket } from "@/socket/socket"
 import { useSocket } from "@/contexts/SocketContext"
 import useLoadMessages from "@/hoock/useLoadMessages"
 import MessageSkeleton from "@/components/MessageSkeleton"
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { useScrollManager } from "@/hoock/useScrollManager"
 
 function ChatUser() {
     const dispatch = useDispatch()
     const socket = useSocket();
+    const parentRef = useRef()
     const {user} = useSelector(selectUser)
     const { conversationId } = useParams()
-    const bottomRef = useRef(null)
-    const topRef = useRef(null)
     const [content, setContent] = useState("")
+    const { data: messageData, isLoading: messageLoading, error: messageError } = useGetMessageQuery({conversationId})
+    const {loadMore} = useLoadMessages(conversationId, messageData)
+
+    const rowVirtualizer = useVirtualizer({
+        count: messageData?.length ?? 0,
+        getScrollElement: () => parentRef.current,
+        estimateSize: () => 80,
+        overscan: 5,
+        measureElement: (el) => el?.getBoundingClientRect().height
+    });
+
+    const { scrollBottom, handleNewMessage } = useScrollManager({
+        messageData,
+        conversationId,
+        loadMore,
+        rowVirtualizer,
+        parentRef,
+    })
 
     const { data: conversationData, isLoading: conversatonLoading, error: conversationError } =
     useGetConversationQuery(conversationId, {
@@ -26,8 +45,7 @@ function ChatUser() {
         refetchOnReconnect: true,
         refetchOnFocus: true
     })
-    const { data: messageData, isLoading: messageLoading, error: messageError } = useGetMessageQuery({conversationId})
-    const {loadMore} = useLoadMessages(conversationId, messageData)
+    
 
     // xử lí khi gửi message
     const handleSendMessage = async () => {
@@ -64,15 +82,13 @@ function ChatUser() {
                 }
             ))
             // scroll xuống bottom nếu là người gửi
-            if(message.userId === user?.id){
-                scrollBottom()
-            }
+            handleNewMessage(message.userId === user?.id)
         }
         socket.on("receive_message", handleReceiveMessage);
         return () => {
             socket.off("receive_message", handleReceiveMessage);
         };
-    }, [conversationId, socket, user?.id, dispatch]);
+    }, [conversationId, socket, user?.id, dispatch, handleNewMessage]);
 
     // xử lí update unread về 0 khi click message
     useEffect(() => {
@@ -96,75 +112,67 @@ function ChatUser() {
         ))
     },  [conversationId, user?.id])
 
-    // scroll xuống cuối khi lần đầu vao chat
-    useEffect(() => {
-        scrollBottom()
-    }, [conversationId]);
+    const other = conversationData?.participants?.find(u => u.user.id !== user.id)
     
-    const scrollBottom = () => {
-        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-
-    // gán sự kiên scroll
-    useEffect(() => {
-        const handleScroll = () => {
-            if (window.scrollY === 0) {
-                loadMore()
-            }
-        }
-        window.addEventListener("scroll", handleScroll)
-        return () => {
-            window.removeEventListener("scroll", handleScroll)
-        }
-    }, [loadMore])
-
-    if (!conversationData || messageLoading) {
-        return (
-            <>
-                <MessageSkeleton />
-                <MessageSkeleton right />
-                <MessageSkeleton />
-                <MessageSkeleton right />
-                <MessageSkeleton />
-            </>
-        )
-    }
-    const other = conversationData.participants.find(u => u.user.id !== user.id)
     return (
         <>
-            <div ref={topRef} className="px-2 py-2 flex-1">
-                <p className="fixed ml-10 md:ml-1 text-2xl py-2 border-b mb-5 top-1">{other.user?.name}</p>
-                <div className="flex flex-col flex-1 gap-4 pt-15">  
-                    {messageData?.map((message) => {
-                            return (
-                                <div key={message.id}>
-                                    <Message message={message} right={message.userId === user?.id} user={user}/>
-                                </div>
-                            )
-                        })}
-                        <div ref={bottomRef}></div>
+            <div className="flex flex-col h-full overflow-hidden">
+                <p className="sticky ml-10 md:ml-1 text-2xl py-2 border-b mb-5 top-1">{other?.user?.name}</p>
+                <div ref={parentRef} className="flex-1 min-h-0 overflow-y-scroll pb-20 pl-2 pr-2"
+                    style={{ overflowAnchor: "none" }} >
+                {(!conversationData || messageLoading) ? (
+                <>
+                    <MessageSkeleton />
+                    <MessageSkeleton right />
+                    <MessageSkeleton />
+                    <MessageSkeleton right />
+                    <MessageSkeleton />
+                </>
+            ) : <div style={{
+                        height: rowVirtualizer.getTotalSize(),
+                        minHeight: "100%",
+                        position: "relative",
+                        }}
+                        >
+                            {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                                const message = messageData[virtualRow.index];
+                                return (
+                                    <div
+                                        key={message.id}
+                                        ref={rowVirtualizer.measureElement}
+                                        data-index={virtualRow.index}
+                                        className="absolute top-0 left-0 w-full"
+                                        style={{transform: `translateY(${virtualRow.start}px)`}}
+                                    >
+                                        <div className={`py-1 px-2 ${message.role === "user" ? "" : "border-b border-t"}`} >
+                                            <Message message={message} right={message.userId === user?.id} user={message.role === "user"}/>
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                    </div>}
+                </div>
+                <div className="sticky mr-auto ml-auto w-[70%] md:w-[70%] lg:w-[70%]">
+                    <div className="relative">
+                        <Textarea id="textarea-message"
+                        value={content}
+                        onChange={(e)=> { setContent(e.target.value)}}
+                        className="overflow-hidden px-5 h-16 text-lg rounded-3xl pr-15"
+                        placeholder="Enter text"/>
+                        <button
+                        disabled={
+                            !content.trim() ||
+                            !conversationData ||
+                            !["DIRECT", "GROUP"].includes(conversationData.type)
+                        }
+                        onClick={handleSendMessage}
+                        className="p-2 absolute right-2 top-1/2 -translate-y-1/2
+                        disabled:opacity-40
+                        disabled:cursor-not-allowed"
+                        >
+                            <i className="fa-regular fa-paper-plane"></i>
+                        </button>
                     </div>
-            </div>
-            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[70%] md:w-[50%] lg:w-[40%]">
-                <div className="relative">
-                    <Textarea id="textarea-message"
-                    value={content}
-                    onChange={(e)=> { setContent(e.target.value)}}
-                    className="overflow-hidden px-5 h-16 text-lg rounded-3xl pr-15"
-                    placeholder="Enter text"/>
-                    <button
-                    disabled={
-                        !content.trim() ||
-                        !conversationData ||
-                        !["DIRECT", "GROUP"].includes(conversationData.type)
-                    }
-                    onClick={handleSendMessage}
-                    className="p-2 absolute right-2 top-1/2 -translate-y-1/2
-                    disabled:opacity-40
-                    disabled:cursor-not-allowed"
-                    >
-                        <i className="fa-regular fa-paper-plane"></i>
-                    </button>
                 </div>
             </div>
         </>
