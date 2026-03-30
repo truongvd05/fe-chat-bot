@@ -12,6 +12,7 @@ import useLoadMessages from "@/hoock/useLoadMessages"
 import MessageSkeleton from "@/components/MessageSkeleton"
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useScrollManager } from "@/hoock/useScrollManager"
+import MemberModal from "./MemberModal"
 
 function ChatUser() {
     const dispatch = useDispatch()
@@ -20,6 +21,7 @@ function ChatUser() {
     const {user} = useSelector(selectUser)
     const { conversationId } = useParams()
     const [content, setContent] = useState("")
+    const [open, onOpenChange] = useState(false)
     const { data: messageData, isLoading: messageLoading, error: messageError } = useGetMessageQuery({conversationId})
     const {loadMore} = useLoadMessages(conversationId, messageData)
 
@@ -45,7 +47,6 @@ function ChatUser() {
         refetchOnReconnect: true,
         refetchOnFocus: true
     })
-    
 
     // xử lí khi gửi message
     const handleSendMessage = async () => {
@@ -116,8 +117,15 @@ function ChatUser() {
     
     return (
         <>
+            <MemberModal members={conversationData?.participants} open={open} onOpenChange={onOpenChange}/>
             <div className="flex flex-col h-full overflow-hidden">
-                <p className="sticky ml-10 md:ml-1 text-2xl py-2 border-b mb-5 top-1">{other?.user?.name}</p>
+                <div className="sticky ml-10 md:ml-1 text-2xl py-2 border-b mb-5 top-1">
+                    <p >{conversationData?.type === "DIRECT" ? other?.user?.name : conversationData?.title}</p>
+                    <div className="flex gap-2 text-sm items-center" onClick={() => onOpenChange(true)}>
+                        <i class="fa-solid fa-user"></i>
+                        <p className="cursor-pointer">{conversationData?.participants?.length} thành viên</p>
+                    </div>
+                </div>
                 <div ref={parentRef} className="flex-1 min-h-0 overflow-y-scroll pb-20 pl-2 pr-2"
                     style={{ overflowAnchor: "none" }} >
                 {(!conversationData || messageLoading) ? (
@@ -144,7 +152,7 @@ function ChatUser() {
                                         className="absolute top-0 left-0 w-full"
                                         style={{transform: `translateY(${virtualRow.start}px)`}}
                                     >
-                                        <div className={`py-1 px-2 ${message.role === "user" ? "" : "border-b border-t"}`} >
+                                        <div className={`${message.role === "user" ? "" : "border-b border-t"}`} >
                                             <Message message={message} right={message.userId === user?.id} user={message.role === "user"}/>
                                         </div>
                                     </div>

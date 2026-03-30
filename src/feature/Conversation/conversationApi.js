@@ -30,6 +30,14 @@ export const conversationApi = createApi({
       }),
       invalidatesTags: [{ type: "Conversation" }],
     }),
+    createGroupConversation: builder.mutation({
+      query: ({ name, memberIds }) => ({
+        url: `/conversation/group`,
+        method: "POST",
+        body: { name, members: memberIds },
+      }),
+      invalidatesTags: [{ type: "Conversation" }],
+    }),
     createBotConversation: builder.mutation({
       query: (title) => ({
         url: `/conversation/bot`,
@@ -48,6 +56,7 @@ export const {
   useGetConversationsQuery,
   useCreateDirectConversationMutation,
   useCreateBotConversationMutation,
+  useCreateGroupConversationMutation,
   // lazy
   useLazyGetBotConversationQuery,
   useLazyGetBotConversationsQuery,

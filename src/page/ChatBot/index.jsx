@@ -3,7 +3,7 @@ import { messageApi, useGetMessageQuery, useSendBotMessageMutation } from "@/fea
 import { useParams } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea"
 import Message from "../../components/Message";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import useLoadMessages from "@/hoock/useLoadMessages";
 import { selectTOken } from "@/feature/User/userSelector";
@@ -121,9 +121,9 @@ function ChatBot() {
                                         key={message.id}
                                         ref={rowVirtualizer.measureElement}
                                         data-index={virtualRow.index}
-                                        className="absolute top-0 left-0 w-full" style={{transform: `translateY(${virtualRow.start}px)`}}
+                                        className="absolute top-0 left-0 w-full px-1 py-1" style={{transform: `translateY(${virtualRow.start}px)`}}
                                     >
-                                        <div className={`${message.role === "user" ? "" : "border-b border-t"}`}>
+                                        <div>
                                             <Message message={message} right={message.role === "user"} user={message.role === "user"}/>
                                         </div>
                                     </div>
@@ -142,8 +142,7 @@ function ChatBot() {
                     disabled={!content}
                     className="p-2 absolute right-5 top-1/2 -translate-y-1/2  
                     disabled:opacity-40 
-                    disabled:cursor-not-allowed h-full"
-                    >
+                    disabled:cursor-not-allowed h-full">
                         <i className="fa-regular fa-paper-plane"></i>
                     </button>
                 </div>

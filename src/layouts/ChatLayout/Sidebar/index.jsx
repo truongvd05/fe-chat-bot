@@ -20,12 +20,12 @@ function Sidebar() {
                 fixed inset-0 bg-black/40 z-10 lg:hidden
             `}/>}
             <div className={`fixed lg:static top-0 left-0 h-full z-11
-            ${theme === "dark" ? "bg-neutral-700" : "bg-white"}
-            transform transition-transform duration-300
-             ${isOpen ? "translate-x-0" : "-translate-x-full"}
-             lg:translate-x-0
-             w-70
-            `}>
+                ${theme === "dark" ? "bg-neutral-700" : "bg-white"}
+                transform transition-transform duration-300
+                ${isOpen ? "translate-x-0" : "-translate-x-full"}
+                lg:translate-x-0
+                w-70
+                `}>
                 <div className="py-7.5 px-1.5 h-full flex overflow-auto">
                     {isOpen && <div className="z-12 fixed right-5 top-5">
                         <i onClick={() => setIsOpen(false)}

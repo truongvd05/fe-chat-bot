@@ -8,6 +8,7 @@ import IconNewBots from "./IconNewBots";
 import IconFriend from "./IconFriend";
 import { useEffect } from "react";
 import { useSocket } from "@/contexts/SocketContext";
+import IconGroup from "./IconGroup";
 
 function Conversation({ type, setIsOpen }) {
     const socket = useSocket()
@@ -68,9 +69,10 @@ function Conversation({ type, setIsOpen }) {
         };
     }, [conversationId, socket]);
     if(isLoading) return <Skeleton/>
+    
     return (
     <div className="w-full">
-        {type === "chat" ? <IconFriend/> : <IconNewBots/>}  
+        {type === "chat" ? <><IconFriend/> <IconGroup/></> : <IconNewBots/>}  
         {!data?.length && (
             <p>Bạn chưa chọn đoạn chat</p>
         )}
@@ -98,13 +100,13 @@ function Conversation({ type, setIsOpen }) {
                 }}
                 className={`rounded-sm cursor-pointer 
                     ${theme === "light" ? "hover:bg-gray-300 text-black" : "hover:bg-gray-500 text-white"}
-                    ${conversationId === item.id ? "bg-gray-400" : ""} py-[3px] px-[5px] w-full h-15`
+                    ${conversationId === item.id ? "bg-gray-400" : ""} py-0.75 px-1.25 w-full h-15`
                         }>
                     <div className="flex items-center">
                         <div className="flex flex-col gap-2 flex-1">
                             <span className="relative">
-                                {type === "chat" ? otheruser?.name : item?.title}
-                                {count > 0 && <p className="absolute top-0 right-0 text-red-500 bg-red-300 rounded-full h-[20px] w-[15px] flex justify-center items-center">{count}</p>}
+                                {item.type === "DIRECT" ? otheruser?.name : item?.title}
+                                {count > 0 && <p className="absolute top-0 right-0 text-red-500 bg-red-300 rounded-full h-5 w-3.75 flex justify-center items-center">{count}</p>}
                             </span>
                             {item.lastMessage?.content && 
                             <p className="text-sm opacity-70 truncate w-45">
