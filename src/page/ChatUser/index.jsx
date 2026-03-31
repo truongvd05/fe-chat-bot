@@ -1,6 +1,6 @@
-import { conversationApi, useGetConversationQuery } from "@/feature/Conversation/conversationApi"
+import { conversationApi, useAddMembersInConversationMutation, useGetConversationQuery, useKickMembersInConversationMutation, useLazySearchAvailableUsersQuery } from "@/feature/Conversation/conversationApi"
 import { messageApi, useGetMessageQuery } from "@/feature/Message/messageApi"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useParams } from "react-router-dom"
 import { Textarea } from "@/components/ui/textarea"
@@ -13,6 +13,7 @@ import MessageSkeleton from "@/components/MessageSkeleton"
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useScrollManager } from "@/hoock/useScrollManager"
 import MemberModal from "./MemberModal"
+import MemberSelectModal from "@/layouts/ChatLayout/Sidebar/Conversation/MemberSelectModal"
 
 function ChatUser() {
     const dispatch = useDispatch()
@@ -23,6 +24,17 @@ function ChatUser() {
     const [content, setContent] = useState("")
     const [open, onOpenChange] = useState(false)
     const { data: messageData, isLoading: messageLoading, error: messageError } = useGetMessageQuery({conversationId})
+    const [ addMembers, {isLoading: addMembersLoading, error: addMembersError }] = useAddMembersInConversationMutation()
+    const [ kickMembers, {isLoading: kickMembersLoading, error: kickMembersError }] = useKickMembersInConversationMutation()
+
+    const [triggerSearchAvailableUsers, {
+        data: searchAvailableUsersData,
+        isLoading: searchAvailableUsersLoading,
+        isError: searchAvailableUsersError,
+        error,
+        reset: resetSearchAvailableUsers  
+    }] = useLazySearchAvailableUsersQuery();
+
     const {loadMore} = useLoadMessages(conversationId, messageData)
 
     const rowVirtualizer = useVirtualizer({
@@ -117,13 +129,29 @@ function ChatUser() {
     
     return (
         <>
-            <MemberModal members={conversationData?.participants} open={open} onOpenChange={onOpenChange}/>
+            <MemberModal
+                members={conversationData?.participants}
+                open={open}
+                onOpenChange={onOpenChange}
+                onKick={(selectedMembers) => kickMembers({ conversationId, memberIds: selectedMembers }).unwrap()}
+                />
             <div className="flex flex-col h-full overflow-hidden">
                 <div className="sticky ml-10 md:ml-1 text-2xl py-2 border-b mb-5 top-1">
                     <p >{conversationData?.type === "DIRECT" ? other?.user?.name : conversationData?.title}</p>
-                    <div className="flex gap-2 text-sm items-center" onClick={() => onOpenChange(true)}>
-                        <i class="fa-solid fa-user"></i>
-                        <p className="cursor-pointer">{conversationData?.participants?.length} thành viên</p>
+                    <div className="flex gap-2 text-sm items-center justify-between pr-5">
+                        <div className="flex items-center" onClick={() => onOpenChange(true)}>
+                            <i className="fa-solid fa-user"></i>
+                            <p className="cursor-pointer">{conversationData?.participants?.length} thành viên</p>
+                        </div>
+                        <MemberSelectModal
+                            trigger={<i className="fa-solid fa-plus"></i>}
+                            onSearch={(value) => triggerSearchAvailableUsers({conversationId, q: value}).unwrap()}
+                            onSubmit={async({memberIds}) => addMembers({memberIds, conversationId}).unwrap()}
+                            loading={searchAvailableUsersLoading}
+                            error={searchAvailableUsersError}
+                            data={searchAvailableUsersData}
+                            reset={resetSearchAvailableUsers}
+                            />
                     </div>
                 </div>
                 <div ref={parentRef} className="flex-1 min-h-0 overflow-y-scroll pb-20 pl-2 pr-2"

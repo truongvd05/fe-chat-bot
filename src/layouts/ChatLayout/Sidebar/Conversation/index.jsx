@@ -8,7 +8,9 @@ import IconNewBots from "./IconNewBots";
 import IconFriend from "./IconFriend";
 import { useEffect } from "react";
 import { useSocket } from "@/contexts/SocketContext";
-import IconGroup from "./IconGroup";
+import MemberSelectModal from "./MemberSelectModal";
+import { useLazyFindUserQuery } from "@/feature/User/userApi";
+import { useCreateGroupConversationMutation } from "@/feature/Conversation/conversationApi";
 
 function Conversation({ type, setIsOpen }) {
     const socket = useSocket()
@@ -29,6 +31,19 @@ function Conversation({ type, setIsOpen }) {
     } = useGetConversationsQuery(undefined, {
         skip: type !== "chat",
     })
+
+    const [triggerFindUser, {
+        data: findUserData,
+        isLoading: findUserLoading,
+        isError: findUserError,
+        error,
+        reset: resetFIndUser 
+    }] = useLazyFindUserQuery();
+
+    const [ createGroupConversation, {
+        isLoading: createGruopLoading,
+        error: createGroupError
+    }] = useCreateGroupConversationMutation()
     
     const isLoading = botLoading || chatLoading;
     
@@ -72,7 +87,24 @@ function Conversation({ type, setIsOpen }) {
     
     return (
     <div className="w-full">
-        {type === "chat" ? <><IconFriend/> <IconGroup/></> : <IconNewBots/>}  
+        {type === "chat" ?
+        <>
+            <IconFriend/>
+            <MemberSelectModal
+                title="tạo nhóm"
+                trigger={<i className="fa-solid fa-users"></i>}
+                onSearch={(value) => triggerFindUser(value).unwrap()}
+                onSubmit={async({name, memberIds}) => {
+                    if (!name.trim()) return;
+                    await createGroupConversation({name, memberIds}).unwrap()}
+                }
+                
+                loading={findUserLoading}
+                error={findUserError}
+                data={findUserData}
+                reset={resetFIndUser}
+                />
+        </> : <IconNewBots/>}  
         {!data?.length && (
             <p>Bạn chưa chọn đoạn chat</p>
         )}
