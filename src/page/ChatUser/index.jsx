@@ -1,4 +1,4 @@
-import { conversationApi, useAddMembersInConversationMutation, useGetConversationQuery, useKickMembersInConversationMutation, useLazySearchAvailableUsersQuery, usePromoteToAdminConversationMutation } from "@/feature/Conversation/conversationApi"
+import { conversationApi, useAddMembersInConversationMutation, useGetConversationQuery, useKickMembersInConversationMutation, useLazySearchAvailableUsersQuery, useLeaveGroupMutation, usePromoteToAdminConversationMutation } from "@/feature/Conversation/conversationApi"
 import { messageApi, useGetMessageQuery } from "@/feature/Message/messageApi"
 import { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
@@ -27,6 +27,7 @@ function ChatUser() {
     const [ addMembers, {isLoading: addMembersLoading, error: addMembersError }] = useAddMembersInConversationMutation()
     const [ kickMembers, {isLoading: kickMembersLoading, error: kickMembersError }] = useKickMembersInConversationMutation()
     const [ PromoteToAdmin, {isLoading: PromoteToAdminLoading, error: PromoteToAdminError }] = usePromoteToAdminConversationMutation()
+    const [ LeaveGroup, {isLoading: LeaveGroupAdminLoading, error: LeaveGroupAdminError }] = useLeaveGroupMutation()
 
     const [triggerSearchAvailableUsers, {
         data: searchAvailableUsersData,
@@ -136,12 +137,14 @@ function ChatUser() {
                 onOpenChange={onOpenChange}
                 onKick={(selectedMembers) => kickMembers({ conversationId, memberIds: selectedMembers }).unwrap()}
                 onPromote={(selectedMembers) => PromoteToAdmin({ conversationId, memberIds: selectedMembers }).unwrap()}
+                onLeave={() => LeaveGroup({ conversationId }).unwrap()}
                 owner={conversationData?.ownerId}
                 />
             <div className="flex flex-col h-full overflow-hidden">
                 <div className="sticky ml-10 md:ml-1 text-2xl py-2 border-b mb-5 top-1">
                     <p >{conversationData?.type === "DIRECT" ? other?.user?.name : conversationData?.title}</p>
-                    <div className="flex gap-2 text-sm items-center justify-between pr-5">
+                    {conversationData?.type === "GROUP" && 
+                    <div className="flex gap-2 text-sm items-center justify-between pr-5">    
                         <div className="flex items-center" onClick={() => onOpenChange(true)}>
                             <i className="fa-solid fa-user"></i>
                             <p className="cursor-pointer">{conversationData?.participants?.length} thành viên</p>
@@ -155,7 +158,7 @@ function ChatUser() {
                             data={searchAvailableUsersData}
                             reset={resetSearchAvailableUsers}
                             />
-                    </div>
+                    </div>}
                 </div>
                 <div ref={parentRef} className="flex-1 min-h-0 overflow-y-scroll pb-20 pl-2 pr-2"
                     style={{ overflowAnchor: "none" }} >

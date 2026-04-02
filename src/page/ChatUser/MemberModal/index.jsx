@@ -30,7 +30,7 @@ import { selectUser } from "@/feature/User/userSelector"
 import { useState } from "react"
 import { useSelector } from "react-redux"
 
-function MemberModal({ members, open, onOpenChange, onKick, onPromote, owner }) {
+function MemberModal({ members, open, onOpenChange, onKick, onPromote, onLeave, owner }) {
   const {user} = useSelector(selectUser)
   const [keyword, setKeyword] = useState("")
   const [openLeave, setOpenLeave] = useState(false)
@@ -117,7 +117,10 @@ function MemberModal({ members, open, onOpenChange, onKick, onPromote, owner }) 
 
                   <AlertDialogFooter>
                     <AlertDialogCancel>Hủy</AlertDialogCancel>
-                    <AlertDialogAction
+                    <AlertDialogAction onClick={() => {
+                        onLeave()
+                        onOpenChange(false);
+                    }}
                       className="bg-red-500 hover:bg-red-600"
                     >
                       Rời nhóm

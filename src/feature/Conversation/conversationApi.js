@@ -126,6 +126,13 @@ export const conversationApi = createApi({
       }),
       invalidatesTags: [{ type: "Conversation" }],
     }),
+    leaveGroup: builder.mutation({
+      query: ({ conversationId }) => ({
+        url: `/conversation/${conversationId}/leaveGroup`,
+        method: "POST",
+      }),
+      invalidatesTags: [{ type: "Conversation" }],
+    }),
   }),
 });
 
@@ -140,6 +147,7 @@ export const {
   useAddMembersInConversationMutation,
   useKickMembersInConversationMutation,
   usePromoteToAdminConversationMutation,
+  useLeaveGroupMutation,
   // lazy
   useLazyGetBotConversationQuery,
   useLazyGetBotConversationsQuery,
