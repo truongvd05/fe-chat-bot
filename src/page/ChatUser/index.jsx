@@ -1,4 +1,4 @@
-import { conversationApi, useAddMembersInConversationMutation, useGetConversationQuery, useKickMembersInConversationMutation, useLazySearchAvailableUsersQuery } from "@/feature/Conversation/conversationApi"
+import { conversationApi, useAddMembersInConversationMutation, useGetConversationQuery, useKickMembersInConversationMutation, useLazySearchAvailableUsersQuery, usePromoteToAdminConversationMutation } from "@/feature/Conversation/conversationApi"
 import { messageApi, useGetMessageQuery } from "@/feature/Message/messageApi"
 import { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
@@ -26,6 +26,7 @@ function ChatUser() {
     const { data: messageData, isLoading: messageLoading, error: messageError } = useGetMessageQuery({conversationId})
     const [ addMembers, {isLoading: addMembersLoading, error: addMembersError }] = useAddMembersInConversationMutation()
     const [ kickMembers, {isLoading: kickMembersLoading, error: kickMembersError }] = useKickMembersInConversationMutation()
+    const [ PromoteToAdmin, {isLoading: PromoteToAdminLoading, error: PromoteToAdminError }] = usePromoteToAdminConversationMutation()
 
     const [triggerSearchAvailableUsers, {
         data: searchAvailableUsersData,
@@ -134,6 +135,8 @@ function ChatUser() {
                 open={open}
                 onOpenChange={onOpenChange}
                 onKick={(selectedMembers) => kickMembers({ conversationId, memberIds: selectedMembers }).unwrap()}
+                onPromote={(selectedMembers) => PromoteToAdmin({ conversationId, memberIds: selectedMembers }).unwrap()}
+                owner={conversationData?.ownerId}
                 />
             <div className="flex flex-col h-full overflow-hidden">
                 <div className="sticky ml-10 md:ml-1 text-2xl py-2 border-b mb-5 top-1">

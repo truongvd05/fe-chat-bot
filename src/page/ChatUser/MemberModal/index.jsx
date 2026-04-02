@@ -30,21 +30,19 @@ import { selectUser } from "@/feature/User/userSelector"
 import { useState } from "react"
 import { useSelector } from "react-redux"
 
-function MemberModal({ members, open, onOpenChange, onKick }) {
+function MemberModal({ members, open, onOpenChange, onKick, onPromote, owner }) {
   const {user} = useSelector(selectUser)
   const [keyword, setKeyword] = useState("")
   const [openLeave, setOpenLeave] = useState(false)
 
-  const isAdmin = members?.some( m => m.userId === user.id && m.role === "ADMIN")
-  
   const filteredMembers = members?.filter(m =>
     m.user?.name?.toLowerCase().includes(keyword.toLowerCase())
   )
-
+  
   const adminCount = members?.filter(m => m.role === "ADMIN").length
 
-  const isOnlyAdmin = isAdmin && adminCount === 1
-
+  const isOnlyAdmin = adminCount === 1
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -58,17 +56,18 @@ function MemberModal({ members, open, onOpenChange, onKick }) {
         <div className="space-y-3 max-h-75 overflow-y-auto overflow-x-hidden">
           {filteredMembers?.map(m => {
               const isMe = m.userId === user.id
+            
               return (
-                <div key={m.userId} className="flex items-center gap-3">
-                  <div className="flex-1 flex gap-5 items-center">
+                <div key={m.userId} className={`flex items-center gap-3 p-1 rounded-sm ${isMe && "bg-amber-100"}`}>
+                  <div className={`flex-1 flex gap-5 items-center `}>
                     <p className="font-medium">{m.user.name}</p>
                     {isMe && <p className="text-sm opacity-70">Bạn</p>}
                   </div>
 
                   <span className="text-sm text-gray-500">
-                    {m.role}
+                    {owner === m.userId ? "OWNER" : m.role}
                   </span>
-                  {isAdmin && !isMe && (
+                  {m.role === "MEMBER" && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <i className="fa-solid fa-ellipsis cursor-pointer px-2"></i>
@@ -76,7 +75,7 @@ function MemberModal({ members, open, onOpenChange, onKick }) {
                       <DropdownMenuContent align="end">
                         {m.role !== "ADMIN" && (
                           <DropdownMenuItem
-                            onClick={() => onPromote(m.userId)}
+                            onClick={() => onPromote([m.userId])}
                           >
                             Thăng làm Admin
                           </DropdownMenuItem>

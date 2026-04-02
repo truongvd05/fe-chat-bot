@@ -73,7 +73,7 @@ export const conversationApi = createApi({
               const existingIds = draft.participants.map((m) => m.userId);
               const newMembers = memberIds
                 .filter((id) => !existingIds.includes(id))
-                .map((id) => ({ id, name: "..." })); // placeholder, có thể fill name sau fetch
+                .map((id) => ({ id, name: "..." }));
               draft.participants.push(...newMembers);
             },
           ),
@@ -118,6 +118,14 @@ export const conversationApi = createApi({
         }
       },
     }),
+    promoteToAdminConversation: builder.mutation({
+      query: ({ conversationId, memberIds }) => ({
+        url: `/conversation/${conversationId}/promoteToAdmin`,
+        method: "POST",
+        body: { members: memberIds },
+      }),
+      invalidatesTags: [{ type: "Conversation" }],
+    }),
   }),
 });
 
@@ -131,6 +139,7 @@ export const {
   useCreateGroupConversationMutation,
   useAddMembersInConversationMutation,
   useKickMembersInConversationMutation,
+  usePromoteToAdminConversationMutation,
   // lazy
   useLazyGetBotConversationQuery,
   useLazyGetBotConversationsQuery,
