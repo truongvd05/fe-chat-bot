@@ -100,7 +100,7 @@ function ChatBot() {
                 <div ref={parentRef} className="flex-1 min-h-0 overflow-auto pb-20 pl-2 pr-2"
                     style={{ overflowAnchor: "none" }}
                 >  
-                    {(!conversationData || messageLoading || !messageData?.length) ? (
+                    {(!conversationData || messageLoading) ? (
                     <>
                         <MessageSkeleton />
                         <MessageSkeleton right />
