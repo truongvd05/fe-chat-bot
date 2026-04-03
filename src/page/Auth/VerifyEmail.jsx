@@ -5,33 +5,19 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { useVerifyEmailMutation } from "@/feature/Auth/authApi";
-import { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 
 function VerifyEmail() {
-    const navigate = useNavigate()
     const [searchParams] = useSearchParams();
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(false);
-    const [success, setSuccess] = useState(false);
     const token = searchParams.get("token");
-    const [VerifyEmail, {isLoading}] = useVerifyEmailMutation()
+    const [VerifyEmail, {isLoading, isError, isSuccess}] = useVerifyEmailMutation()
+
     useEffect(() => {
-        const Verify = async () => {
-            setLoading(true)
-            setError(false)
-            try {
-                await VerifyEmail({token}).unwrap();
-                setSuccess(res.success)
-            } catch (err) {
-                console.log(err);
-                setError(true)
-            } finally {
-                setLoading(false);
-            }
-        }
-        Verify();
+        if (!token) return;
+        VerifyEmail({token})
     }, [token])
+
 return (
         <Card className="w-full max-w-sm m-auto">
             <CardHeader>
@@ -46,13 +32,13 @@ return (
                     {!isLoading  && (
                         <>
                             <div className="flex gap-2 items-center justify-center mb-2">
-                                {success && (
+                                {isSuccess && (
                                 <>
                                     <p>Xác thực thành công</p>
-                                    <i class="fa-solid fa-check text-green-500"></i>
+                                    <i className="fa-solid fa-check text-green-500"></i>
                                 </>
                                 )}
-                                {error && <span className="text-sm text-red-500">Liên kết đã hết hạn hoặc không hợp lệ</span>}
+                                {isError && <span className="text-sm text-red-500">Liên kết đã hết hạn hoặc không hợp lệ</span>}
                             </div>
                             <Button>
                                 <Link to={`/login`}>Login</Link>
