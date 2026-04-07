@@ -92,12 +92,12 @@ function ChatBot() {
             event.close()
         }
     }, [conversationId, token])
-
+    
     return (
         <>
             <div className="flex flex-col h-full">
                 <p className="sticky ml-10 md:ml-1 text-2xl py-2">{conversationData?.title}</p>
-                <div ref={parentRef} className="flex-1 min-h-0 overflow-auto pb-20 pl-2 pr-2"
+                <div ref={parentRef} className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden pb-20 pl-2 pr-2"
                     style={{ overflowAnchor: "none" }}
                 >  
                     {(!conversationData || messageLoading) ? (

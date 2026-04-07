@@ -35,7 +35,7 @@ export default function useLoadMessages(conversationId, messages) {
     try {
       const oldMessages = await triggerGetMessage({
         conversationId,
-        c: oldestMessage.createdAt,
+        c: oldestMessage.id,
       }).unwrap();
 
       // hêt message

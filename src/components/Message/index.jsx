@@ -7,18 +7,21 @@ function Message({message, right, user}) {
     const {theme} = useTheme()
 
     const bubbleClass = `
-    whitespace-pre-wrap
-    wrap-break-word
-    max-w-full
-    px-3 py-2
-    rounded-2xl
-    ${theme === "light" ? "bg-olive-100" : ""}
-    ${right ? "border border-white" : ""}
-  `;
-  if(!message?.content) return null;
+        whitespace-pre-wrap
+        wrap-break-word
+        max-w-full
+        px-3 py-2
+        rounded-2xl
+        ${theme === "light" ? "bg-olive-100" : ""}
+        ${right ? "border border-white" : ""}
+    `;
+
+    const {attachments} = message;
+    
+    if(!message?.content && (!attachments || attachments.length === 0)) return null;
     return (
         <>
-            <div className={`${right ? "flex justify-end ml-auto" : "flex" } w-[80%]`}>
+            <div key={message.id} className={`${right ? "flex justify-end ml-auto" : "flex" } w-[80%]`}>
                 {user ? <p className={bubbleClass}>
                     {message.content}
                 </p> : 
@@ -35,9 +38,18 @@ function Message({message, right, user}) {
                     </Markdown>
                 </div>
                 }
+                {attachments && attachments.map((p)=> {
+                    return (
+                        <img
+                            src={p.fileUrl.replace('/src/uploads/', '/uploads/')}
+                            alt="uploaded"
+                            style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                            />
+                    )
+                })}
             </div>
             {message.status === "sending" && (
-            <span className="text-xs text-gray-400 ml-2">
+            <span className="text-xs text-gray-400 flex ml-auto">
                 Đang gửi...
             </span>
             )}

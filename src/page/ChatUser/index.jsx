@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { useParams } from "react-router-dom"
 import { Textarea } from "@/components/ui/textarea"
 import Message from "@/components/Message"
-import { selectUser } from "@/feature/User/userSelector"
+import { selectTOken, selectUser } from "@/feature/User/userSelector"
 import { getSocket } from "@/socket/socket"
 import { useSocket } from "@/contexts/SocketContext"
 import useLoadMessages from "@/hoock/useLoadMessages"
@@ -20,9 +20,12 @@ function ChatUser() {
     const socket = useSocket();
     const parentRef = useRef()
     const {user} = useSelector(selectUser)
+    const token = useSelector(selectTOken)
     const { conversationId } = useParams()
     const [content, setContent] = useState("")
     const [open, onOpenChange] = useState(false)
+    const fileInputRef = useRef(null)
+    const [files, setFiles] = useState([])
     const { data: messageData, isLoading: messageLoading, error: messageError } = useGetMessageQuery({conversationId})
     const [ addMembers, {isLoading: addMembersLoading, error: addMembersError }] = useAddMembersInConversationMutation()
     const [ kickMembers, {isLoading: kickMembersLoading, error: kickMembersError }] = useKickMembersInConversationMutation()
@@ -61,21 +64,37 @@ function ChatUser() {
         refetchOnReconnect: true,
         refetchOnFocus: true
     })
+    const other = conversationData?.participants?.find(u => u.user.id !== user.id)
 
     // xử lí khi gửi message
     const handleSendMessage = async () => {
         try {
             if (!conversationData) return
             if (!["DIRECT", "GROUP"].includes(conversationData.type)) return
-            if(!conversationId || !content) return
+            if(!conversationId || (!content.trim() && files.length === 0)) return
             const socket = getSocket()
-            if (!socket) return;
-            socket.emit("send_message", {
-                conversationId,
-                content
-            })
+            if(files.length > 0) {
+                const formData = new FormData()
+                formData.append("content", content)
+                formData.append("targetUserId", other?.user?.id) // ✅
+                formData.append("conversationId", conversationId)
+                files.forEach(file => formData.append("files", file))
+                await fetch(`${import.meta.env.VITE_BASE_URL}message/conversations/${conversationId}`, {
+                    method: "POST",
+                    headers: { Authorization: `Bearer ${token}` },
+                    body: formData,
+                })
+            } else {
+                if (!socket) return;
+                socket.emit("send_message", {
+                    conversationId,
+                    content
+                })
+            }
             scrollBottom()
             setContent("")
+            setFiles([])
+            if (fileInputRef.current) fileInputRef.current.value = ""
         } catch(err) {
             console.log("Error:", err)
         }
@@ -127,8 +146,6 @@ function ChatUser() {
         ))
     },  [conversationId, user?.id])
 
-    const other = conversationData?.participants?.find(u => u.user.id !== user.id)
-    
     return (
         <>
             <MemberModal
@@ -195,15 +212,51 @@ function ChatUser() {
                     </div>}
                 </div>
                 <div className="sticky mr-auto ml-auto w-[70%] md:w-[70%] lg:w-[70%]">
+                    {files.length > 0 && (
+                        <div className="flex gap-2 px-2 pb-2 flex-wrap">
+                            {files.map((file, i) => (
+                                <div key={i} className="relative">
+                                    {file.type.startsWith("image/") ? (
+                                        <img
+                                            src={URL.createObjectURL(file)}
+                                            className="w-16 h-16 object-cover rounded"
+                                        />
+                                    ) : (
+                                        <div className="w-16 h-16 flex items-center justify-center border rounded text-xs text-center p-1">
+                                            {file.name}
+                                        </div>
+                                    )}
+                                    <button
+                                        onClick={() => setFiles(files.filter((_, idx) => idx !== i))}
+                                        className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center"
+                                    >×</button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                     <div className="relative">
                         <Textarea id="textarea-message"
                         value={content}
                         onChange={(e)=> { setContent(e.target.value)}}
-                        className="overflow-hidden px-5 h-16 text-lg rounded-3xl pr-15"
+                        className="overflow-hidden h-16 text-lg rounded-3xl pr-15 pl-12"
                         placeholder="Enter text"/>
                         <button
+                            onClick={() => fileInputRef.current.click()}
+                            className="p-2 absolute left-3 top-1/2 -translate-y-1/2 opacity-60 hover:opacity-100"
+                        >
+                            <i className="fa-solid fa-paperclip"></i>
+                        </button>
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            multiple
+                            className="hidden"
+                            onChange={(e) => setFiles(Array.from(e.target.files))}
+                            accept="image/*,video/*,application/pdf"
+                        />
+                        <button
                         disabled={
-                            !content.trim() ||
+                            (!content.trim() && files.length === 0) || // ✅
                             !conversationData ||
                             !["DIRECT", "GROUP"].includes(conversationData.type)
                         }
