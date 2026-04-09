@@ -1,5 +1,5 @@
 import { conversationApi, useAddMembersInConversationMutation, useGetConversationQuery, useKickMembersInConversationMutation, useLazySearchAvailableUsersQuery, useLeaveGroupMutation, usePromoteToAdminConversationMutation } from "@/feature/Conversation/conversationApi"
-import { messageApi, useGetMessageQuery } from "@/feature/Message/messageApi"
+import { messageApi, useGetMessageQuery, useSendMessageWithFilesMutation } from "@/feature/Message/messageApi"
 import { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useParams } from "react-router-dom"
@@ -29,6 +29,7 @@ function ChatUser() {
     const { data: messageData, isLoading: messageLoading, error: messageError } = useGetMessageQuery({conversationId})
     const [ addMembers, {isLoading: addMembersLoading, error: addMembersError }] = useAddMembersInConversationMutation()
     const [ kickMembers, {isLoading: kickMembersLoading, error: kickMembersError }] = useKickMembersInConversationMutation()
+    const [ sendMessageWithFiles, {isLoading: sendMessageWithFilesLoading, error: sendMessageWithFilesError }] = useSendMessageWithFilesMutation()
     const [ PromoteToAdmin, {isLoading: PromoteToAdminLoading, error: PromoteToAdminError }] = usePromoteToAdminConversationMutation()
     const [ LeaveGroup, {isLoading: LeaveGroupAdminLoading, error: LeaveGroupAdminError }] = useLeaveGroupMutation()
 
@@ -74,17 +75,9 @@ function ChatUser() {
             if(!conversationId || (!content.trim() && files.length === 0)) return
             const socket = getSocket()
             if(files.length > 0) {
-                const formData = new FormData()
-                formData.append("content", content)
-                formData.append("targetUserId", other?.user?.id) // ✅
-                formData.append("conversationId", conversationId)
-                files.forEach(file => formData.append("files", file))
-                await fetch(`${import.meta.env.VITE_BASE_URL}message/conversations/${conversationId}`, {
-                    method: "POST",
-                    headers: { Authorization: `Bearer ${token}` },
-                    body: formData,
-                })
+                await sendMessageWithFiles({conversationId, content, files}).unwrap()
             } else {
+                console.log(1);
                 if (!socket) return;
                 socket.emit("send_message", {
                     conversationId,
@@ -105,6 +98,8 @@ function ChatUser() {
         if (!socket) return;
         const handleReceiveMessage = (message) => {
             if (message.conversationId !== conversationId) return
+            // nếu là ảnh bỏ qua vì đã có rtk xử lí
+            if (message.userId === user?.id && message.attachments?.length > 0) return;
             dispatch(messageApi.util.updateQueryData(
                 "getMessage",
                 {conversationId: message.conversationId},
@@ -145,7 +140,6 @@ function ChatUser() {
             }
         ))
     },  [conversationId, user?.id])
-    console.log(messageData);
     
     return (
         <>

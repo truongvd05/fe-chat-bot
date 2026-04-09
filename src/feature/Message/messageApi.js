@@ -26,7 +26,8 @@ export const messageApi = createApi({
         { conversationId, content },
         { dispatch, queryFulfilled },
       ) {
-        const tempId = Date.now();
+        const tempId = `temp_${Date.now()}`;
+
         const result = dispatch(
           messageApi.util.updateQueryData(
             "getMessage",
@@ -78,7 +79,8 @@ export const messageApi = createApi({
         { content, conversationId },
         { dispatch, queryFulfilled },
       ) {
-        const tempId = Date.now();
+        const tempId = `temp_${Date.now()}`;
+
         const result = dispatch(
           messageApi.util.updateQueryData(
             "getMessage",
@@ -114,6 +116,69 @@ export const messageApi = createApi({
         } catch (err) {
           // lỗi thì rollback
           result.undo();
+        }
+      },
+    }),
+    sendMessageWithFiles: builder.mutation({
+      query: ({ conversationId, content, files }) => {
+        const formData = new FormData();
+        formData.append("content", content);
+        files.forEach((file) => formData.append("files", file));
+        return {
+          url: `/message/conversations/${conversationId}`,
+          method: "POST",
+          body: formData,
+        };
+      },
+      async onQueryStarted(
+        { content, conversationId, files },
+        { dispatch, queryFulfilled },
+      ) {
+        const tempId = `temp_${Date.now()}`;
+
+        const previewAttachments = files.map((file, index) => ({
+          id: `preview_${Date.now()}_${index}`,
+          fileUrl: URL.createObjectURL(file), // blob URL tạm
+          type: file.type,
+          name: file.name,
+          isPreview: true,
+        }));
+
+        const result = dispatch(
+          messageApi.util.updateQueryData(
+            "getMessage",
+            { conversationId },
+            (draft) => {
+              draft.push({
+                id: tempId,
+                content,
+                attachments: previewAttachments,
+                isSending: true,
+                role: "user",
+              });
+            },
+          ),
+        );
+
+        try {
+          const { data: newMessage } = await queryFulfilled;
+
+          dispatch(
+            messageApi.util.updateQueryData(
+              "getMessage",
+              { conversationId },
+              (draft) => {
+                const index = draft.findIndex((m) => m.id === tempId);
+                if (index !== -1) {
+                  draft[index] = { ...newMessage, role: "user" };
+                }
+              },
+            ),
+          );
+          previewAttachments.forEach((a) => URL.revokeObjectURL(a.fileUrl));
+        } catch (err) {
+          result.undo();
+          previewAttachments.forEach((a) => URL.revokeObjectURL(a.fileUrl));
         }
       },
     }),
@@ -167,6 +232,7 @@ export const {
   useGetMessageQuery,
   useSendBotMessageMutation,
   useSendMessageMutation,
+  useSendMessageWithFilesMutation,
   // lazy
   useLazyGetMessageQuery,
 } = messageApi;
