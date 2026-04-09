@@ -22,9 +22,25 @@ function Message({message, right, user}) {
     return (
         <>
             <div key={message.id} className={`${right ? "flex justify-end ml-auto" : "flex" } w-[80%]`}>
-                {user ? <p className={bubbleClass}>
-                    {message.content}
-                </p> : 
+                {user ? (
+                // Tin nhắn người dùng
+                <div className={bubbleClass}>
+                    {message.content && <p className="m-0">{message.content}</p>}
+                    {attachments && attachments.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-1">
+                            {attachments.map((p) => (
+                                <img
+                                    key={p.id}
+                                    src={p.fileUrl.replace('/src/uploads/', 'http://localhost:3000/uploads/')}
+                                    alt={p.fileName}
+                                    className="max-h-60 object-contain rounded-lg"
+                                />
+                            ))}
+                        </div>
+                    )}
+                </div>
+            ) : (
+                // Tin nhắn AI
                 <div className={`${bubbleClass}
                     prose prose-sm max-w-none
                     prose-p:my-0
@@ -36,17 +52,20 @@ function Message({message, right, user}) {
                     <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>
                         {message.content}
                     </Markdown>
+                    {attachments && attachments.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-1">
+                            {attachments.map((p) => (
+                                <img
+                                    key={p.id}
+                                    src={p.fileUrl.replace('/src/uploads/', '/uploads/')}
+                                    alt={p.fileName}
+                                    className="max-h-60 object-contain rounded-lg"
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
-                }
-                {attachments && attachments.map((p)=> {
-                    return (
-                        <img
-                            src={p.fileUrl.replace('/src/uploads/', '/uploads/')}
-                            alt="uploaded"
-                            style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-                            />
-                    )
-                })}
+            )}
             </div>
             {message.status === "sending" && (
             <span className="text-xs text-gray-400 flex ml-auto">

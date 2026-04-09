@@ -145,7 +145,8 @@ function ChatUser() {
             }
         ))
     },  [conversationId, user?.id])
-
+    console.log(messageData);
+    
     return (
         <>
             <MemberModal
