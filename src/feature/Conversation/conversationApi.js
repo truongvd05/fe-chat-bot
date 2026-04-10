@@ -20,7 +20,7 @@ export const conversationApi = createApi({
     }),
     getConversation: builder.query({
       query: (conversationId) => `/conversation/${conversationId}`,
-      providesTags: (result, error, id) => [{ type: "Conversation", id }],
+      providesTags: (result, error, id) => ["Conversation"],
     }),
     createDirectConversation: builder.mutation({
       query: (targetUserId) => ({
@@ -28,7 +28,7 @@ export const conversationApi = createApi({
         method: "POST",
         body: { targetUserId },
       }),
-      invalidatesTags: [{ type: "Conversation" }],
+      invalidatesTags: ["Conversation"],
     }),
     createGroupConversation: builder.mutation({
       query: ({ name, memberIds }) => ({
@@ -36,7 +36,7 @@ export const conversationApi = createApi({
         method: "POST",
         body: { name, members: memberIds },
       }),
-      invalidatesTags: [{ type: "Conversation" }],
+      invalidatesTags: ["Conversation"],
     }),
     createBotConversation: builder.mutation({
       query: (title) => ({
@@ -44,7 +44,7 @@ export const conversationApi = createApi({
         method: "POST",
         body: { title },
       }),
-      invalidatesTags: [{ type: "botConversation" }],
+      invalidatesTags: ["botConversation"],
     }),
     searchAvailableUsers: builder.query({
       query: ({ conversationId, q }) => ({
@@ -58,33 +58,7 @@ export const conversationApi = createApi({
         method: "POST",
         body: { members: memberIds },
       }),
-      invalidatesTags: [{ type: "Conversation" }],
-      async onQueryStarted(
-        { conversationId, memberIds },
-        { dispatch, queryFulfilled },
-      ) {
-        // thêm member vào cache ngay
-        const patchResult = dispatch(
-          conversationApi.util.updateQueryData(
-            "getConversation",
-            conversationId,
-            (draft) => {
-              // tránh duplicate nếu trùng id
-              const existingIds = draft.participants.map((m) => m.userId);
-              const newMembers = memberIds
-                .filter((id) => !existingIds.includes(id))
-                .map((id) => ({ id, name: "..." }));
-              draft.participants.push(...newMembers);
-            },
-          ),
-        );
-
-        try {
-          await queryFulfilled;
-        } catch (err) {
-          patchResult.undo(); // rollback nếu backend fail
-        }
-      },
+      invalidatesTags: ["Conversation"],
     }),
     kickMembersInConversation: builder.mutation({
       query: ({ conversationId, memberIds }) => ({
@@ -92,7 +66,7 @@ export const conversationApi = createApi({
         method: "DELETE",
         body: { members: memberIds },
       }),
-      invalidatesTags: [{ type: "Conversation" }],
+      invalidatesTags: ["Conversation"],
       async onQueryStarted(
         { conversationId, memberIds },
         { dispatch, queryFulfilled },
@@ -102,7 +76,7 @@ export const conversationApi = createApi({
             "getConversation",
             conversationId,
             (draft) => {
-              draft.members = draft.participants.filter(
+              draft.participants = draft.participants.filter(
                 (m) => !memberIds.includes(m.userId),
               );
             },
@@ -124,14 +98,14 @@ export const conversationApi = createApi({
         method: "POST",
         body: { members: memberIds },
       }),
-      invalidatesTags: [{ type: "Conversation" }],
+      invalidatesTags: ["Conversation"],
     }),
     leaveGroup: builder.mutation({
       query: ({ conversationId }) => ({
         url: `/conversation/${conversationId}/leaveGroup`,
         method: "POST",
       }),
-      invalidatesTags: [{ type: "Conversation" }],
+      invalidatesTags: ["Conversation"],
     }),
   }),
 });

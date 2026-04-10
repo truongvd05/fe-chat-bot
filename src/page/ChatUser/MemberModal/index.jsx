@@ -41,7 +41,7 @@ function MemberModal({ members, open, onOpenChange, onKick, onPromote, onLeave, 
   
   const adminCount = members?.filter(m => m.role === "ADMIN").length
 
-  const isOnlyAdmin = adminCount === 1
+const isOnlyAdmin = adminCount === 1 && user.role === "ADMIN"
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

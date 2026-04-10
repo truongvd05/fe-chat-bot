@@ -2,7 +2,7 @@ import { conversationApi, useAddMembersInConversationMutation, useGetConversatio
 import { messageApi, useGetMessageQuery, useSendMessageWithFilesMutation } from "@/feature/Message/messageApi"
 import { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { Textarea } from "@/components/ui/textarea"
 import Message from "@/components/Message"
 import { selectTOken, selectUser } from "@/feature/User/userSelector"
@@ -14,12 +14,14 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { useScrollManager } from "@/hoock/useScrollManager"
 import MemberModal from "./MemberModal"
 import MemberSelectModal from "@/layouts/ChatLayout/Sidebar/Conversation/MemberSelectModal"
+import { toast } from "sonner";
 
 function ChatUser() {
+    const navigate = useNavigate()
     const dispatch = useDispatch()
     const socket = useSocket();
     const parentRef = useRef()
-    const {user} = useSelector(selectUser)
+    const { user } = useSelector(selectUser)
     const token = useSelector(selectTOken)
     const { conversationId } = useParams()
     const [content, setContent] = useState("")
@@ -59,7 +61,7 @@ function ChatUser() {
         parentRef,
     })
 
-    const { data: conversationData, isLoading: conversatonLoading, error: conversationError } =
+    const { data: conversationData, isLoading: conversatonLoading, error: conversationError, refetch: refetchConversation } =
     useGetConversationQuery(conversationId, {
         refetchOnMountOrArgChange: true,
         refetchOnReconnect: true,
@@ -141,6 +143,52 @@ function ChatUser() {
         ))
     },  [conversationId, user?.id])
     
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleGroupEvent = (data) => {
+            const { conversationId: convId, action, member } = data;
+            if (convId !== conversationId) return;
+            console.log(action);
+            
+            const isMe = member
+                ?.map(String)
+                .includes(String(user?.id));
+
+            if (isMe) {
+                    if (action === "kick") {
+                        toast.error("Bạn đã bị xóa khỏi nhóm");
+                        navigate("/chat");
+                    }
+
+                    if (action === "leave") {
+                        toast.success("Bạn đã rời nhóm");
+                        console.log(2); 
+                        navigate("/chat");
+                    }
+
+                    if (action === "add") {
+                        console.log(1);
+                        
+                        toast.success("Bạn đã được thêm vào nhóm");
+                    }
+
+                    if (action === "promote") {
+                        toast.success("Bạn đã được thăng quyền admin");
+                    }
+                }
+                refetchConversation();
+                dispatch(conversationApi.util.invalidateTags(["Conversation"]));
+        };
+
+
+        socket.on("group_event", handleGroupEvent);
+
+        return () => {
+            socket.off("group_event", handleGroupEvent);
+        };
+    }, [socket, conversationId, dispatch, refetchConversation, navigate, user?.id]);
+
     return (
         <>
             <MemberModal

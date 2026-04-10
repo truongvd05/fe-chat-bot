@@ -22,15 +22,12 @@ function Conversation({ type, setIsOpen }) {
     const navigate = useNavigate()
     const { data: botData,
         isLoading: botLoading,
-    } = useGetBotConversationsQuery("bots", {
-        skip: type !== "bots",
-    })
+    } = useGetBotConversationsQuery("bots")
 
     const { data: chatData,
         isLoading: chatLoading,
-    } = useGetConversationsQuery(undefined, {
-        skip: type !== "chat",
-    })
+        refetch: refetchConversations,
+    } = useGetConversationsQuery(undefined)
 
     const [triggerFindUser, {
         data: findUserData,
@@ -83,6 +80,23 @@ function Conversation({ type, setIsOpen }) {
             socket.off("conversation_updated", handleReceiveConversation);
         };
     }, [conversationId, socket]);
+
+    useEffect(() => {
+        if (!socket) return;
+        
+       // THÊM: Khi có member bị kick/rời nhóm
+        const handleGroupEvent = ({ conversationId: convId }) => {
+            console.log("Member removed event:", convId);
+            refetchConversations();
+        };
+        
+        socket.on("group_event", handleGroupEvent);//
+        
+        return () => {
+            socket.off("group_event", handleGroupEvent);//
+        };
+    }, [conversationId, socket, dispatch, user.id, refetchConversations]);
+
     if(isLoading) return <Skeleton/>
     
     return (
