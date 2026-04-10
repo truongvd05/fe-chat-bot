@@ -96,9 +96,9 @@ function Conversation({ type, setIsOpen }) {
             socket.off("group_event", handleGroupEvent);//
         };
     }, [conversationId, socket, dispatch, user.id, refetchConversations]);
-
-    if(isLoading) return <Skeleton/>
     
+    if(!type) return
+    if(isLoading) return <Skeleton/>
     return (
     <div className="w-full">
         {type === "chat" ?
