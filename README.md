@@ -1,7 +1,7 @@
-FE Chat Bot
+🚀 FE Chat Bot
 
 Frontend for a real-time AI chat application built with React.
-The application supports real-time messaging using Server-Sent Events (SSE) and Socket.IO, authentication with JWT + refresh token, and a modern UI.
+This project provides a modern chat experience with real-time communication, authentication, and scalable state management.
 
 Demo
 
@@ -12,7 +12,7 @@ Features
 
 Real-time chat using Server-Sent Events (SSE)
 WebSocket connection with Socket.IO
-JWT authentication
+Authentication with JWT + Refresh Token
 Automatic refresh token handling
 Chat conversation management
 Modern responsive UI
@@ -59,5 +59,32 @@ src
 ├── utils
 │
 └── main.jsx
+
+Getting Started
+
+1.  Install dependencies
+    npm install
+2.  Run development server
+    npm run dev
+3.  Build for production
+    npm run build
+
+Authentication Flow
+Access token stored in memory / state
+Refresh token handled automatically via API
+Failed requests are retried after token refresh
+Secure communication with credentials enabled
+
+Real-time Communication
+SSE used for AI streaming responses
+Socket.IO used for:
+user-to-user messaging
+online status
+real-time events
+
+Notes
+Ensure backend server is running before starting frontend
+Check correct API URLs in .env
+Restart dev server after changing environment variables
 
 ✍️ Author: TruongVD

@@ -65,8 +65,8 @@ function Login() {
             </CardHeader>
             <form className="flex flex-col items-center gap-2" onSubmit={handleSubmit(onSubmit)}>
                 <fieldset disabled={isLoading}
-                className={`w-full flex flex-col items-center gap-2 ${
-                isLoading ? "opacity-70" : ""}`}>
+                    className={`w-full flex flex-col items-center gap-2 ${
+                    isLoading ? "opacity-70" : ""}`}>
                     <div className="flex flex-col w-[80%] m-auto gap-2">
                         <Input type="email" autoComplete="username" placeholder="Email" {...register("email", {required: true})}/>
                         {errors.email && <span className="text-red-500 text-sm">{errors.email.message}</span>}

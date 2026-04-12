@@ -99,7 +99,6 @@ function Conversation({ type, setIsOpen }) {
     
     if(type !== "chat" && type !== "bots") return
     if(isLoading) return <Skeleton/>
-    console.log(type);
     
     return (
     <div className="w-full">

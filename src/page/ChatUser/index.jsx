@@ -22,12 +22,13 @@ function ChatUser() {
     const socket = useSocket();
     const parentRef = useRef()
     const { user } = useSelector(selectUser)
-    const token = useSelector(selectTOken)
     const { conversationId } = useParams()
     const [content, setContent] = useState("")
     const [open, onOpenChange] = useState(false)
     const fileInputRef = useRef(null)
     const [files, setFiles] = useState([])
+    const [typingUsers, setTypingUsers] = useState([]);
+
     const { data: messageData, isLoading: messageLoading, error: messageError } = useGetMessageQuery({conversationId})
     const [ addMembers, {isLoading: addMembersLoading, error: addMembersError }] = useAddMembersInConversationMutation()
     const [ kickMembers, {isLoading: kickMembersLoading, error: kickMembersError }] = useKickMembersInConversationMutation()
@@ -79,7 +80,6 @@ function ChatUser() {
             if(files.length > 0) {
                 await sendMessageWithFiles({conversationId, content, files}).unwrap()
             } else {
-                console.log(1);
                 if (!socket) return;
                 socket.emit("send_message", {
                     conversationId,
@@ -149,7 +149,6 @@ function ChatUser() {
         const handleGroupEvent = (data) => {
             const { conversationId: convId, action, member } = data;
             if (convId !== conversationId) return;
-            console.log(action);
             
             const isMe = member
                 ?.map(String)
@@ -163,13 +162,10 @@ function ChatUser() {
 
                     if (action === "leave") {
                         toast.success("Bạn đã rời nhóm");
-                        console.log(2); 
                         navigate("/chat");
                     }
 
                     if (action === "add") {
-                        console.log(1);
-                        
                         toast.success("Bạn đã được thêm vào nhóm");
                     }
 
@@ -188,6 +184,37 @@ function ChatUser() {
             socket.off("group_event", handleGroupEvent);
         };
     }, [socket, conversationId, dispatch, refetchConversation, navigate, user?.id]);
+
+    // Nhận typing_users từ server
+    useEffect(() => {
+        if (!socket) return;
+        const handleTypingUsers = ({ conversationId: convId, userIds }) => {
+            console.log("emit typing_start", { convId, userIds });
+            if (convId !== conversationId) return;
+            // Lọc bỏ chính mình
+            setTypingUsers(userIds.filter(id => String(id) !== String(user?.id)));
+        };
+        socket.on("typing_users", handleTypingUsers);
+        return () => socket.off("typing_users", handleTypingUsers);
+    }, [socket, conversationId, user?.id]); 
+
+    const typingRef = useRef(false);
+    const timeoutRef = useRef(null);
+
+    // typing
+    const handleTyping = () => {
+        if (!socket || !conversationId) return;
+        if (!typingRef.current) {
+            socket.emit("typing_start", { conversationId })
+            typingRef.current = true;
+        }
+        clearTimeout(timeoutRef.current);
+
+        timeoutRef.current = setTimeout(() => {
+            socket.emit("typing_stop", { conversationId });
+            typingRef.current = false;
+        }, 5000);
+    };
 
     return (
         <>
@@ -254,6 +281,20 @@ function ChatUser() {
                             })}
                     </div>}
                 </div>
+                {/* Typing indicator */}
+                {typingUsers.length > 0 && (
+                    <div className="pl-4 pb-1 text-sm text-gray-400 italic">
+                        {typingUsers.length === 1
+                            ? (() => {
+                                const typingUser = conversationData?.participants?.find(
+                                    p => p.user.id === typingUsers[0]
+                                );
+                                return `${typingUser?.user?.name ?? "Ai đó"} đang gõ...`;
+                            })()
+                            : `${typingUsers.length} người đang gõ...`
+                        }
+                    </div>
+                )}
                 <div className="sticky mr-auto ml-auto w-[70%] md:w-[70%] lg:w-[70%]">
                     {files.length > 0 && (
                         <div className="flex gap-2 px-2 pb-2 flex-wrap">
@@ -280,7 +321,10 @@ function ChatUser() {
                     <div className="relative">
                         <Textarea id="textarea-message"
                         value={content}
-                        onChange={(e)=> { setContent(e.target.value)}}
+                        onChange={(e)=> {
+                            setContent(e.target.value)
+                            handleTyping();
+                        }}
                         className="overflow-hidden h-16 text-lg rounded-3xl pr-15 pl-12"
                         placeholder="Enter text"/>
                         <button
