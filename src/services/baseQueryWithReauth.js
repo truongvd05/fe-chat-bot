@@ -1,3 +1,4 @@
+import logger from "@/utils/logger";
 import baseQuery from "./baseQuery";
 import { logOut, setAccessToken } from "@/feature/User/userSlice";
 import { fetchBaseQuery } from "@reduxjs/toolkit/query";
@@ -28,7 +29,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
       try {
         const refresh_token = localStorage.getItem("refresh_token");
         if (!refresh_token) {
-          console.log("NO REFRESH TOKEN");
+          logger.log("NO REFRESH TOKEN");
           api.dispatch(logOut());
           return result;
         }
@@ -44,7 +45,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
           extraOptions,
         );
 
-        console.log("refreshResult:", refreshResult);
+        logger.log("refreshResult:", refreshResult);
         // refresh thành công
         if (refreshResult.data) {
           api.dispatch(setAccessToken(refreshResult.data.data.access_token));

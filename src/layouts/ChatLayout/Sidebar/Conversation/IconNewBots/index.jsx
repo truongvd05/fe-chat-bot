@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useCreateBotConversationMutation } from "@/feature/Conversation/conversationApi";
+import logger from "@/utils/logger";
 
 
 function IconNewBots() {
@@ -24,7 +25,7 @@ function IconNewBots() {
     try {
       await createDirectConversation(value).unwrap()
     } catch (err) {
-      console.log(err);
+      logger.log(err);
     }
   }
 

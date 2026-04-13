@@ -13,6 +13,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForgotPasswordMutation } from "@/feature/Auth/authApi";
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import logger from "@/utils/logger";
 
 const schema = yup.object({
     email: yup.string().email("email không hợp lệ").required("Email là bắt buộc")
@@ -37,7 +38,7 @@ function ForgotPassword() {
             await forgotPassword({email: data.email}).unwrap();
             setSuccessMessage(true)
         } catch (err) {
-            console.log(err);
+            logger.log(err);
             setSuccessMessage(false)
             setError("root", {
                 type: "manual",

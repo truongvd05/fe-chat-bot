@@ -14,6 +14,7 @@ import PasswordInput from "@/components/PasswordInput";
 import { useChangePasswordMutation } from "@/feature/User/userApi";
 import { logOut } from "@/feature/User/userSlice";
 import { useDispatch } from "react-redux";
+import logger from "@/utils/logger";
 
 const schema = yup.object({
     password: yup.string().min(6, "mật khẩu ít nhất 6 kí tự").required("Mật khẩu dùng là bắt buộc"),
@@ -41,7 +42,7 @@ function ChangePassword() {
             localStorage.removeItem("access_token")
             localStorage.removeItem("refresh_token")
         } catch (err) {
-            console.log(err);
+            logger.log(err);
         }
     }
     return (

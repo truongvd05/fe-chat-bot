@@ -24,7 +24,7 @@ export const store = configureStore({
     [conversationApi.reducerPath]: conversationApi.reducer,
     [messageApi.reducerPath]: messageApi.reducer,
     user: persistedUserReducer,
-    online: onlineReducer,
+    onlineUsers: onlineReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

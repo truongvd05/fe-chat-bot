@@ -11,6 +11,7 @@ import {
 import debounce from "lodash.debounce";
 import { Input } from "@/components/ui/input";
 import { useEffect, useRef, useState } from "react";
+import logger from "@/utils/logger";
 
 
 function MemberSelectModal({trigger, title, data, onSearch, onSubmit, loading, error, reset}) {
@@ -25,7 +26,7 @@ function MemberSelectModal({trigger, title, data, onSearch, onSubmit, loading, e
         try {
             await onSubmit({name, memberIds})
         } catch (err) {
-            console.log(err);
+            logger.log(err);
         }
     }
   
@@ -47,7 +48,7 @@ function MemberSelectModal({trigger, title, data, onSearch, onSubmit, loading, e
             try {
                 await onSearch(value);
             } catch (err) {
-                console.log(err);
+                logger.log(err);
             }
         }, 800)
         return () => {

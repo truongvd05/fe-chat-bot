@@ -10,6 +10,7 @@ import { selectTOken } from "@/feature/User/userSelector";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useScrollManager } from "@/hoock/useScrollManager";
 import MessageSkeleton from "@/components/MessageSkeleton";
+import logger from "@/utils/logger";
 
 function ChatBot() {
     const dispatch = useDispatch()
@@ -45,7 +46,7 @@ function ChatBot() {
             setContent("")
             scrollBottom()
         } catch(err) {
-            console.log("Error:", err)
+            logger.log("Error:", err)
         }
     }
 
@@ -57,7 +58,7 @@ function ChatBot() {
             { withCredentials: true }
         )
         event.addEventListener("connected", (e) => {
-            console.log("SSE connected");
+            logger.log("SSE connected");
         })
         event.onmessage = (e) => {
             const data = JSON.parse(e.data);

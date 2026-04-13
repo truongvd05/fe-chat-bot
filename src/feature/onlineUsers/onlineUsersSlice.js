@@ -1,25 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  onlineUsers: [],
+  userIds: [],
 };
-const onlineUser = createSlice({
+const onlineUsersSlice = createSlice({
   name: "online",
   initialState,
   reducers: {
-    setUserOnline: (state, action) => {
-      if (!state.onlineUsers.includes(action.payload)) {
-        state.onlineUsers.push(action.payload);
-      }
-    },
-    setUserOffline: (state, action) => {
-      state.onlineUsers = state.onlineUsers.filter(
-        (id) => id !== action.payload,
-      );
+    setOnlineUsers: (state, action) => {
+      state.userIds = action.payload.map(String);
     },
   },
 });
 
-export const { setUserOnline, setUserOffline } = onlineUser.actions;
+export const { setOnlineUsers } = onlineUsersSlice.actions;
 
-export default onlineUser.reducer;
+export default onlineUsersSlice.reducer;

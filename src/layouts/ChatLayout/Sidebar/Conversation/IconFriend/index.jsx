@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { useEffect, useMemo, useState } from "react";
 import { useLazyFindUserQuery } from "@/feature/User/userApi";
 import { useCreateDirectConversationMutation } from "@/feature/Conversation/conversationApi";
+import logger from "@/utils/logger";
 
 
 function IconFriend() {
@@ -25,7 +26,7 @@ function IconFriend() {
     try {
       await createDirectConversation(targetUserId).unwrap()
     } catch (err) {
-      console.log(err);
+      logger.log(err);
     }
   }
   
@@ -35,7 +36,7 @@ function IconFriend() {
           try {
               await triggerFindUser(value).unwrap();
           } catch (err) {
-            console.log(err);
+            logger.log(err);
           }
       }, 800);
   }, [triggerFindUser]);

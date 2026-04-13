@@ -35,13 +35,15 @@ function MemberModal({ members, open, onOpenChange, onKick, onPromote, onLeave, 
   const [keyword, setKeyword] = useState("")
   const [openLeave, setOpenLeave] = useState(false)
 
+  const onlineUserIds = useSelector(state => state.onlineUsers.userIds)
+
   const filteredMembers = members?.filter(m =>
     m.user?.name?.toLowerCase().includes(keyword.toLowerCase())
   )
   
   const adminCount = members?.filter(m => m.role === "ADMIN").length
 
-const isOnlyAdmin = adminCount === 1 && user.role === "ADMIN"
+  const isOnlyAdmin = adminCount === 1 && user.role === "ADMIN"
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -56,10 +58,13 @@ const isOnlyAdmin = adminCount === 1 && user.role === "ADMIN"
         <div className="space-y-3 max-h-75 overflow-y-auto overflow-x-hidden">
           {filteredMembers?.map(m => {
               const isMe = m.userId === user.id
-            
+              const isOtherOnline = onlineUserIds.includes(String(m.userId))
               return (
                 <div key={m.userId} className={`flex items-center gap-3 p-1 rounded-sm ${isMe && "bg-amber-100"}`}>
                   <div className={`flex-1 flex gap-5 items-center `}>
+                    <span className={`w-2 h-2 rounded-full inline-block ml-2 ${
+                                isOtherOnline ? "bg-green-500" : "bg-red-500"
+                            }`} />
                     <p className="font-medium">{m.user.name}</p>
                     {isMe && <p className="text-sm opacity-70">Bạn</p>}
                   </div>

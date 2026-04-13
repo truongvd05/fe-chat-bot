@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "@/feature/User/userSlice";
 import PasswordInput from "@/components/PasswordInput";
 import { selectUser } from "@/feature/User/userSelector";
+import logger from "@/utils/logger";
 
 const schema = yup.object({
     email: yup.string().required("Vui lòng nhập Email"),
@@ -48,10 +49,10 @@ function Login() {
                 email: data.email,
                 password: data.password
             }).unwrap();
-            console.log("Login success:", result);
+            logger.log("Login success:", result);
             dispatch(setUser(result))
         } catch (err) {
-            console.log("Login failed:", err);
+            logger.log("Login failed:", err);
             setError("err", {
                 type: "manual",
                 message: err?.data?.error || "Đăng nhập thất bại",

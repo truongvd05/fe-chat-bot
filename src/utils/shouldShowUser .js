@@ -1,6 +1,4 @@
 const shouldShowUser = (messages, index) => {
-  console.log(messages);
-
   if (index === 0) return true;
 
   const prev = messages[index - 1];

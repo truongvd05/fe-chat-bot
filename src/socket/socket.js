@@ -1,3 +1,4 @@
+import logger from "@/utils/logger";
 import { io } from "socket.io-client";
 
 let socket;
@@ -25,7 +26,7 @@ export const getSocket = () => socket;
 
 export const disconnectSocket = () => {
   if (socket) {
-    console.log("disconnect socket");
+    logger.log("disconnect socket");
     socket.removeAllListeners(); // clear hết listeners
     socket.disconnect();
     socket = null; // set null để connectSocket tạo mới được

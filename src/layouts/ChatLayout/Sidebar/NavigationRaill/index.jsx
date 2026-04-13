@@ -15,6 +15,7 @@ import { useSocket } from "@/contexts/SocketContext"
 import { useDispatch } from "react-redux"
 import { logOut } from "@/feature/User/userSlice"
 import { disconnectSocket } from "@/socket/socket"
+import logger from "@/utils/logger"
 
 function NavigationRall({ type }) {
     const socket = useSocket();
@@ -35,7 +36,7 @@ function NavigationRall({ type }) {
             localStorage.removeItem("refresh_token")
             navigate("/login")
         } catch (err) {
-            console.log(err);
+            logger.log(err);
         }
     }
 

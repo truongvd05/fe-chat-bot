@@ -2,6 +2,7 @@ import {
   messageApi,
   useLazyGetMessageQuery,
 } from "@/feature/Message/messageApi";
+import logger from "@/utils/logger";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 
@@ -58,7 +59,7 @@ export default function useLoadMessages(conversationId, messages) {
       );
       return uniqueMessages.length;
     } catch (err) {
-      console.log(err);
+      logger.log(err);
     } finally {
       loadingRef.current = false;
     }

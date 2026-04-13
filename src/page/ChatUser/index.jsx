@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { useNavigate, useParams } from "react-router-dom"
 import { Textarea } from "@/components/ui/textarea"
 import Message from "@/components/Message"
-import { selectTOken, selectUser } from "@/feature/User/userSelector"
+import { selectUser } from "@/feature/User/userSelector"
 import { getSocket } from "@/socket/socket"
 import { useSocket } from "@/contexts/SocketContext"
 import useLoadMessages from "@/hoock/useLoadMessages"
@@ -15,6 +15,8 @@ import { useScrollManager } from "@/hoock/useScrollManager"
 import MemberModal from "./MemberModal"
 import MemberSelectModal from "@/layouts/ChatLayout/Sidebar/Conversation/MemberSelectModal"
 import { toast } from "sonner";
+import { selectIsUserOnline } from "@/feature/onlineUsers/onlineUsersSelector"
+import logger from "@/utils/logger"
 
 function ChatUser() {
     const navigate = useNavigate()
@@ -66,9 +68,10 @@ function ChatUser() {
     useGetConversationQuery(conversationId, {
         refetchOnMountOrArgChange: true,
         refetchOnReconnect: true,
-        refetchOnFocus: true
     })
     const other = conversationData?.participants?.find(u => u.user.id !== user.id)
+    const isOtherOnline = useSelector(selectIsUserOnline(other?.user?.id))
+    
 
     // xử lí khi gửi message
     const handleSendMessage = async () => {
@@ -91,7 +94,7 @@ function ChatUser() {
             setFiles([])
             if (fileInputRef.current) fileInputRef.current.value = ""
         } catch(err) {
-            console.log("Error:", err)
+            logger.log("Error:", err)
         }
     }
     
@@ -189,7 +192,6 @@ function ChatUser() {
     useEffect(() => {
         if (!socket) return;
         const handleTypingUsers = ({ conversationId: convId, userIds }) => {
-            console.log("emit typing_start", { convId, userIds });
             if (convId !== conversationId) return;
             // Lọc bỏ chính mình
             setTypingUsers(userIds.filter(id => String(id) !== String(user?.id)));
@@ -215,7 +217,6 @@ function ChatUser() {
             typingRef.current = false;
         }, 5000);
     };
-
     return (
         <>
             <MemberModal
@@ -229,7 +230,14 @@ function ChatUser() {
                 />
             <div className="flex flex-col h-full overflow-hidden">
                 <div className="sticky ml-10 md:ml-1 text-2xl py-2 border-b mb-5 top-1">
-                    <p >{conversationData?.type === "DIRECT" ? other?.user?.name : conversationData?.title}</p>
+                    <div className="flex items-center">
+                        <p >{conversationData?.type === "DIRECT" ? other?.user?.name : conversationData?.title}</p>
+                        {conversationData?.type === "DIRECT" && (
+                            <span className={`w-2 h-2 rounded-full inline-block ml-2 ${
+                                isOtherOnline ? "bg-green-500" : "bg-red-500"
+                            }`} />
+                        )}
+                    </div>
                     {conversationData?.type === "GROUP" && 
                     <div className="flex gap-2 text-sm items-center justify-between pr-5">    
                         <div className="flex items-center" onClick={() => onOpenChange(true)}>
