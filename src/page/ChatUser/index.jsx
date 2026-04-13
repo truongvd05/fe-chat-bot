@@ -197,7 +197,10 @@ function ChatUser() {
             setTypingUsers(userIds.filter(id => String(id) !== String(user?.id)));
         };
         socket.on("typing_users", handleTypingUsers);
-        return () => socket.off("typing_users", handleTypingUsers);
+        return () => {
+            socket.off("typing_users", handleTypingUsers);
+            setTypingUsers([]);
+        }
     }, [socket, conversationId, user?.id]); 
 
     const typingRef = useRef(false);
@@ -217,6 +220,9 @@ function ChatUser() {
             typingRef.current = false;
         }, 5000);
     };
+
+
+
     return (
         <>
             <MemberModal
