@@ -12,15 +12,15 @@ function ChatLayout(){
     }
     return (
     <div className="overflow-x-hidden">
-        <div className="fixed top-0 bottom-0 w-70 z-10">
+        <div className="fixed top-0 bottom-0 z-10 ">
             <Sidebar/>
         </div>
 
-        <div className="h-screen border-r border-l flex-1 flex flex-col md:mr-25 md:ml-25 lg:ml-70  lg:mr-37.5 xl:mr-70 min-w-0  pb-5">
+        <div className="h-screen border-r border-l flex-1 flex flex-col md:mr-25 md:ml-25 lg:ml-70  lg:mr-37.5 xl:mr-70 min-w-0 pb-5">
             <Outlet/>
         </div>
 
-        <div className="fixed right-0 top-0 bottom-0 z-0">
+        <div className="fixed right-0 top-0 bottom-full ">
             <User/>
         </div>
     </div>

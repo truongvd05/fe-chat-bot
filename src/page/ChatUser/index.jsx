@@ -17,6 +17,8 @@ import MemberSelectModal from "@/layouts/ChatLayout/Sidebar/Conversation/MemberS
 import { toast } from "sonner";
 import { selectIsUserOnline } from "@/feature/onlineUsers/onlineUsersSelector"
 import logger from "@/utils/logger"
+import shouldShowUser from "@/utils/shouldShowUser "
+import shouldShowTime from "@/utils/shouldShowTime"
 
 function ChatUser() {
     const navigate = useNavigate()
@@ -288,7 +290,13 @@ function ChatUser() {
                                         style={{transform: `translateY(${virtualRow.start}px)`}}
                                     >
                                         <div className={`${message.role === "user" ? "" : "border-b border-t"}`} >
-                                            <Message message={message} right={message.userId === user?.id} user={message.role === "user"}/>
+                                            <Message
+                                                message={message}
+                                                right={message.userId === user?.id}
+                                                user={message.role === "user"}
+                                                showName={shouldShowUser(messageData, virtualRow.index)}
+                                                showTime={shouldShowTime(messageData, virtualRow.index)}
+                                                />
                                         </div>
                                     </div>
                                 )

@@ -4,10 +4,10 @@ const shouldShowUser = (messages, index) => {
   const prev = messages[index - 1];
   const curr = messages[index];
 
+  if (!prev || !curr) return true;
   if (prev.userId !== curr.userId) return true;
 
   const diff = new Date(curr.createdAt) - new Date(prev.createdAt);
-
   return diff > 5 * 60 * 1000;
 };
 

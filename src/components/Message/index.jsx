@@ -3,7 +3,7 @@ import Markdown from "react-markdown"
 import rehypeSanitize from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
 
-function Message({message, right, user}) {
+function Message({message, right, user, showName, showTime}) {
     const {theme} = useTheme()
 
     const bubbleClass = `
@@ -19,8 +19,18 @@ function Message({message, right, user}) {
     const {attachments} = message;
     
     if(!message?.content && (!attachments || attachments.length === 0)) return null;
+
+    const formatTime = (dateStr) => {
+        const date = new Date(dateStr);
+        return date.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+    };
     return (
         <>
+            {showName && !right && (
+                <span className="text-xs font-semibold text-gray-500 ml-1 mt-1">
+                    {message.user?.name}
+                </span>
+            )}
             <div key={message.id} className={`${right ? "flex justify-end ml-auto" : "flex" } w-[80%]`}>
                 {user ? (
                 // Tin nhắn người dùng
@@ -67,6 +77,11 @@ function Message({message, right, user}) {
                 </div>
             )}
             </div>
+            {showTime && message.createdAt && (
+                <span className={`flex text-xs text-gray-400 ${right ? "justify-end mr-1" : "ml-1"}`}>
+                    {formatTime(message.createdAt)}
+                </span>
+            )}
             {message.status === "sending" && (
             <span className="text-xs text-gray-400 flex ml-auto">
                 Đang gửi...
