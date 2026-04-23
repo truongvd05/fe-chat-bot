@@ -25,7 +25,6 @@ function ForgotPassword() {
         register,
         handleSubmit,
         setError,
-        clearErrors,
         watch,
         formState: { errors },
     } = useForm( {resolver: yupResolver(schema) });
@@ -50,7 +49,6 @@ function ForgotPassword() {
 
     useEffect(()=> {
         setSuccessMessage(false);
-        clearErrors("root");
     }, [emailValue])
 
 return (

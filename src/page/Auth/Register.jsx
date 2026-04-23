@@ -58,6 +58,8 @@ function Register() {
                 password: data.password,
                 confirm_password: data.password_confirmation,
             }).unwrap();
+            localStorage.setItem("access_token", res.access_token)
+            localStorage.setItem("refresh_token", res.refresh_token)
             setToast(true);
             setTimeout(() => {
                 navigate("/login")

@@ -21,12 +21,6 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
     toast.error("Lỗi không xác định");
   }
 
-  if (result.error && result.error.status === 429) {
-    toast.error(
-      result.error.data?.message || "Quá nhiều yêu cầu, vui lòng thử lại sau",
-    );
-  }
-
   // access token hết hạn
   if (result.error && result.error?.status === 401) {
     // không có api refresh thì lock

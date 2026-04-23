@@ -20,7 +20,7 @@ import { selectUser } from "@/feature/User/userSelector";
 import logger from "@/utils/logger";
 
 const schema = yup.object({
-    email: yup.string().email("Email không hợp lệ").required("Vui lòng nhập Email"),
+    email: yup.string().required("Vui lòng nhập Email"),
     password: yup.string().required("Vui lòng nhập mật khẩu")
 })
 
@@ -53,7 +53,7 @@ function Login() {
             dispatch(setUser(result))
         } catch (err) {
             logger.log("Login failed:", err);
-            setError("root", {
+            setError("err", {
                 type: "manual",
                 message: err?.data?.error || "Đăng nhập thất bại",
         });
@@ -69,7 +69,7 @@ function Login() {
                     className={`w-full flex flex-col items-center gap-2 ${
                     isLoading ? "opacity-70" : ""}`}>
                     <div className="flex flex-col w-[80%] m-auto gap-2">
-                        <Input type="email" autoComplete="username" placeholder="Email" {...register("email")}/>
+                        <Input type="email" autoComplete="username" placeholder="Email" {...register("email", {required: true})}/>
                         {errors.email && <span className="text-red-500 text-sm">{errors.email.message}</span>}
                         <PasswordInput
                             placeholder="Password"
