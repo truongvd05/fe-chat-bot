@@ -78,7 +78,7 @@ function Login() {
                             error={errors.password}
                             />
                     </div>
-                    {errors.root && <span className="text-red-500 text-sm">{errors.err.message}</span>}
+                    {errors.root && <span className="text-red-500 text-sm">{errors.root.message}</span>}
                     <Button disabled={isLoading} className="block" type="submit">Đăng nhập</Button>
                 </fieldset>
             </form>
