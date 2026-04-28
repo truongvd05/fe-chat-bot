@@ -62,6 +62,7 @@ function ChatBot() {
         })
         event.onmessage = (e) => {
             const data = JSON.parse(e.data);
+            logger.log(data)
             if (data.type === "bot_stream") {
                 dispatch(
                     messageApi.util.updateQueryData(
