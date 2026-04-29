@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 .dockerignore
+.env.development
+.env.production
 
 # Editor directories and files
 .vscode/*
