@@ -53,7 +53,7 @@ function Login() {
             dispatch(setUser(result))
         } catch (err) {
             logger.log("Login failed:", err);
-            setError("err", {
+            setError("root", {
                 type: "manual",
                 message: err?.data?.error || "Đăng nhập thất bại",
         });
