@@ -20,6 +20,7 @@ const schema = yup.object({
 })
 
 function ForgotPassword() {
+
     const [forgotPassword, {isLoading}] = useForgotPasswordMutation()
         const {
         register,
