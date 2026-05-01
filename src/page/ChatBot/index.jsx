@@ -86,7 +86,7 @@ function ChatBot() {
             }
         }
         // xử lí token hết hạn thì kết nối lại SSE
-        event.onerror = async (err) => {
+        event.onerror = (err) => {
             console.error("SSE error", err);
             event.close();
         }
