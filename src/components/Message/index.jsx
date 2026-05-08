@@ -21,7 +21,6 @@ function Message({canModify, message, right, user, showName, showTime}) {
         max-w-full
         px-3 py-2
         rounded-2xl
-        w-full
         wrap-anywhere 
         ${theme === "light" ? "bg-olive-100" : ""}
         ${right ? "border border-white" : ""}
