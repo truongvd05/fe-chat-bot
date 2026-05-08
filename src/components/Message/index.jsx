@@ -1,17 +1,28 @@
 import { useTheme } from "@/contexts/ThemeContext"
+import { selectUser } from "@/feature/User/userSelector";
+import { useRef, useState } from "react";
 import Markdown from "react-markdown"
+import { useSelector } from "react-redux";
 import rehypeSanitize from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
 
-function Message({message, right, user, showName, showTime}) {
+function Message({canModify, message, right, user, showName, showTime}) {
     const {theme} = useTheme()
+    const { user: currentUser } = useSelector(selectUser)
+    const [showMenu, setShowMenu] = useState(false)
+    const [isEditing, setIsEditing] = useState(false)
+    const [editContent, setEditContent] = useState(message.content)
+    const menuRef = useRef(null)
+
+    // const [deleteMessage]
 
     const bubbleClass = `
         whitespace-pre-wrap
-        wrap-break-word
         max-w-full
         px-3 py-2
         rounded-2xl
+        w-full
+        wrap-anywhere 
         ${theme === "light" ? "bg-olive-100" : ""}
         ${right ? "border border-white" : ""}
     `;
@@ -57,8 +68,10 @@ function Message({message, right, user, showName, showTime}) {
                     prose-pre:bg-black
                     prose-pre:text-white
                     prose-pre:p-3
+                    prose-p:break-words
                     prose-pre:rounded-lg
-                    prose-pre:overflow-x-auto`}>
+                    prose-pre:overflow-x-auto
+                    `}>
                     <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>
                         {message.content}
                     </Markdown>

@@ -161,3 +161,15 @@ button:focus-visible {
     @apply bg-background text-foreground;
   }
 }
+
+.prose pre {
+    white-space: pre-wrap !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+}
+
+.prose code {
+    white-space: pre-wrap !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+}

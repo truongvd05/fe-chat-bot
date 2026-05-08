@@ -119,6 +119,37 @@ export const messageApi = createApi({
         }
       },
     }),
+    deleteMessage: builder.mutation({
+      query: ({ conversationId, messageId, content }) => ({
+        url: `/message/${messageId}/conversation/${conversationId}`,
+        method: "DELETE",
+        body: { content },
+      }),
+      async onQueryStarted(
+        { conversationId, messageId, content },
+        { dispatch, queryFulfilled },
+      ) {
+        const result = dispatch(
+          messageApi.util.updateQueryData(
+            "getMessage",
+            { conversationId, messageId, content },
+            (draft) => {
+              const index = draft.findIndex(
+                (message) => (message.id = messageId),
+              );
+              if (index !== -1) {
+                draft.splice(index, 1);
+              }
+            },
+          ),
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
+    }),
     sendMessageWithFiles: builder.mutation({
       query: ({ conversationId, content, files }) => {
         const formData = new FormData();

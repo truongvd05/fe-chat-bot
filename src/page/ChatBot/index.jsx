@@ -18,6 +18,8 @@ function ChatBot() {
     const token = useSelector(selectTOken)
     const parentRef = useRef();
     const [content, setContent] = useState("")
+    const [isStreaming, setIsStreaming] = useState(false)
+    const [botThinking, setBotThinking] = useState(false)
 
     const { data: conversationData, isLoading: conversatonLoading, error: conversationError } = useGetBotConversationQuery(conversationId)
     const { data: messageData, isLoading: messageLoading, error: messageError } = useGetMessageQuery({conversationId})
@@ -42,11 +44,13 @@ function ChatBot() {
 
     const handleSendMessage = async () => {
         try {
+            setBotThinking(true)
             await sendBotMessage({conversationId, content}).unwrap()
             setContent("")
             scrollBottom()
         } catch(err) {
             logger.log("Error:", err)
+            setBotThinking(false)
         }
     }
 
@@ -64,6 +68,8 @@ function ChatBot() {
             const data = JSON.parse(e.data);
             logger.log(data)
             if (data.type === "bot_stream") {
+                setIsStreaming(true)
+                setBotThinking(false)
                 dispatch(
                     messageApi.util.updateQueryData(
                         "getMessage",
@@ -83,6 +89,10 @@ function ChatBot() {
                         }
                     )
                 );
+            }
+            if (data.type === "bot_stream_end") {
+                setIsStreaming(false)
+                setBotThinking(false)
             }
         }
         // xử lí token hết hạn thì kết nối lại SSE
@@ -125,13 +135,18 @@ function ChatBot() {
                                         data-index={virtualRow.index}
                                         className="absolute top-0 left-0 w-full px-1 py-1" style={{transform: `translateY(${virtualRow.start}px)`}}
                                     >
-                                        <div>
-                                            <Message message={message} right={message.role === "user"} user={message.role === "user"}/>
-                                        </div>
+                                        <Message message={message} right={message.role === "user"} user={message.role === "user"}/>
                                     </div>
                                 )
                             })}
                     </div>}
+                    {botThinking && (
+                        <div className="flex items-center gap-2 px-3 py-2 w-fit rounded-2xl bg-gray-100 dark:bg-gray-800 ml-1 mt-1">
+                            <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:0ms]"/>
+                            <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:150ms]"/>
+                            <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:300ms]"/>
+                        </div>
+                    )}
                 </div>
                 <div className="sticky bottom-10 mr-auto ml-auto w-[70%] max-h-37.5 ">
                     <Textarea id="textarea-message"
@@ -141,7 +156,7 @@ function ChatBot() {
                     placeholder="Enter text"/>
                     <button
                     onClick={handleSendMessage}
-                    disabled={!content}
+                    disabled={isStreaming  || !content}
                     className="p-2 absolute right-5 top-1/2 -translate-y-1/2  
                     disabled:opacity-40 
                     disabled:cursor-not-allowed h-full">

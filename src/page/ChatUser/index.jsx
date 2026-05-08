@@ -289,6 +289,7 @@ function ChatUser() {
                                     >
                                         <div className={`${message.role === "user" ? "" : "border-b border-t"}`} >
                                             <Message
+                                                canModify={message.role === "user" && message.userId === user?.id && conversationData?.type !== "BOT"}
                                                 message={message}
                                                 right={message.userId === user?.id}
                                                 user={message.role === "user"}
