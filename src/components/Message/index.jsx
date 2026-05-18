@@ -18,7 +18,7 @@ function Message({canModify, message, right, showName, showTime, onEdit, onDelet
     const [showMenu, setShowMenu] = useState(false);
     const btnRef = useRef(null)
     const menuRef = useRef(null)
-
+    
     const handleToggleMenu = () => {
         if (!showMenu && btnRef.current) {
             const rect = btnRef.current.getBoundingClientRect()
@@ -71,7 +71,6 @@ function Message({canModify, message, right, showName, showTime, onEdit, onDelet
                 </span>
             )}
             <div key={message.id} className={`relative group ${right ? "flex justify-end ml-auto" : "flex" } w-[70%]`}>
-
                 <div className={bubbleClass}>
                     <div className={` absolute top-1 ${right ? "-left-10" : "-right-10"} opacity-0 group-hover:opacity-100 transition`}>
                     <button
@@ -120,6 +119,14 @@ function Message({canModify, message, right, showName, showTime, onEdit, onDelet
                         document.body
                     )}
                 </div>
+                    {message.parentMessage && (
+                        <div className="border-l-2 border-purple-400 pl-2 mb-1 text-xs text-gray-400 rounded">
+                            <span className="font-semibold text-purple-400">
+                                {message.parentMessage.user?.name}
+                            </span>
+                            <p className="truncate max-w-50">{message.parentMessage.content}</p>
+                        </div>
+                    )}
                     {message.content && <p className="m-0">{message.content}</p>}
                     {attachments && attachments.length > 0 && (
                         <div className="flex flex-wrap gap-2 mt-1">
@@ -135,6 +142,7 @@ function Message({canModify, message, right, showName, showTime, onEdit, onDelet
                     )}
                 </div>
             </div>
+            {message.isEdited && <p className={`flex m-0 text-xs opacity-60 ${right ? "justify-end mr-1" : "ml-1"}`}>Đã chỉnh sửa<a href=""></a></p>}
             {showTime && message.createdAt && (
                 <span className={`flex text-xs text-gray-400 ${right ? "justify-end mr-1" : "ml-1"}`}>
                     {formatTime(message.createdAt)}

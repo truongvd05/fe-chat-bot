@@ -215,8 +215,8 @@ export const messageApi = createApi({
     }),
     // fake message edit
     editMessage: builder.mutation({
-      query: ({ messageId, content }) => ({
-        url: `/message/${messageId}`,
+      query: ({ messageId, content, conversationId }) => ({
+        url: `/message/${messageId}/conversations/${conversationId}`,
         method: "PUT",
         body: { content },
       }),
@@ -246,7 +246,11 @@ export const messageApi = createApi({
               (draft) => {
                 const index = draft.findIndex((m) => m.id === messageId);
                 if (index !== -1) {
-                  draft[index] = updateMessage;
+                  draft[index] = {
+                    ...updateMessage,
+                    parentMessage: draft[index].parentMessage,
+                    replies: draft[index].replies,
+                  };
                 }
               },
             ),
@@ -266,4 +270,5 @@ export const {
   useSendMessageWithFilesMutation,
   // lazy
   useLazyGetMessageQuery,
+  useEditMessageMutation,
 } = messageApi;
