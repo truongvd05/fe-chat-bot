@@ -25,14 +25,17 @@ function ChatUser() {
     const dispatch = useDispatch()
     const socket = useSocket();
     const parentRef = useRef()
+    const fileInputRef = useRef(null)
     const { user } = useSelector(selectUser)
     const { conversationId } = useParams()
     
     const [content, setContent] = useState("")
     const [open, onOpenChange] = useState(false)
-    const fileInputRef = useRef(null)
     const [files, setFiles] = useState([])
     const [typingUsers, setTypingUsers] = useState([]);
+    const [editingMessage, setEditingMessage] = useState(null)
+    const [deletingMessage, setDeletingMessage] = useState(null)
+    const [replyingMessage, setReplyingMessage] = useState(null)
 
     const { data: messageData, isLoading: messageLoading, error: messageError } = useGetMessageQuery({conversationId})
     const [ addMembers, {isLoading: addMembersLoading, error: addMembersError }] = useAddMembersInConversationMutation()
@@ -84,13 +87,18 @@ function ChatUser() {
             if (!["DIRECT", "GROUP"].includes(conversationData.type)) return
             if(!conversationId || (!content.trim() && files.length === 0)) return
             const socket = getSocket()
-            if(files.length > 0) {
-                await sendMessageWithFiles({conversationId, content, files}).unwrap()
-            } else {
+            if(editingMessage) {
+                // logic edit
+                setEditingMessage(null)
+            } else if (files.length > 0) {
+                await sendMessageWithFiles({conversationId, content, files, parentMessageId: replyingMessage?.id ?? undefined}).unwrap()
+            }
+            else {
                 if (!socket) return;
                 socket.emit("send_message", {
                     conversationId,
-                    content
+                    content,
+                    parentMessageId: replyingMessage?.id ?? undefined
                 })
             }
             scrollBottom()
@@ -294,9 +302,11 @@ function ChatUser() {
                                                 canModify={message.role === "user" && message.userId === user?.id && conversationData?.type !== "BOT"}
                                                 message={message}
                                                 right={message.userId === user?.id}
-                                                user={message.role === "user"}
                                                 showName={shouldShowUser(messageData, virtualRow.index)}
                                                 showTime={shouldShowTime(messageData, virtualRow.index)}
+                                                onEdit={() => setEditingMessage({ id: message.id, content: message.content })}
+                                                onDelete={() => setDeletingMessage({ id: message.id })}
+                                                onReply={() => setReplyingMessage({ id: message.id, content: message.content, senderName: message.user?.name })}
                                                 />
                                         </div>
                                     </div>
@@ -341,42 +351,65 @@ function ChatUser() {
                             ))}
                         </div>
                     )}
-                    <div className="relative">
-                        <Textarea id="textarea-message"
-                        value={content}
-                        onChange={(e)=> {
-                            setContent(e.target.value)
-                            handleTyping();
-                        }}
-                        className="overflow-hidden h-16 text-lg rounded-3xl pr-15 pl-12"
-                        placeholder="Enter text"/>
-                        <button
-                            onClick={() => fileInputRef.current.click()}
-                            className="p-2 absolute left-3 top-1/2 -translate-y-1/2 opacity-60 hover:opacity-100"
-                        >
-                            <i className="fa-solid fa-paperclip"></i>
-                        </button>
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            multiple
-                            className="hidden"
-                            onChange={(e) => setFiles(Array.from(e.target.files))}
-                            accept="image/*,video/*,application/pdf"
-                        />
-                        <button
-                        disabled={
-                            (!content.trim() && files.length === 0) || // ✅
-                            !conversationData ||
-                            !["DIRECT", "GROUP"].includes(conversationData.type)
-                        }
-                        onClick={handleSendMessage}
-                        className="p-2 absolute right-2 top-1/2 -translate-y-1/2
-                        disabled:opacity-40
-                        disabled:cursor-not-allowed"
-                        >
-                            <i className="fa-regular fa-paper-plane"></i>
-                        </button>
+                    <div >
+                        {(editingMessage || replyingMessage) && (
+                        <div className={`flex items-center justify-between px-3 py-2 mb-1 rounded-t-xl border-l-4 
+                            ${editingMessage ? "border-yellow-400 bg-yellow-50/10" : "border-purple-500 bg-purple-50/10"}`}>
+                            <div className="flex items-center gap-2 text-sm">
+                            <i className={`fa-solid ${editingMessage ? "fa-pen" : "fa-reply"}`} />
+                            <span className="text-muted-foreground">
+                                {editingMessage ? "Chỉnh sửa tin nhắn" : `Trả lời ${replyingMessage.senderName}`}
+                            </span>
+                            <span className="text-foreground truncate max-w-[200px]">
+                                {editingMessage?.content ?? replyingMessage?.content}
+                            </span>
+                            </div>
+                            <button onClick={() => {
+                            setEditingMessage(null)
+                            setReplyingMessage(null)
+                            setContent("")
+                            }}>
+                            <i className="fa-solid fa-xmark opacity-60 hover:opacity-100" />
+                            </button>
+                        </div>
+                        )}
+                        <div className="relative">
+                            <Textarea id="textarea-message"
+                            value={content}
+                            onChange={(e)=> {
+                                setContent(e.target.value)
+                                handleTyping();
+                            }}
+                            className="overflow-y-auto text-lg rounded-3xl pr-15 pl-12 min-h-10 max-h-37.5"
+                            placeholder="Enter text"/>
+                            <button
+                                onClick={() => fileInputRef.current.click()}
+                                className="p-2 absolute left-3 top-1/2 -translate-y-1/2 opacity-60 hover:opacity-100"
+                            >
+                                <i className="fa-solid fa-paperclip"></i>
+                            </button>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                multiple
+                                className="hidden"
+                                onChange={(e) => setFiles(Array.from(e.target.files))}
+                                accept="image/*,video/*,application/pdf"
+                            />
+                            <button
+                            disabled={
+                                (!content.trim() && files.length === 0) || // ✅
+                                !conversationData ||
+                                !["DIRECT", "GROUP"].includes(conversationData.type)
+                            }
+                            onClick={handleSendMessage}
+                            className="p-2 absolute right-2 top-1/2 -translate-y-1/2
+                            disabled:opacity-40
+                            disabled:cursor-not-allowed"
+                            >
+                                <i className="fa-regular fa-paper-plane"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

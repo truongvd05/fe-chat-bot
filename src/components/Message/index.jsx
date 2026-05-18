@@ -1,22 +1,50 @@
 import { useTheme } from "@/contexts/ThemeContext"
 import { selectUser } from "@/feature/User/userSelector";
-import { useRef, useState } from "react";
-import Markdown from "react-markdown"
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import rehypeSanitize from "rehype-sanitize";
-import remarkGfm from "remark-gfm";
+import { createPortal } from "react-dom"
 
-function Message({canModify, message, right, user, showName, showTime}) {
+import {
+  MoreVertical,
+  Reply,
+  Pencil,
+  Trash2
+} from "lucide-react";
+
+function Message({canModify, message, right, showName, showTime, onEdit, onDelete, onReply}) {
     const {theme} = useTheme()
+    const [menuPos, setMenuPos] = useState({ top: 0, left: 0 })
     const { user: currentUser } = useSelector(selectUser)
-    const [showMenu, setShowMenu] = useState(false)
-    const [isEditing, setIsEditing] = useState(false)
-    const [editContent, setEditContent] = useState(message.content)
+    const [showMenu, setShowMenu] = useState(false);
+    const btnRef = useRef(null)
     const menuRef = useRef(null)
 
-    // const [deleteMessage]
+    const handleToggleMenu = () => {
+        if (!showMenu && btnRef.current) {
+            const rect = btnRef.current.getBoundingClientRect()
+            setMenuPos({
+                top: rect.bottom + 4,
+                left: right ? rect.right - 160 : rect.left
+            })
+        }
+        setShowMenu(prev => !prev)
+    }
+
+    useEffect(() => {
+        if (!showMenu) return
+        const handler = (e) => {
+        if ( !btnRef.current?.contains(e.target) && !menuRef.current?.contains(e.target)) {
+            setShowMenu(false)
+        }
+    }
+        document.addEventListener("mousedown", handler)
+        return () => document.removeEventListener("mousedown", handler)
+    }, [showMenu])
+
 
     const bubbleClass = `
+        relative
+        group
         whitespace-pre-wrap
         max-w-full
         px-3 py-2
@@ -34,6 +62,7 @@ function Message({canModify, message, right, user, showName, showTime}) {
         const date = new Date(dateStr);
         return date.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
     };
+
     return (
         <>
             {showName && !right && (
@@ -41,10 +70,56 @@ function Message({canModify, message, right, user, showName, showTime}) {
                     {message.user?.name}
                 </span>
             )}
-            <div key={message.id} className={`${right ? "flex justify-end ml-auto" : "flex" } w-[80%]`}>
-                {user ? (
-                // Tin nhắn người dùng
+            <div key={message.id} className={`relative group ${right ? "flex justify-end ml-auto" : "flex" } w-[70%]`}>
+
                 <div className={bubbleClass}>
+                    <div className={` absolute top-1 ${right ? "-left-10" : "-right-10"} opacity-0 group-hover:opacity-100 transition`}>
+                    <button
+                        onClick={handleToggleMenu}
+                        ref={btnRef}
+                        className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700"
+                        >
+                        <MoreVertical size={18} />
+                    </button>
+                    {showMenu && createPortal(
+                        <div ref={menuRef} 
+                            style={{ position: "fixed", top: menuPos.top, left: menuPos.left, zIndex: 9999 }}
+                            className="w-40 rounded-xl border bg-white dark:bg-zinc-900 shadow-lg overflow-hidden"
+                        >
+                            <button onClick={() => { onReply?.(message); setShowMenu(false) }}
+                                className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800">
+                                <Reply size={16} /> Reply
+                            </button>
+
+                            {canModify && (
+                                <>
+                                    <button
+                                        onClick={() => {
+                                            onEdit?.(message);
+                                            setShowMenu(false);
+                                        }}
+                                        className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800"
+                                    >
+                                        <Pencil size={16} />
+                                        Sửa
+                                    </button>
+
+                                    <button
+                                        onClick={() => {
+                                            onDelete?.(message);
+                                            setShowMenu(false);
+                                        }}
+                                        className="w-full flex items-center gap-2 px-3 py-2 text-red-500 hover:bg-gray-100 dark:hover:bg-zinc-800"
+                                    >
+                                        <Trash2 size={16} />
+                                        Xóa
+                                    </button>
+                                </>
+                            )}
+                        </div>,
+                        document.body
+                    )}
+                </div>
                     {message.content && <p className="m-0">{message.content}</p>}
                     {attachments && attachments.length > 0 && (
                         <div className="flex flex-wrap gap-2 mt-1">
@@ -59,35 +134,6 @@ function Message({canModify, message, right, user, showName, showTime}) {
                         </div>
                     )}
                 </div>
-            ) : (
-                // Tin nhắn AI
-                <div className={`${bubbleClass}
-                    prose prose-sm max-w-none
-                    prose-p:my-0
-                    prose-pre:bg-black
-                    prose-pre:text-white
-                    prose-pre:p-3
-                    prose-p:break-words
-                    prose-pre:rounded-lg
-                    prose-pre:overflow-x-auto
-                    `}>
-                    <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>
-                        {message.content}
-                    </Markdown>
-                    {attachments && attachments.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mt-1">
-                            {attachments.map((p) => (
-                                <img
-                                    key={p.id}
-                                    src={p.fileUrl.replace('/src/uploads/', '/uploads/')}
-                                    alt={p.fileName}
-                                    className="max-h-60 object-contain rounded-lg"
-                                />
-                            ))}
-                        </div>
-                    )}
-                </div>
-            )}
             </div>
             {showTime && message.createdAt && (
                 <span className={`flex text-xs text-gray-400 ${right ? "justify-end mr-1" : "ml-1"}`}>
