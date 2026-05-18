@@ -1,10 +1,10 @@
 import { lazy } from 'react';
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import AuthLayout from "@/layouts/AuthLayout";
 import ChatLayout from "@/layouts/ChatLayout";
-import Home from "@/page/Home";
 import ChatEmpty from '../ChatEmpty';
+import NotFound from '@/page/NotFound';
 
 const Login = lazy(() => import("@/page/Auth/Login"))
 const Register = lazy(() => import("@/page/Auth/Register"))
@@ -12,7 +12,6 @@ const ResetPassword = lazy(() => import("@/page/Auth/ResetPassword"))
 const VerifyEmail = lazy(() => import("@/page/Auth/VerifyEmail"))
 const ChangePassword = lazy(() => import("@/page/Auth/ChangePassword"))
 const ForgotPassword = lazy(() => import("@/page/Auth/ForgotPassword"))
-const ChatBot = lazy(() => import("@/page/ChatBot"))
 const Profile = lazy(() => import("@/page/Profile"))
 const ChatUser = lazy(() => import("@/page/ChatUser"))
 
@@ -22,15 +21,10 @@ function AppRoutes() {
     <BrowserRouter>
         <Routes>
             <Route element={<ChatLayout/>}>
-                <Route path="/" element={<Home/>}/>
-                <Route path="/home" element={<Home/>}/>
+                <Route path="/" element={<Navigate to="/chat" replace/>}/>
                 <Route path="/chat">
                     <Route index element={<ChatEmpty />} />
                     <Route path=":conversationId" element={<ChatUser />} />
-                </Route>
-                <Route path="/bots">
-                    <Route index element={<ChatEmpty />} />
-                    <Route path=":conversationId" element={<ChatBot />} />
                 </Route>
             </Route>
             <Route element={<AuthLayout/>}>
@@ -42,6 +36,7 @@ function AppRoutes() {
                 <Route path='/change-password' element={<ChangePassword/>}/>
             </Route>
             <Route path='/profile' element={<Profile/>}/>
+            <Route path="*" element={<NotFound />} />
         </Routes>
     </BrowserRouter>
     )

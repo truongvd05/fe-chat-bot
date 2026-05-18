@@ -26,6 +26,13 @@ export const authApi = createApi({
         body: data,
       }),
     }),
+    forgotPasswordByPhone: builder.mutation({
+      query: (data) => ({
+        url: "auth/forgot-password-phone",
+        method: "POST",
+        body: data,
+      }),
+    }),
     resetPassword: builder.mutation({
       query: (data) => ({
         url: `auth/reset-password?token=${data.token}`,
@@ -57,6 +64,13 @@ export const authApi = createApi({
         body: data,
       }),
     }),
+    validatePhone: builder.mutation({
+      query: (data) => ({
+        url: `auth/validate/phone`,
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -67,5 +81,7 @@ export const {
   useResetPasswordMutation,
   useVerifyEmailMutation,
   useResendVerifyEmailMutation,
+  useForgotPasswordByPhoneMutation,
   useValidateEmailMutation,
+  useValidatePhoneMutation,
 } = authApi;

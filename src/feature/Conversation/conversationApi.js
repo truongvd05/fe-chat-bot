@@ -11,7 +11,7 @@ export const conversationApi = createApi({
       providesTags: (result, error, id) => [{ type: "botConversation", id }],
     }),
     getBotConversations: builder.query({
-      query: (type) => `/conversation/${type}`,
+      query: () => `/conversation`,
       providesTags: ["botConversation"],
     }),
     getConversations: builder.query({

@@ -1,10 +1,9 @@
-import { conversationApi, useGetBotConversationsQuery, useGetConversationsQuery } from "@/feature/Conversation/conversationApi";
+import { conversationApi, useGetConversationsQuery } from "@/feature/Conversation/conversationApi";
 import { useNavigate, useParams } from "react-router-dom";
 import Skeleton from "./Skeleton";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "@/feature/User/userSelector";
-import IconNewBots from "./IconNewBots";
 import IconFriend from "./IconFriend";
 import { useEffect } from "react";
 import { useSocket } from "@/contexts/SocketContext";
@@ -12,23 +11,19 @@ import MemberSelectModal from "./MemberSelectModal";
 import { useLazyFindUserQuery } from "@/feature/User/userApi";
 import { useCreateGroupConversationMutation } from "@/feature/Conversation/conversationApi";
 
-function Conversation({ type, setIsOpen }) {
+function Conversation({ setIsOpen }) {
     const socket = useSocket()
     const dispatch = useDispatch()
     const {user} = useSelector(selectUser)
     const {theme} = useTheme()
     const {conversationId} = useParams()
-
     const navigate = useNavigate()
-    const { data: botData,
-        isLoading: botLoading,
-    } = useGetBotConversationsQuery("bots")
 
     const { data: chatData,
         isLoading: chatLoading,
         refetch: refetchConversations,
-    } = useGetConversationsQuery(undefined)
-
+    } = useGetConversationsQuery()
+    
     const [triggerFindUser, {
         data: findUserData,
         isLoading: findUserLoading,
@@ -42,10 +37,7 @@ function Conversation({ type, setIsOpen }) {
         error: createGroupError
     }] = useCreateGroupConversationMutation()
     
-    const isLoading = botLoading || chatLoading;
     
-    const data = type === "bots" ? botData : chatData;
-
     useEffect(() => {
         if (!socket) return;
         const handleReceiveConversation = (conversation) => {
@@ -97,12 +89,11 @@ function Conversation({ type, setIsOpen }) {
         };
     }, [conversationId, socket, dispatch, user.id, refetchConversations]);
     
-    if(type !== "chat" && type !== "bots") return
-    if(isLoading) return <Skeleton/>
+    if(chatLoading) return <Skeleton/>
+    console.log(chatData);
     
     return (
     <div className="w-full">
-        {type === "chat" ?
         <>
             <IconFriend/>
             <MemberSelectModal
@@ -119,31 +110,13 @@ function Conversation({ type, setIsOpen }) {
                 data={findUserData}
                 reset={resetFIndUser}
                 />
-        </> : <IconNewBots/>}  
-        {!data?.length && (
-            <p>Bạn chưa chọn đoạn chat</p>
-        )}
-        {(data?.map((item)=> {
-            let otheruser;
-            let count;
-            if (type !== "BOT") {
-                const otherParticipant = item?.participants?.find(
-                    p => p.user?.id !== user?.id
-                );
-                const unreadCount = item.participants?.find(p => p.user?.id === user.id)
-                otheruser = otherParticipant?.user;
-                count = unreadCount?.unreadCount
-                
-            }
+        </>
+        {(chatData?.map((item)=> {
             return (
                 <div key={item.id}
                 onClick={() => {
                     setIsOpen(false)
-                    if(type === "chat") {
-                        navigate(`/${type}/${item.id}`)
-                    } else {
-                        navigate(`/${type}/${item.id}`)
-                    }
+                        navigate(`/chat/${item.id}`)
                 }}
                 className={`rounded-sm cursor-pointer 
                     ${theme === "light" ? "hover:bg-gray-300 text-black" : "hover:bg-gray-500 text-white"}
@@ -151,14 +124,10 @@ function Conversation({ type, setIsOpen }) {
                         }>
                     <div className="flex items-center">
                         <div className="flex flex-col gap-2 flex-1">
-                            <span className="relative">
-                                {item.type === "DIRECT" ? otheruser?.name : item?.title}
-                                {count > 0 && <p className="absolute top-0 right-0 text-red-500 bg-red-300 rounded-full h-5 w-3.75 flex justify-center items-center">{count}</p>}
-                            </span>
+                            <span className="relative">{item.type === "DIRECT" ? "DIRECT" : item.title}</span>
                             {item.lastMessage?.content && 
                             <p className="text-sm opacity-70 truncate w-45">
-                                {type === "bots" && (item.lastMessage?.userId === user.id ?  "Bạn" : item?.lastMessage?.role)}
-                                {type === "chat" && item.lastMessage?.userId === user.id ? "Bạn" 
+                                {item.lastMessage?.userId === user.id ? "Bạn" 
                                     : item.lastMessage.user?.name}
                                     : {item.lastMessage.content}
                                 </p>}

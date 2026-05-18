@@ -68,7 +68,8 @@ function MemberSelectModal({trigger, title, data, onSearch, onSubmit, loading, e
     };
 
   return (
-    <Dialog onOpenChange={(open) => {
+    <Dialog className="h-[80vh] flex flex-col"
+        onOpenChange={(open) => {
                 if (!open) {
                     resetState();
                 }

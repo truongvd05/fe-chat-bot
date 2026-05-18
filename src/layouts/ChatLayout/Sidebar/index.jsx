@@ -5,8 +5,6 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useLocation } from "react-router-dom";
 
 function Sidebar() {
-    const location = useLocation()
-    const type = location.pathname.split("/")[1];
     const [isOpen, setIsOpen] = useState(false)
     const {theme} = useTheme()
     return (
@@ -34,10 +32,10 @@ function Sidebar() {
                         "></i>
                     </div>}
                     <div className="w-[20%] flex flex-col justify-between gap-2 items-center">
-                        <NavigationRall type={type} />
+                        <NavigationRall />
                     </div>
                     <div className="flex-1 flex flex-col gap-2 items-center overflow-x-hidden">
-                        <Conversation type={type} setIsOpen={setIsOpen} isOpen={isOpen}/>
+                        <Conversation setIsOpen={setIsOpen} isOpen={isOpen}/>
                     </div>
                 </div>
             </div>

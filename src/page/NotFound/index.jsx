@@ -1,3 +1,4 @@
+
 function NotFound() {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center gap-4 text-center">
@@ -9,9 +10,11 @@ function NotFound() {
                     truongbk444@gmail.com
                 </a>
             </p>
-            <a href="/" className="mt-2 underline">Về trang chủ</a>
+            <a href="/" className="mt-2 underline">
+                Về trang chủ
+            </a>
         </div>
-    );
+    )
 }
 
-export default NotFound;
+export default NotFound

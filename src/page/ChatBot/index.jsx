@@ -5,10 +5,10 @@ import { Textarea } from "@/components/ui/textarea"
 import Message from "../../components/Message";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import useLoadMessages from "@/hoock/useLoadMessages";
+import useLoadMessages from "@/hooks/useLoadMessages";
 import { selectTOken } from "@/feature/User/userSelector";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { useScrollManager } from "@/hoock/useScrollManager";
+import { useScrollManager } from "@/hooks/useScrollManager";
 import MessageSkeleton from "@/components/MessageSkeleton";
 import logger from "@/utils/logger";
 

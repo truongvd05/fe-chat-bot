@@ -2,7 +2,6 @@ import { Navigate, Outlet } from "react-router-dom"
 import Sidebar from "./Sidebar"
 import { useSelector } from "react-redux"
 import { selectUser } from "@/feature/User/userSelector"
-import User from "@/components/User"
 
 function ChatLayout(){
     const {user} = useSelector(selectUser)
@@ -16,12 +15,8 @@ function ChatLayout(){
             <Sidebar/>
         </div>
 
-        <div className="h-screen border-r border-l flex-1 flex flex-col md:mr-25 md:ml-25 lg:ml-70  lg:mr-37.5 xl:mr-70 min-w-0 pb-5">
+        <div className="h-screen border-r border-l flex-1 flex flex-col md:ml-25 lg:ml-70  min-w-0 pb-5">
             <Outlet/>
-        </div>
-
-        <div className="fixed right-0 top-0 bottom-full ">
-            <User/>
         </div>
     </div>
     )

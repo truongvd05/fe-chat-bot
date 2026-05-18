@@ -8,10 +8,10 @@ import Message from "@/components/Message"
 import { selectUser } from "@/feature/User/userSelector"
 import { getSocket } from "@/socket/socket"
 import { useSocket } from "@/contexts/SocketContext"
-import useLoadMessages from "@/hoock/useLoadMessages"
+import useLoadMessages from "@/hooks/useLoadMessages"
 import MessageSkeleton from "@/components/MessageSkeleton"
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { useScrollManager } from "@/hoock/useScrollManager"
+import { useScrollManager } from "@/hooks/useScrollManager"
 import MemberModal from "./MemberModal"
 import MemberSelectModal from "@/layouts/ChatLayout/Sidebar/Conversation/MemberSelectModal"
 import { toast } from "sonner";
@@ -27,6 +27,7 @@ function ChatUser() {
     const parentRef = useRef()
     const { user } = useSelector(selectUser)
     const { conversationId } = useParams()
+    
     const [content, setContent] = useState("")
     const [open, onOpenChange] = useState(false)
     const fileInputRef = useRef(null)
@@ -68,6 +69,7 @@ function ChatUser() {
 
     const { data: conversationData, isLoading: conversatonLoading, error: conversationError, refetch: refetchConversation } =
     useGetConversationQuery(conversationId, {
+        skip: !conversationId,
         refetchOnMountOrArgChange: true,
         refetchOnReconnect: true,
     })
@@ -220,7 +222,7 @@ function ChatUser() {
         timeoutRef.current = setTimeout(() => {
             socket.emit("typing_stop", { conversationId });
             typingRef.current = false;
-        }, 5000);
+        }, 2000);
     };
 
     return (
