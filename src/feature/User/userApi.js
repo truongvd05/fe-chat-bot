@@ -4,7 +4,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 export const userApi = createApi({
   reducerPath: "userApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["User"],
+  tagTypes: ["User, Friends, Friends-request"],
   endpoints: (builder) => ({
     getUser: builder.query({
       query: () => ({
@@ -32,14 +32,41 @@ export const userApi = createApi({
         params: { q },
       }),
     }),
+    getFriend: builder.query({
+      query: () => ({
+        url: "user/friends",
+      }),
+      providesTags: ["Friends"],
+    }),
+    getFriendRequest: builder.query({
+      query: () => ({
+        url: "user/friend-request",
+      }),
+      providesTags: ["Friends-request"],
+    }),
+    addFriend: builder.mutation({
+      query: ({ targetUserId }) => ({
+        url: "user/add-friend",
+        method: "POST",
+        body: { targetUserId },
+      }),
+    }),
+    accFriend: builder.mutation({
+      query: ({ targetUserId }) => ({
+        url: "user/",
+      }),
+    }),
   }),
 });
 
 export const {
   useGetUserQuery,
+  useGetFriendQuery,
+  useFindUserQuery,
+  useGetFriendRequestQuery,
   useLogoutMutation,
   useChangePasswordMutation,
-  useFindUserQuery,
+  useAddFriendMutation,
   // lazy
   useLazyFindUserQuery,
 } = userApi;

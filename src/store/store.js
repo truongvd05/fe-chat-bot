@@ -9,6 +9,7 @@ import { authApi } from "@/feature/Auth/authApi";
 import { conversationApi } from "@/feature/Conversation/conversationApi";
 import { messageApi } from "@/feature/Message/messageApi";
 import onlineReducer from "@/feature/onlineUsers/onlineUsersSlice";
+import conversationReducer from "@/feature/Conversation/conversationSlice";
 
 const userPersistConfig = {
   key: "user",
@@ -25,6 +26,7 @@ export const store = configureStore({
     [messageApi.reducerPath]: messageApi.reducer,
     user: persistedUserReducer,
     onlineUsers: onlineReducer,
+    conversation: conversationReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

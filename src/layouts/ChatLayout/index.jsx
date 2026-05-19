@@ -15,7 +15,7 @@ function ChatLayout(){
             <Sidebar/>
         </div>
 
-        <div className="h-screen border-r border-l flex-1 flex flex-col md:ml-25 lg:ml-70  min-w-0 pb-5">
+        <div className="h-screen border-r border-l flex-1 flex flex-col md:ml-25 lg:ml-100  min-w-0 pb-5">
             <Outlet/>
         </div>
     </div>

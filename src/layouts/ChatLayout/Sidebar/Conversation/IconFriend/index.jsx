@@ -8,17 +8,17 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
-import debounce from "lodash.debounce";
 import { Input } from "@/components/ui/input";
-import { useEffect, useMemo, useState } from "react";
-import { useLazyFindUserQuery } from "@/feature/User/userApi";
-import { useCreateDirectConversationMutation } from "@/feature/Conversation/conversationApi";
+import { useState } from "react";
+import { useAddFriendMutation, useLazyFindUserQuery } from "@/feature/User/userApi";
 import logger from "@/utils/logger";
 import { addRecentSearch, getRecentSearch } from "@/utils/searchHistory";
 import UserProfileModal from "@/components/UserProfileModal";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/feature/User/userSelector";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { useCreateDirectConversationMutation } from "@/feature/Conversation/conversationApi";
 
 
 function IconFriend() {
@@ -26,7 +26,8 @@ function IconFriend() {
   const navigate = useNavigate()
   
   const [triggerFindUser, { data, isLoading, isError, error }] = useLazyFindUserQuery();
-  const [ createDirectConversation, {isLoading: createDirectLoading, error: createDirectError}] = useCreateDirectConversationMutation()
+  const [ addFriend, {isLoading: addFriendLoading, error: addFriendError}] = useAddFriendMutation()
+  const [ createDirectConversation, {isLoading: createDirectConversationLoading, error: createDirectConversationLoadingError}] = useCreateDirectConversationMutation()
   const [value, setValue] = useState("")
   const [showProfile, setShowProfile] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
@@ -35,9 +36,13 @@ function IconFriend() {
 
   const handleAdd = async (targetUserId) => {
     try {
-      await createDirectConversation(targetUserId).unwrap()
+      await addFriend({targetUserId}).unwrap()
+      toast.success("Đã gửi lời mời kết bạn thành công")
       setShowProfile(true);
     } catch (err) {
+      if(err.status === 429) {
+        toast.error("đừng spam nữa")
+      }
       logger.log(err);
     }
   }
@@ -47,7 +52,7 @@ function IconFriend() {
     try {
         const result = await triggerFindUser(value).unwrap();
         addRecentSearch(result)
-        setSelectedUser(data);
+        setSelectedUser(result);
         setShowProfile(true)
     } catch (err) {
       logger.log(err);
@@ -84,10 +89,10 @@ function IconFriend() {
           <DialogTitle>Tìm kiếm bạn bè.</DialogTitle>
         </DialogHeader>
             <Input value={value} onChange={(e)=> setValue(e.target.value)} type="text" autoComplete="name" placeholder="nhập số điện thoại"/>
+            <p className="text-sm opacity-70">Kết quả gần nhất</p>
             {historySearch.length > 0 && historySearch.map((item) => {
               return (
               <div key={item.id}>
-                <p className="text-sm opacity-70">Kết quả gần nhất</p>
                 <p className="cursor-pointer hover:bg-amber-100 px-3 py-3" 
                 onClick={() => handleSelectHistory(item)} >{item.name}</p>
               </div>)

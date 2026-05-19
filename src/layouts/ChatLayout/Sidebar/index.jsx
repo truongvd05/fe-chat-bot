@@ -3,10 +3,18 @@ import Conversation from "./Conversation"
 import NavigationRall from "./NavigationRaill"
 import { useTheme } from "@/contexts/ThemeContext";
 import { useLocation } from "react-router-dom";
+import PhoneBookList from "./PhoneBookList";
 
 function Sidebar() {
     const [isOpen, setIsOpen] = useState(false)
     const {theme} = useTheme()
+    const { pathname } = useLocation()
+    const isPhoneBook = pathname.startsWith("/phone-book")
+
+    const ConversationSlot = isPhoneBook
+        ? PhoneBookList
+        : Conversation
+
     return (
         <>
             {<button
@@ -22,7 +30,7 @@ function Sidebar() {
                 transform transition-transform duration-300
                 ${isOpen ? "translate-x-0" : "-translate-x-full"}
                 lg:translate-x-0
-                w-70
+                w-100
                 `}>
                 <div className="py-7.5 px-1.5 h-full flex overflow-auto">
                     {isOpen && <div className="z-12 fixed right-5 top-5">
@@ -34,8 +42,8 @@ function Sidebar() {
                     <div className="w-[20%] flex flex-col justify-between gap-2 items-center">
                         <NavigationRall />
                     </div>
-                    <div className="flex-1 flex flex-col gap-2 items-center overflow-x-hidden">
-                        <Conversation setIsOpen={setIsOpen} isOpen={isOpen}/>
+                    <div className="flex-1 flex flex-col gap-2 items-center overflow-x-hidden p-2">
+                        <ConversationSlot />
                     </div>
                 </div>
             </div>

@@ -11,7 +11,7 @@ import MemberSelectModal from "./MemberSelectModal";
 import { useLazyFindUserQuery } from "@/feature/User/userApi";
 import { useCreateGroupConversationMutation } from "@/feature/Conversation/conversationApi";
 
-function Conversation({ setIsOpen }) {
+function Conversation() {
     const socket = useSocket()
     const dispatch = useDispatch()
     const {user} = useSelector(selectUser)
@@ -90,7 +90,6 @@ function Conversation({ setIsOpen }) {
     }, [conversationId, socket, dispatch, user.id, refetchConversations]);
     
     if(chatLoading) return <Skeleton/>
-    console.log(chatData);
     
     return (
     <div className="w-full">
@@ -115,8 +114,7 @@ function Conversation({ setIsOpen }) {
             return (
                 <div key={item.id}
                 onClick={() => {
-                    setIsOpen(false)
-                        navigate(`/chat/${item.id}`)
+                    navigate(`/chat/${item.id}`)
                 }}
                 className={`rounded-sm cursor-pointer 
                     ${theme === "light" ? "hover:bg-gray-300 text-black" : "hover:bg-gray-500 text-white"}

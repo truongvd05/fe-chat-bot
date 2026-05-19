@@ -4,15 +4,11 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 export const conversationApi = createApi({
   reducerPath: "conversationApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["Conversation", "botConversation"],
+  tagTypes: ["Conversation", "group"],
   endpoints: (builder) => ({
-    getBotConversation: builder.query({
-      query: (conversationId) => `/conversation/bot/${conversationId}`,
-      providesTags: (result, error, id) => [{ type: "botConversation", id }],
-    }),
-    getBotConversations: builder.query({
-      query: () => `/conversation`,
-      providesTags: ["botConversation"],
+    getGroupConversation: builder.query({
+      query: () => "/conversation/groups",
+      providesTags: ["group"],
     }),
     getConversations: builder.query({
       query: () => "/conversation/",
@@ -37,14 +33,6 @@ export const conversationApi = createApi({
         body: { name, members: memberIds },
       }),
       invalidatesTags: ["Conversation"],
-    }),
-    createBotConversation: builder.mutation({
-      query: (title) => ({
-        url: `/conversation/bot`,
-        method: "POST",
-        body: { title },
-      }),
-      invalidatesTags: ["botConversation"],
     }),
     searchAvailableUsers: builder.query({
       query: ({ conversationId, q }) => ({
@@ -111,20 +99,16 @@ export const conversationApi = createApi({
 });
 
 export const {
-  useGetBotConversationQuery,
-  useGetBotConversationsQuery,
   useGetConversationQuery,
   useGetConversationsQuery,
+  useGetGroupConversationQuery,
   useCreateDirectConversationMutation,
-  useCreateBotConversationMutation,
   useCreateGroupConversationMutation,
   useAddMembersInConversationMutation,
   useKickMembersInConversationMutation,
   usePromoteToAdminConversationMutation,
   useLeaveGroupMutation,
   // lazy
-  useLazyGetBotConversationQuery,
-  useLazyGetBotConversationsQuery,
   useLazyGetConversationQuery,
   useLazyGetConversationsQuery,
   useLazySearchAvailableUsersQuery,

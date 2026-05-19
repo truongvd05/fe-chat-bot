@@ -5,6 +5,10 @@ import AuthLayout from "@/layouts/AuthLayout";
 import ChatLayout from "@/layouts/ChatLayout";
 import ChatEmpty from '../ChatEmpty';
 import NotFound from '@/page/NotFound';
+import Friends from '@/page/PhoneBook/Friends';
+import Groups from '@/page/PhoneBook/Groups';
+import FriendsRequests from '@/page/PhoneBook/FriendRequests';
+import GroupRequests from '@/page/PhoneBook/GroupRequests';
 
 const Login = lazy(() => import("@/page/Auth/Login"))
 const Register = lazy(() => import("@/page/Auth/Register"))
@@ -16,7 +20,6 @@ const Profile = lazy(() => import("@/page/Profile"))
 const ChatUser = lazy(() => import("@/page/ChatUser"))
 
 function AppRoutes() {
-    
     return (
     <BrowserRouter>
         <Routes>
@@ -25,6 +28,13 @@ function AppRoutes() {
                 <Route path="/chat">
                     <Route index element={<ChatEmpty />} />
                     <Route path=":conversationId" element={<ChatUser />} />
+                </Route>
+                <Route path='/phone-book'>
+                    <Route index element={<Navigate to="/phone-book/friends" replace />} />
+                    <Route path='friends' element={<Friends />} />
+                    <Route path='groups' element={<Groups />} />
+                    <Route path='friend-requests' element={<FriendsRequests/>} />
+                    <Route path='group-requests' element={<GroupRequests/>} />
                 </Route>
             </Route>
             <Route element={<AuthLayout/>}>

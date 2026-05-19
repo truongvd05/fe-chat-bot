@@ -55,7 +55,7 @@ function ChatUser() {
     const other = conversationData?.participants?.find(u => u.user.id !== user.id)
     const isOtherOnline = useSelector(selectIsUserOnline(other?.user?.id))
 
-    const { loadMore } = useLoadMessages(conversationId, messageData)
+    const { loadMore, hasMore } = useLoadMessages(conversationId, messageData)
     const rowVirtualizer = useVirtualizer({
         count: messageData?.length ?? 0,
         getScrollElement: () => parentRef.current,
@@ -128,6 +128,7 @@ function ChatUser() {
                         </>
                     ) : (
                         <div style={{ height: rowVirtualizer.getTotalSize(), minHeight: "100%", position: "relative" }}>
+                            {hasMore && <p className="text-center text-sm opacity-50">Đã tải hết tin nhắn</p>}
                             {rowVirtualizer.getVirtualItems().map((virtualRow) => {
                                 const message = messageData[virtualRow.index]
                                 return (

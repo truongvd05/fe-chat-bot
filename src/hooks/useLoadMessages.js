@@ -12,6 +12,7 @@ export default function useLoadMessages(conversationId, messages) {
   const messagesRef = useRef(messages);
   const hasMoreRef = useRef(true);
   const loadingRef = useRef(false);
+  const [hasMore, setHasMore] = useState(true);
 
   const [triggerGetMessage] = useLazyGetMessageQuery();
 
@@ -21,6 +22,7 @@ export default function useLoadMessages(conversationId, messages) {
 
   useEffect(() => {
     hasMoreRef.current = true;
+    setHasMore(false);
   }, [conversationId]);
 
   const loadMore = useCallback(async () => {
@@ -42,6 +44,7 @@ export default function useLoadMessages(conversationId, messages) {
       // hêt message
       if (oldMessages.length < 10) {
         hasMoreRef.current = false;
+        setHasMore(true);
       }
 
       // check trùng key
@@ -67,5 +70,6 @@ export default function useLoadMessages(conversationId, messages) {
 
   return {
     loadMore,
+    hasMore,
   };
 }
