@@ -56,6 +56,13 @@ export const userApi = createApi({
         url: "user/",
       }),
     }),
+    resendVerifyEmail: builder.mutation({
+      query: (data) => ({
+        url: "auth/resen-verify-email",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -64,9 +71,10 @@ export const {
   useGetFriendQuery,
   useFindUserQuery,
   useGetFriendRequestQuery,
+  useLazyFindUserQuery,
   useLogoutMutation,
   useChangePasswordMutation,
   useAddFriendMutation,
+  useResendVerifyEmailMutation,
   // lazy
-  useLazyFindUserQuery,
 } = userApi;

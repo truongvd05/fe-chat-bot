@@ -50,13 +50,7 @@ export const authApi = createApi({
         body: data,
       }),
     }),
-    resendVerifyEmail: builder.mutation({
-      query: (data) => ({
-        url: "auth/resen-verify-email",
-        method: "POST",
-        body: data,
-      }),
-    }),
+
     validateEmail: builder.mutation({
       query: (data) => ({
         url: `auth/validate/email`,
@@ -80,7 +74,6 @@ export const {
   useForgotPasswordMutation,
   useResetPasswordMutation,
   useVerifyEmailMutation,
-  useResendVerifyEmailMutation,
   useForgotPasswordByPhoneMutation,
   useValidateEmailMutation,
   useValidatePhoneMutation,

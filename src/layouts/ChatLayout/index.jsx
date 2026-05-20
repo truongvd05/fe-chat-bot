@@ -1,11 +1,24 @@
-import { Navigate, Outlet } from "react-router-dom"
+import { Navigate, Outlet, useNavigate } from "react-router-dom"
 import Sidebar from "./Sidebar"
 import { useSelector } from "react-redux"
 import { selectUser } from "@/feature/User/userSelector"
+import { toast } from "sonner"
+import { useEffect } from "react"
 
 function ChatLayout(){
     const {user} = useSelector(selectUser)
-    
+    const navigate = useNavigate()
+    useEffect(() => {
+    if (user && !user.emailVerifiedAt) {
+        toast.warning("Xác thực email để sử dụng đầy đủ tính năng", {
+            duration: 5000,
+            action: {
+                label: "Xác thực ngay",
+                onClick: () => navigate("/send-verify-email")
+            }
+        });
+    }
+    }, []);
     if(!user) {
         return <Navigate to="/login" replace/>
     }

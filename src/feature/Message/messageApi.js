@@ -15,59 +15,6 @@ export const messageApi = createApi({
         { type: "Message", id: conversationId },
       ],
     }),
-    sendBotMessage: builder.mutation({
-      query: ({ conversationId, content }) => ({
-        url: `/message/bot/conversations/${conversationId}`,
-        method: "POST",
-        body: { content },
-      }),
-      // fake message gửi
-      async onQueryStarted(
-        { conversationId, content },
-        { dispatch, queryFulfilled },
-      ) {
-        const tempId = `temp_${Date.now()}`;
-
-        const result = dispatch(
-          messageApi.util.updateQueryData(
-            "getMessage",
-            { conversationId },
-            (draft) => {
-              draft.push({
-                id: tempId,
-                content,
-                isSending: true,
-                role: "user",
-                status: "sending",
-              });
-            },
-          ),
-        );
-        try {
-          const { data: newMessage } = await queryFulfilled;
-          //   thay thể fake bằng cái thật
-          dispatch(
-            messageApi.util.updateQueryData(
-              "getMessage",
-              { conversationId },
-              (draft) => {
-                const index = draft.findIndex((m) => m.id === tempId);
-                if (index !== -1) {
-                  draft[index] = {
-                    ...newMessage,
-                    role: "user",
-                    status: "sent",
-                  };
-                }
-              },
-            ),
-          );
-        } catch (err) {
-          // lỗi thì rollback
-          result.undo();
-        }
-      },
-    }),
     // fake message gửi
     sendMessage: builder.mutation({
       query: ({ conversationId, targetUserId, content }) => ({
@@ -265,7 +212,6 @@ export const messageApi = createApi({
 
 export const {
   useGetMessageQuery,
-  useSendBotMessageMutation,
   useSendMessageMutation,
   useSendMessageWithFilesMutation,
   // lazy

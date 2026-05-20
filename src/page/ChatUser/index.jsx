@@ -1,4 +1,4 @@
-import { conversationApi, useAddMembersInConversationMutation, useGetConversationQuery, useKickMembersInConversationMutation, useLazySearchAvailableUsersQuery, useLeaveGroupMutation, usePromoteToAdminConversationMutation } from "@/feature/Conversation/conversationApi"
+import { useAddMembersInConversationMutation, useGetConversationQuery, useKickMembersInConversationMutation, useLazySearchAvailableUsersQuery, useLeaveGroupMutation, usePromoteToAdminConversationMutation } from "@/feature/Conversation/conversationApi"
 import { useEditMessageMutation, useGetMessageQuery, useSendMessageWithFilesMutation } from "@/feature/Message/messageApi"
 import { useRef, useState } from "react"
 import { useSelector } from "react-redux"

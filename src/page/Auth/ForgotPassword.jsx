@@ -69,7 +69,7 @@ function ForgotPassword() {
     }, [inputValue])
 
     async function handleSendOTP() {
-        toast.warning("Chức năng chưa dùng được do chủ web chưa có tiền đăng kí sms");
+        toast.warning("Chức năng chưa được phát triển");
         return;
         await sendOTP(inputValue, {
             onError: (msg) => setError("root", { message: msg })

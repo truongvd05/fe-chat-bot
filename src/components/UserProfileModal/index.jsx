@@ -42,7 +42,7 @@ function UserProfileModal({
         </div>
 
       <div className="flex-1 overflow-y-auto">
-        <div className="h-36 bg-gradient-to-r from-blue-400 to-blue-600 shrink-0" />
+        <div className="h-36 bg-linear-to-r from-blue-400 to-blue-600 shrink-0" />
         <div className="px-6 pb-6 relative">
           <div className="flex items-end gap-3 -mt-10 mb-4">
             <div className="relative">

@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { getSocket } from "@/socket/socket";
 import logger from "@/utils/logger";
+import { toast } from "sonner";
 
 /**
  * Xử lý logic gửi message và typing indicator
@@ -32,9 +33,14 @@ export function useChatActions({
       if (!conversationId || (!content.trim() && files.length === 0)) return;
 
       const socket = getSocket();
+      if (!socket) return;
+
+      socket.once("error_message", ({ message, statusCode }) => {
+        logger.log("Error:", statusCode, message);
+        toast.error(message);
+      });
 
       if (editingMessage) {
-        if (!socket) return;
         socket.emit("edit_message", {
           messageId: editingMessage.id,
           conversationId,
@@ -49,7 +55,6 @@ export function useChatActions({
           parentMessageId: replyingMessage?.id ?? undefined,
         }).unwrap();
       } else {
-        if (!socket) return;
         socket.emit("send_message", {
           conversationId,
           content,
