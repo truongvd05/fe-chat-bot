@@ -1,3 +1,4 @@
+import { NavLink } from "react-router-dom"
 
 function NotFound() {
     return (
@@ -10,9 +11,7 @@ function NotFound() {
                     truongbk444@gmail.com
                 </a>
             </p>
-            <a href="/" className="mt-2 underline">
-                Về trang chủ
-            </a>
+            <NavLink to={"/"}>Về trang chủ</NavLink>
         </div>
     )
 }

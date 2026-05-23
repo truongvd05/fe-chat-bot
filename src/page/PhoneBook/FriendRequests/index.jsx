@@ -3,7 +3,6 @@ import PhoneBookRequestLayout from "../components/PhoneBookRequestLayout";
 
 export default function FriendsRequests() {
     const { data, isLoading, isError } = useGetFriendRequestQuery();
-    console.log(data);
     
     if (isLoading) return <p>Đang tải...</p>;
     if (isError) return <p>Lỗi rồi!</p>;

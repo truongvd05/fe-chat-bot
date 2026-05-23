@@ -74,6 +74,7 @@ function ChatUser() {
         content, setContent, files, setFiles, fileInputRef, setReplyingMessage,
         editingMessage, setEditingMessage, replyingMessage
     })
+    
     useUnreadReset({ conversationId, userId: user?.id })
 
 

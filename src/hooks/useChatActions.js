@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { getSocket } from "@/socket/socket";
 import logger from "@/utils/logger";
 import { toast } from "sonner";
@@ -26,6 +26,29 @@ export function useChatActions({
   const typingRef = useRef(false);
   const timeoutRef = useRef(null);
 
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;
+
+    const handleError = ({ message, statusCode }) => {
+      logger.log("Error:", statusCode, message);
+      if (statusCode === 403 && message === "Tài khoản chưa được xác thực") {
+        toast.warning("Xác thực email để sử dụng đầy đủ tính năng", {
+          duration: 5000,
+          action: {
+            label: "Xác thực ngay",
+            onClick: () => (window.location.href = "/send-verify-email"),
+          },
+        });
+      } else {
+        toast.error(message || "Lỗi không xác định");
+      }
+    };
+
+    socket.on("error_message", handleError);
+    return () => socket.off("error_message", handleError); // cleanup
+  }, []);
+
   const handleSendMessage = async () => {
     try {
       if (!conversationData) return;
@@ -34,11 +57,6 @@ export function useChatActions({
 
       const socket = getSocket();
       if (!socket) return;
-
-      socket.once("error_message", ({ message, statusCode }) => {
-        logger.log("Error:", statusCode, message);
-        toast.error(message);
-      });
 
       if (editingMessage) {
         socket.emit("edit_message", {

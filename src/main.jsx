@@ -8,15 +8,18 @@ import { PersistGate } from 'redux-persist/integration/react'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { SocketProvider } from './contexts/SocketContext'
 import ErrorBoundary from './components/ErrorBoundary'
+import { BrowserRouter } from 'react-router-dom'
 
 createRoot(document.getElementById('root')).render(
     <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
             <ThemeProvider>
                 <SocketProvider>
-                    <ErrorBoundary>
-                        <App />
-                    </ErrorBoundary>
+                    <BrowserRouter>
+                        <ErrorBoundary>
+                            <App />
+                        </ErrorBoundary>
+                    </BrowserRouter>
                 </SocketProvider>
             </ThemeProvider>
         </PersistGate>

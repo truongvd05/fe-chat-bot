@@ -5,17 +5,28 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { useVerifyEmailMutation } from "@/feature/Auth/authApi";
+import { setEmailVerified } from "@/feature/User/userSlice";
+import logger from "@/utils/logger";
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { Link, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 
 function VerifyEmail() {
     const [searchParams] = useSearchParams();
     const token = searchParams.get("token");
+    const dispatch = useDispatch()
     const [VerifyEmail, {isLoading, isError, isSuccess}] = useVerifyEmailMutation()
 
     useEffect(() => {
-        if (!token) return;
-        VerifyEmail({token})
+        try {
+            if (!token) return;
+            VerifyEmail({token}).unwrap()
+            dispatch(setEmailVerified())
+        } catch (err) {
+            toast.error(err?.data?.message || "Xác thực thất bại")
+            logger.log(err)
+        }
     }, [token])
 
 return (

@@ -27,7 +27,6 @@ export function useChatSocket({
     if (!socket) return;
     const handleReceiveMessage = (message) => {
       if (message.conversationId !== conversationId) return;
-      console.log(message);
 
       // Nếu là ảnh bỏ qua vì đã có RTK xử lý
       if (message.userId === user?.id && message.attachments?.length > 0)

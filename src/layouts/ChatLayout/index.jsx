@@ -9,16 +9,16 @@ function ChatLayout(){
     const {user} = useSelector(selectUser)
     const navigate = useNavigate()
     useEffect(() => {
-    if (user && !user.emailVerifiedAt) {
-        toast.warning("Xác thực email để sử dụng đầy đủ tính năng", {
-            duration: 5000,
-            action: {
-                label: "Xác thực ngay",
-                onClick: () => navigate("/send-verify-email")
-            }
-        });
-    }
-    }, []);
+        if (user && !user.emailVerifiedAt) {
+            toast.warning("Xác thực email để sử dụng đầy đủ tính năng", {
+                duration: 5000,
+                action: {
+                    label: "Xác thực ngay",
+                    onClick: () => navigate("/send-verify-email")
+                }
+            });
+        }
+    }, [user]);
     if(!user) {
         return <Navigate to="/login" replace/>
     }

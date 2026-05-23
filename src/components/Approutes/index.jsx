@@ -1,4 +1,4 @@
-import { lazy } from 'react';
+import { lazy, Suspense  } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import AuthLayout from "@/layouts/AuthLayout";
@@ -22,7 +22,7 @@ const ChatUser = lazy(() => import("@/page/ChatUser"))
 
 function AppRoutes() {
     return (
-    <BrowserRouter>
+    <Suspense fallback={null}>
         <Routes>
             <Route element={<ChatLayout/>}>
                 <Route path="/" element={<Navigate to="/chat" replace/>}/>
@@ -50,7 +50,7 @@ function AppRoutes() {
             <Route path='/profile' element={<Profile/>}/>
             <Route path="*" element={<NotFound />} />
         </Routes>
-    </BrowserRouter>
+    </Suspense>
     )
 }
 

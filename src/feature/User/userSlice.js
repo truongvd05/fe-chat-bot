@@ -22,15 +22,21 @@ const userSlice = createSlice({
       state.accessToken = action.payload;
       localStorage.setItem("access_token", action.payload);
     },
-    logOut(state, action) {
+    logOut(state) {
       state.user = null;
       state.accessToken = null;
       state.isLoggedIn = false;
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
     },
+    setEmailVerified(state) {
+      if (state.user) {
+        state.user.emailVerifiedAt = new Date().toISOString();
+      }
+    },
   },
 });
 
-export const { setUser, logOut, setAccessToken } = userSlice.actions;
+export const { setUser, logOut, setAccessToken, setEmailVerified } =
+  userSlice.actions;
 export default userSlice.reducer;

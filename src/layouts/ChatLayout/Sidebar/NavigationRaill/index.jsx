@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import NavIcon from "./NavIcon"
 import { useTheme } from "@/contexts/ThemeContext"
-import { useLocation, useNavigate, useParams } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { useLogoutMutation } from "@/feature/User/userApi"
 import { useDispatch } from "react-redux"
 import { logOut } from "@/feature/User/userSlice"
