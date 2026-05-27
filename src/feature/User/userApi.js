@@ -1,10 +1,11 @@
 import baseQueryWithReauth from "@/services/baseQueryWithReauth";
 import { createApi } from "@reduxjs/toolkit/query/react";
+import { updateUser } from "./userSlice";
 
 export const userApi = createApi({
   reducerPath: "userApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["User, Friends, Friends-request"],
+  tagTypes: ["User", "Friends", "Friends-request"],
   endpoints: (builder) => ({
     getUser: builder.query({
       query: () => ({
@@ -63,6 +64,31 @@ export const userApi = createApi({
         body: data,
       }),
     }),
+    uploadAvatar: builder.mutation({
+      query: (formData) => {
+        return {
+          url: `user/avatar`,
+          method: "PATCH",
+          body: formData,
+        };
+      },
+      invalidatesTags: ["User"],
+    }),
+    editUser: builder.mutation({
+      query: (formData) => ({
+        url: `user`,
+        method: "PUT",
+        body: formData,
+      }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          console.log(data);
+
+          dispatch(updateUser(data));
+        } catch {}
+      },
+    }),
   }),
 });
 
@@ -76,5 +102,7 @@ export const {
   useChangePasswordMutation,
   useAddFriendMutation,
   useResendVerifyEmailMutation,
+  useUploadAvatarMutation,
+  useEditUserMutation,
   // lazy
 } = userApi;

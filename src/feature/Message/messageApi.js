@@ -9,7 +9,9 @@ export const messageApi = createApi({
     getMessage: builder.query({
       query: ({ conversationId, c }) => ({
         url: `/message/conversations/${conversationId}`,
-        params: { c },
+        params: {
+          c,
+        },
       }),
       providesTags: (result, error, conversationId) => [
         { type: "Message", id: conversationId },

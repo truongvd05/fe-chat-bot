@@ -34,9 +34,12 @@ const userSlice = createSlice({
         state.user.emailVerifiedAt = new Date().toISOString();
       }
     },
+    updateUser(state, action) {
+      state.user = { ...state.user, ...action.payload };
+    },
   },
 });
 
-export const { setUser, logOut, setAccessToken, setEmailVerified } =
+export const { setUser, logOut, setAccessToken, setEmailVerified, updateUser } =
   userSlice.actions;
 export default userSlice.reducer;

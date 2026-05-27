@@ -18,7 +18,7 @@ function UserAvatar() {
         className="relative w-9 h-9 rounded-full overflow-hidden border-2 border-transparent hover:border-blue-400 transition-all"
       >
         <img
-          src={user.avatar || "/default-avatar.png"}
+          src={user.avatarUrl || "/default-avatar.png"}
           className="w-full h-full object-cover"
         />
       </button>
