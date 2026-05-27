@@ -106,18 +106,15 @@ function MemberSelectModal({trigger, title, data, onSearch, onSubmit, loading, e
             {!loading && error && <span className="text-red-500 text-sm">{error?.data?.message || "Có lỗi xảy ra"}</span>}
             {!loading && !error && data?.length === 0 &&  <span className="text-red-500 text-sm">Không tìm thấy</span>}
             <div className="overflow-y-auto max-h-70">
-                {data && data.map((user)=> {
-                  return (
-                  <div key={user.id}
-                  onClick={() => toggleUser(user)}
+                {data && 
+                  <div key={data.id}
+                  onClick={() => toggleUser(data)}
                   className={`cursor-pointer hover:bg-amber-50 px-3 py-3
-                    ${selectedUser.has(user.id) ? "bg-gray-300" : ""}
+                    ${selectedUser.has(data.id) ? "bg-gray-300" : ""}
                   `}>
-                      <p>{user.name || "undefined"} </p>
-                      <p>{user.email}</p>
-                  </div>
-                  )
-                })}
+                      <p>{data.name || "undefined"} </p>
+                      <p>{data.email}</p>
+                  </div>}
             </div>
         <DialogFooter className="mt-4">
           <DialogClose asChild>

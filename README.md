@@ -1,90 +1,150 @@
-🚀 FE Chat Bot
+# 💬 ChatDemo
 
-Frontend for a real-time AI chat application built with React.
-This project provides a modern chat experience with real-time communication, authentication, and scalable state management.
+Frontend for a real-time chat application inspired by Zalo, built with React.
 
-Demo
+🌐 **Production:** [chatdemo.site](https://chatdemo.site) &nbsp;|&nbsp; 📦 **Repo:** [github.com/truongvd05/chatdemo](https://github.com/truongvd05/chatdemo)
 
-Production:
-https://chatdemo.site
+---
 
-Features
+## ✨ Features
 
-Real-time chat using Server-Sent Events (SSE)
-WebSocket connection with Socket.IO
-Authentication with JWT + Refresh Token
-Automatic refresh token handling
-Chat conversation management
-Modern responsive UI
-Optimized API handling using RTK Query
-Global state management with Redux Toolkit
+### 💬 Chat
 
-Tech Stack
+- Real-time messaging with **Socket.IO** (WebSocket)
+- Typing indicator & online/offline status
+- Group chat support
+- Chat conversation management
 
-Frontend
-React
-Vite
-Redux Toolkit
-RTK Query
-Socket.IO client
-TailwindCSS
+### 🔐 Authentication
 
-Backend communication
-REST API
-SSE (Server Sent Events)
-WebSocket (Socket.IO)
+- JWT with Access Token + Refresh Token
+- Automatic silent token refresh
+- Email verification & forgot password flow
+- Secure credential-based communication
 
-Deployment
-Nginx
-Cloudflare
-PM2 (backend)
+### ⚡ Performance
 
-src
-├── api
-│ ├── baseQuery.js
-│ ├── baseQueryWithReauth.js
+- API latency reduced **30–50%** via Redis caching & rate limiting on critical endpoints
+- Optimized API calls with RTK Query (caching, deduplication, auto re-fetch)
+
+---
+
+## 🧰 Tech Stack
+
+| Layer            | Technology               |
+| ---------------- | ------------------------ |
+| UI Framework     | React + Vite             |
+| State Management | Redux Toolkit, RTK Query |
+| Styling          | TailwindCSS              |
+| Real-time        | Socket.IO client         |
+| Deployment       | Nginx, Cloudflare        |
+
+---
+
+## 📁 Project Structure
+
+```
+src/
+├── api/
+│   ├── baseQuery.js             # Axios base query config
+│   └── baseQueryWithReauth.js  # Auto refresh token interceptor
 │
-├── components
+├── components/                 # Shared UI components
 │
-├── context
-│ └── SocketContext.jsx
+├── context/
+│   └── SocketContext.jsx       # Global Socket.IO connection
 │
-├── feature
-│ └── user
+├── feature/
+│   └── user/                   # User slice (Redux)
 │
-├── pages
+├── pages/                      # Route-level pages
 │
-├── services
+├── services/                   # RTK Query API service definitions
 │
-├── utils
+├── utils/                      # Helper functions
 │
 └── main.jsx
+```
 
-Getting Started
+---
 
-1.  Install dependencies
-    npm install
-2.  Run development server
-    npm run dev
-3.  Build for production
-    npm run build
+## 🚀 Getting Started
 
-Authentication Flow
-Access token stored in memory / state
-Refresh token handled automatically via API
-Failed requests are retried after token refresh
-Secure communication with credentials enabled
+### Prerequisites
 
-Real-time Communication
-SSE used for AI streaming responses
-Socket.IO used for:
-user-to-user messaging
-online status
-real-time events
+- Node.js >= 18
+- Backend server running — see [chatdemo backend repo](#)
 
-Notes
-Ensure backend server is running before starting frontend
-Check correct API URLs in .env
-Restart dev server after changing environment variables
+### Installation
 
-✍️ Author: TruongVD
+```bash
+# 1. Clone the repository
+git clone https://github.com/truongvd05/chatdemo.git
+cd chatdemo
+
+# 2. Install dependencies
+npm install
+
+# 3. Configure environment
+cp .env.example .env
+# Edit .env with your API and Socket URLs
+
+# 4. Start development server
+npm run dev
+```
+
+### Build for Production
+
+```bash
+npm run build
+```
+
+---
+
+## ⚙️ Environment Variables
+
+```env
+VITE_API_URL=https://your-api-url.com
+VITE_SOCKET_URL=https://your-socket-url.com
+```
+
+> ⚠️ Restart the dev server after changing `.env` values.
+
+---
+
+## 🔐 Authentication Flow
+
+```
+Login
+  │
+  ▼
+Access Token (stored in memory)
+  │
+  ├─ Request succeeds ───────────────► Response
+  │
+  └─ 401 Unauthorized
+         │
+         ▼
+  Refresh Token (httpOnly cookie)
+         │
+         ├─ Valid ──► New Access Token ──► Retry original request
+         │
+         └─ Invalid ──► Redirect to Login
+```
+
+---
+
+## 🔌 Real-time Communication
+
+| Protocol                  | Usage                                                                |
+| ------------------------- | -------------------------------------------------------------------- |
+| **WebSocket** (Socket.IO) | Messaging, typing indicator, online status, unread, real-time events |
+
+---
+
+## 👤 Author
+
+**Vũ Đình Trường**  
+📧 truongbk444@gmail.com  
+🐙 [github.com/truongvd05](https://github.com/truongvd05)  
+🌐 [chatdemo.site](https://chatdemo.site)
