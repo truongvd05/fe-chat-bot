@@ -39,6 +39,14 @@ export const userApi = createApi({
       }),
       providesTags: ["Friends"],
     }),
+    unFriend: builder.mutation({
+      query: ({ targetUserId }) => ({
+        url: "user/unfriend",
+        method: "POST",
+        body: { targetUserId },
+      }),
+      invalidatesTags: ["Friends"],
+    }),
     getFriendRequest: builder.query({
       query: () => ({
         url: "user/friend-request",
@@ -59,7 +67,7 @@ export const userApi = createApi({
         body: { requestId },
         method: "POST",
       }),
-      invalidatesTags: ["Friends-request"],
+      invalidatesTags: ["Friends-request", "Friends"],
     }),
     rejectFriend: builder.mutation({
       query: ({ requestId }) => ({
@@ -67,7 +75,7 @@ export const userApi = createApi({
         body: { requestId },
         method: "POST",
       }),
-      invalidatesTags: ["Friends-request"],
+      invalidatesTags: ["Friends-request", "Friends"],
     }),
     resendVerifyEmail: builder.mutation({
       query: (data) => ({
@@ -117,5 +125,6 @@ export const {
   useResendVerifyEmailMutation,
   useUploadAvatarMutation,
   useEditUserMutation,
+  useUnFriendMutation,
   // lazy
 } = userApi;
