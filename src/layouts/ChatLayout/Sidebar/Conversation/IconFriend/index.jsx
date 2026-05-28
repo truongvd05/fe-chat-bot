@@ -92,9 +92,10 @@ function IconFriend() {
             <p className="text-sm opacity-70">Kết quả gần nhất</p>
             {historySearch.length > 0 && historySearch.map((item) => {
               return (
-              <div key={item.id}>
-                <p className="cursor-pointer hover:bg-amber-100 px-3 py-3" 
-                onClick={() => handleSelectHistory(item)} >{item.name}</p>
+              <div key={item.id} className="flex items-center p-2 hover:bg-amber-100" onClick={() => handleSelectHistory(item)}>
+                <img className="w-10 h-10" src={item.avatarUrl || "https://www.shutterstock.com/image-vector/default-avatar-social-media-display-600nw-2632690107.jpg"} alt='avatar' />
+                <p className="flex cursor-pointer  px-3 py-3" 
+                 >{item.name}</p>
               </div>)
               })
             }

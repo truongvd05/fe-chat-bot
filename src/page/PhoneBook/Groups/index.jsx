@@ -18,8 +18,20 @@ export default function Groups() {
             <ul>
                 {data.map((c) => {
                     return (
-                        <li key={c.id}>
+                        <li key={c.id} className="flex items-center justify-between p-2 hover:bg-amber-50">
                             <p>{c.title}</p>
+                            <div className="flex gap-2">
+                                <button
+                                    className="px-3 py-1 bg-blue-500 text-white text-sm userounded hover:bg-blue-600"
+                                >
+                                    Tắt thông báo
+                                </button>
+                                <button
+                                    className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
+                                >
+                                    Rời nhóm
+                                </button>
+                            </div>
                         </li>
                     )
                 })}

@@ -51,11 +51,23 @@ export const userApi = createApi({
         method: "POST",
         body: { targetUserId },
       }),
+      invalidatesTags: ["Friends-request"],
     }),
-    accFriend: builder.mutation({
-      query: ({ targetUserId }) => ({
-        url: "user/",
+    acceptFriend: builder.mutation({
+      query: ({ requestId }) => ({
+        url: "user/accept-friend",
+        body: { requestId },
+        method: "POST",
       }),
+      invalidatesTags: ["Friends-request"],
+    }),
+    rejectFriend: builder.mutation({
+      query: ({ requestId }) => ({
+        url: "user/reject-friend",
+        body: { requestId },
+        method: "POST",
+      }),
+      invalidatesTags: ["Friends-request"],
     }),
     resendVerifyEmail: builder.mutation({
       query: (data) => ({
@@ -83,8 +95,7 @@ export const userApi = createApi({
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          console.log(data);
-
+          // update state user khi sửa thông tin
           dispatch(updateUser(data));
         } catch {}
       },
@@ -101,6 +112,8 @@ export const {
   useLogoutMutation,
   useChangePasswordMutation,
   useAddFriendMutation,
+  useAcceptFriendMutation,
+  useRejectFriendMutation,
   useResendVerifyEmailMutation,
   useUploadAvatarMutation,
   useEditUserMutation,

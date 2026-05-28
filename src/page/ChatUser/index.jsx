@@ -129,13 +129,13 @@ function ChatUser() {
                         </>
                     ) : (
                         <div style={{ height: rowVirtualizer.getTotalSize(), minHeight: "100%", position: "relative" }}>
-                            {hasMore && <p className="text-center text-sm opacity-50">Đã tải hết tin nhắn</p>}
+                            {hasMore && <p className="text-center text-sm opacity-50 ">Đã tải hết tin nhắn</p>}
                             {rowVirtualizer.getVirtualItems().map((virtualRow) => {
                                 const message = messageData[virtualRow.index]
                                 return (
                                     <div key={message.id} ref={rowVirtualizer.measureElement}
                                         data-index={virtualRow.index}
-                                        className="absolute top-0 left-0 w-full"
+                                        className="absolute top-0 left-0 w-full mt-10"
                                         style={{ transform: `translateY(${virtualRow.start}px)` }}>
                                         <div className={`${message.role === "user" ? "" : "border-b border-t"}`}>
                                             <Message
