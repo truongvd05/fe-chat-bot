@@ -11,9 +11,16 @@ export function useConversationSuggest({
     useLazyGetSuggestQuery();
   const prevConversationId = useRef(null);
   const lastMessageRef = useRef(null);
+  const abortRef = useRef(null);
 
   useEffect(() => {
     if (prevConversationId.current === conversationId) return;
+
+    // Hủy request cũ nếu đang chạy
+    if (abortRef.current) {
+      abortRef.current.abort();
+      abortRef.current = null;
+    }
 
     // Reset khi đổi conversation
     prevConversationId.current = conversationId;
@@ -27,12 +34,18 @@ export function useConversationSuggest({
 
     if (String(lastMessage.userId) === String(user.id)) return;
 
-    triggerSuggest({ conversationId, lastMessage: lastMessage.content })
+    const promise = triggerSuggest({
+      conversationId,
+      lastMessage: lastMessage.content,
+    });
+
+    abortRef.current = promise;
+
+    promise
       .unwrap()
-      .then((data) => {
-        setSuggestions(data ?? []);
-      })
+      .then((data) => setSuggestions(data ?? []))
       .catch((err) => {
+        if (err?.name === "AbortError") return; // bỏ qua nếu bị cancel
         console.log("suggest error:", err);
         setSuggestions([]);
       });

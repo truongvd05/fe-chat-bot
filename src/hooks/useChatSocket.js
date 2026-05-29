@@ -40,7 +40,7 @@ export function useChatSocket({
   useEffect(() => {
     if (!socket) return;
     const handleSuggest = ({ conversationId: convId, suggestions }) => {
-      if (convId !== conversationId) return;
+      if (String(convId) !== String(conversationId)) return;
       setSuggestions(suggestions);
     };
     socket.on("bot_suggest", handleSuggest);
