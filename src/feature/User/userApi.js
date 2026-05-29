@@ -20,6 +20,14 @@ export const userApi = createApi({
         body: data,
       }),
     }),
+    toggleAiSuggest: builder.mutation({
+      query: (aiSuggest) => ({
+        url: "user/ai-suggest",
+        method: "PATCH",
+        body: { aiSuggest },
+      }),
+      invalidatesTags: ["User"],
+    }),
     logout: builder.mutation({
       query: () => ({
         url: "auth/logout",
@@ -126,5 +134,6 @@ export const {
   useUploadAvatarMutation,
   useEditUserMutation,
   useUnFriendMutation,
+  useToggleAiSuggestMutation,
   // lazy
 } = userApi;

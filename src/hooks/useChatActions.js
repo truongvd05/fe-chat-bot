@@ -9,8 +9,6 @@ import { toast } from "sonner";
 export function useChatActions({
   conversationId,
   conversationData,
-  user,
-  editMessage,
   sendMessageWithFiles,
   scrollBottom,
   content,

@@ -15,12 +15,37 @@ export function useChatSocket({
   socket,
   conversationId,
   user,
+  setSuggestions,
   refetchConversation,
   handleNewMessage,
 }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [typingUsers, setTypingUsers] = useState([]);
+  const [isThinking, setIsThinking] = useState(false);
+
+  // xử lí khi ai đang thingking
+  useEffect(() => {
+    if (!socket) return;
+    const handleThinking = ({ conversationId: convId, thinking }) => {
+      if (String(convId) !== String(conversationId)) return;
+      if (thinking) setSuggestions([]);
+      setIsThinking(thinking);
+    };
+    socket.on("bot_thinking", handleThinking);
+    return () => socket.off("bot_thinking", handleThinking);
+  }, [socket, conversationId]);
+
+  // Nhận message suggest mới từ socket
+  useEffect(() => {
+    if (!socket) return;
+    const handleSuggest = ({ conversationId: convId, suggestions }) => {
+      if (convId !== conversationId) return;
+      setSuggestions(suggestions);
+    };
+    socket.on("bot_suggest", handleSuggest);
+    return () => socket.off("bot_suggest", handleSuggest);
+  }, [socket, conversationId]);
 
   // Nhận message mới từ socket
   useEffect(() => {
@@ -121,5 +146,5 @@ export function useChatSocket({
     return () => socket.off("message_edited", handleMessageEdited);
   }, [socket, conversationId, dispatch]);
 
-  return { typingUsers };
+  return { typingUsers, isThinking };
 }

@@ -10,18 +10,24 @@ import {
 import NavIcon from "./NavIcon"
 import { useTheme } from "@/contexts/ThemeContext"
 import { useNavigate } from "react-router-dom"
-import { useLogoutMutation } from "@/feature/User/userApi"
-import { useDispatch } from "react-redux"
-import { logOut } from "@/feature/User/userSlice"
+import { useLogoutMutation, useToggleAiSuggestMutation } from "@/feature/User/userApi"
+import { useDispatch, useSelector } from "react-redux"
+import { logOut, updateUser } from "@/feature/User/userSlice"
 import { disconnectSocket } from "@/socket/socket"
 import logger from "@/utils/logger"
 import UserAvatar from "@/components/UserAvatar"
+import { selectUser } from "@/feature/User/userSelector"
+import { toast } from "sonner"
 
 function NavigationRall() {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const {theme, setTheme} = useTheme()
+    const {user} = useSelector(selectUser)
+    console.log(user.aiSuggest);
+    
     const [ logoutApi, {isLoading, error}] = useLogoutMutation()
+    const [toggetAi] = useToggleAiSuggestMutation()
 
     const refresh_token = localStorage.getItem("refresh_token")
 
@@ -39,6 +45,17 @@ function NavigationRall() {
             navigate("/login")
         } catch (err) {
             logger.log(err);
+        }
+    }
+
+    const handleToggerAi = async (aiSuggest) => {
+        try {
+            await toggetAi(aiSuggest).unwrap()
+            dispatch(updateUser({ aiSuggest }));
+            toast.success(aiSuggest ? "Đã bật gợi ý AI" : "Đã tắt gợi ý AI")
+        } catch (err) {
+            logger.error(err)
+            toast.error("lỗi không xác định")
         }
     }
 
@@ -64,6 +81,9 @@ return (
                     <DropdownMenuGroup>
                     <DropdownMenuItem onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
                         {theme === "light" ? "dark" : "light"}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => {handleToggerAi(!user?.aiSuggest)}}>
+                        {user?.aiSuggest ? "Tắt gợi ý từ AI" : "Bật gợi ý từ AI"}
                     </DropdownMenuItem>
                     </DropdownMenuGroup>
                     <DropdownMenuItem onClick={handleLogout}>

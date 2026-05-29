@@ -4,7 +4,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 export const messageApi = createApi({
   reducerPath: "messageApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["Message"],
+  tagTypes: ["Message", "Suggest"],
   endpoints: (builder) => ({
     getMessage: builder.query({
       query: ({ conversationId, c }) => ({
@@ -16,6 +16,14 @@ export const messageApi = createApi({
       providesTags: (result, error, conversationId) => [
         { type: "Message", id: conversationId },
       ],
+    }),
+    getSuggest: builder.query({
+      query: ({ conversationId, lastMessage }) => ({
+        url: `/ai/suggest/${conversationId}`,
+        method: "POST",
+        body: { lastMessage },
+      }),
+      providesTags: ["Suggest"],
     }),
     // fake message gửi
     sendMessage: builder.mutation({
@@ -217,6 +225,7 @@ export const {
   useSendMessageMutation,
   useSendMessageWithFilesMutation,
   // lazy
+  useLazyGetSuggestQuery,
   useLazyGetMessageQuery,
   useEditMessageMutation,
 } = messageApi;

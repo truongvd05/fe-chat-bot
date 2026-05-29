@@ -46,8 +46,6 @@ function Conversation() {
                 "getConversations",
                 undefined,
                 (draft) => {
-                    console.log(conversation);
-                    
                     const index = draft.findIndex(
                         c => c.id === conversation.id
                     )

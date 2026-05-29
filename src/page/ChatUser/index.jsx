@@ -21,6 +21,7 @@ import { useChatSocket } from "@/hooks/useChatSocket"
 import { useChatActions } from "@/hooks/useChatActions"
 import { useUnreadReset } from "@/hooks/useUnreadReset"
 import MemberModal from "./conponents/MemberModal"
+import { useConversationSuggest } from "@/hooks/useConversationSuggest"
 
 function ChatUser() {
     const socket = useSocket()
@@ -28,6 +29,7 @@ function ChatUser() {
     const fileInputRef = useRef(null)
     const { user } = useSelector(selectUser)
     const { conversationId } = useParams()
+    const [suggestions, setSuggestions] = useState([]);
 
     const [content, setContent] = useState("")
     const [open, onOpenChange] = useState(false)
@@ -67,14 +69,22 @@ function ChatUser() {
         messageData, conversationId, loadMore, rowVirtualizer, parentRef,
     })
 
-    const { typingUsers } = useChatSocket({ socket, conversationId, user, refetchConversation, handleNewMessage })
+    const { typingUsers, isThinking  } = useChatSocket({ socket, setSuggestions, conversationId, user, refetchConversation, handleNewMessage })
+
+    const { suggestLoading } = useConversationSuggest({
+        messageData,
+        user,
+        conversationId,
+        setSuggestions,
+    });
+
 
     const { handleSendMessage, handleTyping } = useChatActions({
         conversationId, conversationData, user, sendMessageWithFiles, scrollBottom, editMessage,
         content, setContent, files, setFiles, fileInputRef, setReplyingMessage,
         editingMessage, setEditingMessage, replyingMessage
     })
-    
+
     useUnreadReset({ conversationId, userId: user?.id })
 
 
@@ -167,7 +177,12 @@ function ChatUser() {
                             : `${typingUsers.length} người đang gõ...`}
                     </div>
                 )}
-
+                {(suggestLoading || isThinking) && (
+                <div className="pl-4 pb-1 text-sm text-blue-400 italic flex items-center gap-2">
+                    <span className="animate-pulse">✦</span>
+                    AI đang gợi ý câu trả lời...
+                </div>
+                )}
                 {/* Input area */}
                 <div className="sticky mr-auto ml-auto w-[70%] md:w-[70%] lg:w-[70%]">
                     {files.length > 0 && (
@@ -186,6 +201,22 @@ function ChatUser() {
                                         ×
                                     </button>
                                 </div>
+                            ))}
+                        </div>
+                    )}
+                    {suggestions.length > 0 && (
+                        <div className="flex gap-2 px-2 pb-2 flex-wrap">
+                            {suggestions.map((text, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => {
+                                        setContent(text);
+                                        setSuggestions([]);
+                                    }}
+                                    className="text-sm px-3 py-1 rounded-full border hover:bg-accent transition-colors"
+                                >
+                                    {text}
+                                </button>
                             ))}
                         </div>
                     )}
@@ -210,7 +241,11 @@ function ChatUser() {
                         <div className="relative">
                             <Textarea id="textarea-message"
                                 value={content}
-                                onChange={(e) => { setContent(e.target.value); handleTyping(socket) }}
+                                onChange={(e) => {
+                                    setContent(e.target.value);
+                                    handleTyping(socket)
+                                    if (e.target.value) setSuggestions([]);
+                                }}
                                 className="overflow-y-auto text-lg rounded-3xl pr-15 pl-12 min-h-10 max-h-37.5"
                                 placeholder="Enter text" />
                             <button onClick={() => fileInputRef.current.click()}
