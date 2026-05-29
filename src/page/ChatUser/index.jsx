@@ -177,7 +177,7 @@ function ChatUser() {
                             : `${typingUsers.length} người đang gõ...`}
                     </div>
                 )}
-                {(suggestLoading || isThinking) && (
+                {(user.aiSuggest &&(suggestLoading || isThinking)) && (
                 <div className="pl-4 pb-1 text-sm text-blue-400 italic flex items-center gap-2">
                     <span className="animate-pulse">✦</span>
                     AI đang gợi ý câu trả lời...

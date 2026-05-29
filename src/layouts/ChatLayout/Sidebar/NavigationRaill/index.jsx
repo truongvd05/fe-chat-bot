@@ -24,7 +24,6 @@ function NavigationRall() {
     const navigate = useNavigate()
     const {theme, setTheme} = useTheme()
     const {user} = useSelector(selectUser)
-    console.log(user.aiSuggest);
     
     const [ logoutApi, {isLoading, error}] = useLogoutMutation()
     const [toggetAi] = useToggleAiSuggestMutation()
