@@ -101,5 +101,14 @@ export function useChatActions({
     }, 2000);
   };
 
-  return { handleSendMessage, handleTyping };
+  const handleDeleteMeesage = async ({ id }) => {
+    const socket = getSocket();
+    if (!socket) return;
+    socket.emit("delete_message", {
+      messageId: id,
+      conversationId,
+    });
+  };
+
+  return { handleSendMessage, handleTyping, handleDeleteMeesage };
 }

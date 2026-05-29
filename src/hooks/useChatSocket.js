@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { conversationApi } from "@/feature/Conversation/conversationApi";
+import { getSocket } from "@/socket/socket";
 import { messageApi } from "@/feature/Message/messageApi";
+import { store } from "@/store/store";
+import { selectUser } from "@/feature/User/userSelector";
 
 /**
  * Xử lý tất cả socket events trong chat:
@@ -137,6 +140,9 @@ export function useChatSocket({
             if (msg) {
               msg.content = message.content;
               msg.isEdited = message.isEdited;
+              if (user.id === message.userId) {
+                toast.success("Sửa tin nhắn thành công");
+              }
             }
           },
         ),
@@ -145,6 +151,33 @@ export function useChatSocket({
     socket.on("message_edited", handleMessageEdited);
     return () => socket.off("message_edited", handleMessageEdited);
   }, [socket, conversationId, dispatch]);
+
+  // nhận xóa message
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;
+
+    const handleMessageDeleted = (message) => {
+      store.dispatch(
+        messageApi.util.updateQueryData(
+          "getMessage",
+          { conversationId },
+          (draft) => {
+            const index = draft.findIndex(
+              (m) => String(m.id) === String(message.id),
+            );
+            if (index !== -1) draft.splice(index, 1);
+            if (user.id === message.userId) {
+              toast.success("Xóa tin nhắn thành công");
+            }
+          },
+        ),
+      );
+    };
+
+    socket.on("message_deleted", handleMessageDeleted);
+    return () => socket.off("message_deleted", handleMessageDeleted);
+  }, [conversationId]);
 
   return { typingUsers, isThinking };
 }

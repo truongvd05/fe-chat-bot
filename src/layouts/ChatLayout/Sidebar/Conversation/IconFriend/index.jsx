@@ -88,7 +88,7 @@ function IconFriend() {
         <DialogHeader>
           <DialogTitle>Tìm kiếm bạn bè.</DialogTitle>
         </DialogHeader>
-            <Input value={value} onChange={(e)=> setValue(e.target.value)} type="text" autoComplete="name" placeholder="nhập số điện thoại"/>
+            <Input value={value} onChange={(e)=> setValue(e.target.value)} type="text"  placeholder="nhập số điện thoại, email"/>
             <p className="text-sm opacity-70">Kết quả gần nhất</p>
             {historySearch.length > 0 && historySearch.map((item) => {
               return (

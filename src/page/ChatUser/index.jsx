@@ -35,7 +35,6 @@ function ChatUser() {
     const [open, onOpenChange] = useState(false)
     const [files, setFiles] = useState([])
     const [editingMessage, setEditingMessage] = useState(null)
-    const [deletingMessage, setDeletingMessage] = useState(null)
     const [replyingMessage, setReplyingMessage] = useState(null)
 
     const { data: messageData, isLoading: messageLoading } = useGetMessageQuery({ conversationId })
@@ -79,10 +78,10 @@ function ChatUser() {
     });
 
 
-    const { handleSendMessage, handleTyping } = useChatActions({
+    const { handleSendMessage, handleTyping, handleDeleteMeesage } = useChatActions({
         conversationId, conversationData, user, sendMessageWithFiles, scrollBottom, editMessage,
         content, setContent, files, setFiles, fileInputRef, setReplyingMessage,
-        editingMessage, setEditingMessage, replyingMessage
+        editingMessage, setEditingMessage, replyingMessage,
     })
 
     useUnreadReset({ conversationId, userId: user?.id })
@@ -155,7 +154,7 @@ function ChatUser() {
                                                 showName={shouldShowUser(messageData, virtualRow.index)}
                                                 showTime={shouldShowTime(messageData, virtualRow.index)}
                                                 onEdit={() => setEditingMessage({ id: message.id, content: message.content })}
-                                                onDelete={() => setDeletingMessage({ id: message.id })}
+                                                onDelete={() => handleDeleteMeesage({ id: message.id })}
                                                 onReply={() => setReplyingMessage({ id: message.id, content: message.content, senderName: message.user?.name })}
                                             />
                                         </div>
