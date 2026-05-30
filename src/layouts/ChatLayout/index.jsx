@@ -18,7 +18,7 @@ function ChatLayout(){
                 }
             });
         }
-    }, [user]);
+    }, [user.id]);
     if(!user) {
         return <Navigate to="/login" replace/>
     }

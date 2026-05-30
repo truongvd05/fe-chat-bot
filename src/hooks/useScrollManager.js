@@ -6,11 +6,13 @@ export function useScrollManager({
   loadMore,
   rowVirtualizer,
   parentRef,
+  parentEl,
 }) {
   const isAutoFillingRef = useRef(false);
   const isLoadingMoreRef = useRef(false);
   const isInitializedRef = useRef(false);
   const scrollBottomRef = useRef(null);
+
   // Reset khi đổi conversation
   useEffect(() => {
     isInitializedRef.current = false;
@@ -91,12 +93,15 @@ export function useScrollManager({
     }
   }, [loadMore, rowVirtualizer]);
 
+  const handleScrollRef = useRef(null);
+  handleScrollRef.current = handleScroll;
+
   useEffect(() => {
-    const el = parentRef.current;
-    if (!el) return;
-    el.addEventListener("scroll", handleScroll);
-    return () => el.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
+    if (!parentEl) return;
+    const handler = () => handleScrollRef.current();
+    parentEl.addEventListener("scroll", handler);
+    return () => parentEl.removeEventListener("scroll", handler);
+  }, [parentEl]);
 
   return { scrollBottom, scrollBottomRef, handleNewMessage };
 }

@@ -10,6 +10,7 @@ import Groups from '@/page/PhoneBook/Groups';
 import FriendsRequests from '@/page/PhoneBook/FriendRequests';
 import GroupRequests from '@/page/PhoneBook/GroupRequests';
 import SendVerifyEmail from '@/page/Auth/SendVerifyEmail';
+import ChatUserWrapper from '@/page/ChatUser';
 
 const Login = lazy(() => import("@/page/Auth/Login"))
 const Register = lazy(() => import("@/page/Auth/Register"))
@@ -18,7 +19,6 @@ const VerifyEmail = lazy(() => import("@/page/Auth/VerifyEmail"))
 const ChangePassword = lazy(() => import("@/page/Auth/ChangePassword"))
 const ForgotPassword = lazy(() => import("@/page/Auth/ForgotPassword"))
 const Profile = lazy(() => import("@/page/Profile"))
-const ChatUser = lazy(() => import("@/page/ChatUser"))
 
 function AppRoutes() {
     return (
@@ -28,7 +28,7 @@ function AppRoutes() {
                 <Route path="/" element={<Navigate to="/chat" replace/>}/>
                 <Route path="/chat">
                     <Route index element={<ChatEmpty />} />
-                    <Route path=":conversationId" element={<ChatUser />} />
+                    <Route path=":conversationId" element={<ChatUserWrapper />} />
                 </Route>
                 <Route path='/phone-book'>
                     <Route index element={<Navigate to="/phone-book/friends" replace />} />

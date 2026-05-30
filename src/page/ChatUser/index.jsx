@@ -1,6 +1,6 @@
 import { useAddMembersInConversationMutation, useGetConversationQuery, useKickMembersInConversationMutation, useLazySearchAvailableUsersQuery, useLeaveGroupMutation, usePromoteToAdminConversationMutation } from "@/feature/Conversation/conversationApi"
 import { useEditMessageMutation, useGetMessageQuery, useSendMessageWithFilesMutation } from "@/feature/Message/messageApi"
-import { useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useSelector } from "react-redux"
 import { useParams } from "react-router-dom"
 import { Textarea } from "@/components/ui/textarea"
@@ -29,6 +29,7 @@ function ChatUser() {
     const { user } = useSelector(selectUser)
     const { conversationId } = useParams()
     const [suggestions, setSuggestions] = useState([]);
+    const [parentEl, setParentEl] = useState(null);
 
     const [content, setContent] = useState("")
     const [open, onOpenChange] = useState(false)
@@ -58,6 +59,8 @@ function ChatUser() {
             refetchOnReconnect: true,
         })
 
+
+
     const other = conversationData?.participants?.find(u => u.user.id !== user.id)
     const isOtherOnline = useSelector(selectIsUserOnline(other?.user?.id))
     const { loadMore, hasMore } = useLoadMessages(conversationId, messageData)
@@ -69,7 +72,7 @@ function ChatUser() {
         measureElement: (el) => el?.getBoundingClientRect().height
     })
     const { scrollBottom, handleNewMessage } = useScrollManager({
-        messageData, conversationId, loadMore, rowVirtualizer, parentRef,
+        messageData, conversationId, loadMore, rowVirtualizer, parentRef, parentEl,
     })
 
     const { typingUsers, isThinking  } = useChatSocket({ socket, setSuggestions, conversationId, user, refetchConversation, handleNewMessage })
@@ -90,6 +93,26 @@ function ChatUser() {
 
     useUnreadReset({ conversationId, userId: user?.id })
 
+    useEffect(() => {
+        scrollBottom()
+    }, [messageData])
+
+    const refCallback = useCallback((el) => {
+        parentRef.current = el;
+        setParentEl(el);
+    }, []);
+
+    if(!conversationData || messageLoading) {
+        return (
+            <>
+                <MessageSkeleton />
+                <MessageSkeleton right />
+                <MessageSkeleton />
+                <MessageSkeleton right />
+                <MessageSkeleton />
+            </>
+        )
+    }
 
     return (
         <>
@@ -131,43 +154,33 @@ function ChatUser() {
                 </div>
 
                 {/* Message list */}
-                <div ref={parentRef} className="flex-1 min-h-0 overflow-y-scroll pb-20 pl-2 pr-2"
+                <div ref={refCallback} className="flex-1 min-h-0 overflow-y-scroll pb-20 pl-2 pr-2"
                     style={{ overflowAnchor: "none" }}>
-                    {(!conversationData || messageLoading) ? (
-                        <>
-                            <MessageSkeleton />
-                            <MessageSkeleton right />
-                            <MessageSkeleton />
-                            <MessageSkeleton right />
-                            <MessageSkeleton />
-                        </>
-                    ) : (
-                        <div style={{ height: rowVirtualizer.getTotalSize(), minHeight: "100%", position: "relative" }}>
-                            {hasMore && <p className="text-center text-sm opacity-50 ">Đã tải hết tin nhắn</p>}
-                            {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                                const message = messageData[virtualRow.index]
-                                return (
-                                    <div key={message.id} ref={rowVirtualizer.measureElement}
-                                        data-index={virtualRow.index}
-                                        className="absolute top-0 left-0 w-full mt-10"
-                                        style={{ transform: `translateY(${virtualRow.start}px)` }}>
-                                        <div className={`${message.role === "user" ? "" : "border-b border-t"}`}>
-                                            <Message
-                                                canModify={message.role === "user" && message.userId === user?.id && conversationData?.type !== "BOT"}
-                                                message={message}
-                                                right={message.userId === user?.id}
-                                                showName={shouldShowUser(messageData, virtualRow.index)}
-                                                showTime={shouldShowTime(messageData, virtualRow.index)}
-                                                onEdit={() => setEditingMessage({ id: message.id, content: message.content })}
-                                                onDelete={() => handleDeleteMeesage({ id: message.id })}
-                                                onReply={() => setReplyingMessage({ id: message.id, content: message.content, senderName: message.user?.name })}
-                                            />
-                                        </div>
+                    <div style={{ height: rowVirtualizer.getTotalSize(), minHeight: "100%", position: "relative" }}>
+                        {hasMore && <p className="text-center text-sm opacity-50 ">Đã tải hết tin nhắn</p>}
+                        {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                            const message = messageData[virtualRow.index]
+                            return (
+                                <div key={message.id} ref={rowVirtualizer.measureElement}
+                                    data-index={virtualRow.index}
+                                    className="absolute top-0 left-0 w-full mt-10"
+                                    style={{ transform: `translateY(${virtualRow.start}px)` }}>
+                                    <div className={`${message.role === "user" ? "" : "border-b border-t"}`}>
+                                        <Message
+                                            canModify={message.role === "user" && message.userId === user?.id && conversationData?.type !== "BOT"}
+                                            message={message}
+                                            right={message.userId === user?.id}
+                                            showName={shouldShowUser(messageData, virtualRow.index)}
+                                            showTime={shouldShowTime(messageData, virtualRow.index)}
+                                            onEdit={() => setEditingMessage({ id: message.id, content: message.content })}
+                                            onDelete={() => handleDeleteMeesage({ id: message.id })}
+                                            onReply={() => setReplyingMessage({ id: message.id, content: message.content, senderName: message.user?.name })}
+                                        />
                                     </div>
-                                )
-                            })}
-                        </div>
-                    )}
+                                </div>
+                            )
+                        })}
+                    </div>
                 </div>
 
                 {/* Typing indicator */}

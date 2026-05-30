@@ -8,32 +8,21 @@ import { useDispatch } from "react-redux";
 
 export default function useLoadMessages(conversationId, messages) {
   const dispatch = useDispatch();
-  // dùng ref để tránh closure vì hook này dùng cho 2 component
-  const messagesRef = useRef(messages);
-  const hasMoreRef = useRef(true);
+  const [hasMore, setHasMore] = useState(false);
   const loadingRef = useRef(false);
-  const [hasMore, setHasMore] = useState(true);
-
+  const messagesRef = useRef(messages);
   const [triggerGetMessage] = useLazyGetMessageQuery();
 
-  useEffect(() => {
-    messagesRef.current = messages;
-  }, [messages]);
-
-  useEffect(() => {
-    hasMoreRef.current = true;
-    setHasMore(false);
-  }, [conversationId]);
+  messagesRef.current = messages;
 
   const loadMore = useCallback(async () => {
-    if (!hasMoreRef.current) return;
     if (loadingRef.current) return;
-
     const currentMessages = messagesRef.current;
+
     if (!currentMessages?.length) return;
 
-    const oldestMessage = currentMessages[0];
     loadingRef.current = true;
+    const oldestMessage = currentMessages[0];
 
     try {
       const oldMessages = await triggerGetMessage({
@@ -43,12 +32,11 @@ export default function useLoadMessages(conversationId, messages) {
 
       // hêt message
       if (oldMessages.length < 10) {
-        hasMoreRef.current = false;
         setHasMore(true);
       }
 
       // check trùng key
-      const existingIds = new Set(messagesRef.current.map((m) => m.id));
+      const existingIds = new Set(currentMessages.map((m) => m.id));
       const uniqueMessages = oldMessages.filter((m) => !existingIds.has(m.id));
 
       dispatch(

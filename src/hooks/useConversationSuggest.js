@@ -1,6 +1,8 @@
 import { useLazyGetSuggestQuery } from "@/feature/Message/messageApi";
+import logger from "@/utils/logger";
 import { useEffect, useRef } from "react";
 
+// hook chỉ gọi 1 lần
 export function useConversationSuggest({
   messageData,
   user,
@@ -10,30 +12,25 @@ export function useConversationSuggest({
   const [triggerSuggest, { isFetching: suggestLoading }] =
     useLazyGetSuggestQuery();
 
-  const prevConversationId = useRef(null);
-  const lastMessageRef = useRef(null);
+  const hasTriggered = useRef(false);
   const abortRef = useRef(null);
 
   useEffect(() => {
-    if (prevConversationId.current === conversationId) return;
+    if (hasTriggered.current) return;
+    if (!messageData?.length || !user) return;
+
+    const lastMessage = messageData[messageData.length - 1];
+    if (String(lastMessage.userId) === String(user.id)) return;
+
+    hasTriggered.current = true;
 
     // Hủy request cũ nếu đang chạy
     if (abortRef.current) {
       abortRef.current.abort();
-      abortRef.current = null;
     }
 
     // Reset khi đổi conversation
-    prevConversationId.current = conversationId;
-    lastMessageRef.current = null;
-    setSuggestions([]);
-
-    if (!messageData?.length || !user) return;
-
-    const lastMessage = messageData[messageData.length - 1];
-    lastMessageRef.current = lastMessage;
-
-    if (String(lastMessage.userId) === String(user.id)) return;
+    console.log(lastMessage);
 
     const promise = triggerSuggest({
       conversationId,
@@ -47,7 +44,7 @@ export function useConversationSuggest({
       .then((data) => setSuggestions(data ?? []))
       .catch((err) => {
         if (err?.name === "AbortError") return; // bỏ qua nếu bị cancel
-        console.log("suggest error:", err);
+        logger.log("suggest error:", err);
         setSuggestions([]);
       });
   }, [conversationId, messageData]);
