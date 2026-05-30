@@ -29,7 +29,6 @@ export function useChatActions({
     if (!socket) return;
 
     const handleError = ({ message, statusCode }) => {
-      logger.log("Error:", statusCode, message);
       if (statusCode === 403 && message === "Tài khoản chưa được xác thực") {
         toast.warning("Xác thực email để sử dụng đầy đủ tính năng", {
           duration: 5000,

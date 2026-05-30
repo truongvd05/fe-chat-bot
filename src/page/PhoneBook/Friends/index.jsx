@@ -30,7 +30,7 @@ export default function Friends() {
 
     return (
         <PhoneBookListLayout subtitle="Bạn bè" icon="fa-user" title="Danh sách bạn bè" count={data?.length} >
-            <ul className="bg-white p-5">
+            <ul className="bg-white p-5 flex flex-col gap-3">
                 {data?.map((user) => (
                     <li key={user.id}
                         onClick={(e) => {
@@ -39,7 +39,7 @@ export default function Friends() {
                             setSelectedUser(user)
                             }
                         } 
-                        className="flex items-center justify-between p-2 hover:bg-amber-50">
+                        className="flex items-center justify-between p-2 hover:bg-amber-50 border rounded-2xl">
                         <span>{user.name}</span>
                         <div className="flex gap-2">
                             <button

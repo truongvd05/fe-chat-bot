@@ -12,13 +12,15 @@ import debounce from "lodash.debounce";
 import { Input } from "@/components/ui/input";
 import { useEffect, useRef, useState } from "react";
 import logger from "@/utils/logger";
+import { useGetFriendQuery } from "@/feature/User/userApi";
 
 
-function MemberSelectModal({trigger, title, data, onSearch, onSubmit, loading, error, reset}) {
+function MemberSelectModal({trigger, title, data, onSearch, onSubmit, loading, isError, error, reset}) {
     const [name, setName] = useState("")
     const [value, setValue] = useState("")
     const debounceRef = useRef()
     const [selectedUser, setSelectedUser] = useState(new Map())
+    const { data: listFriend, isLoading} = useGetFriendQuery()
 
     const handleSubmit = async () => {
         const memberIds  = Array.from(selectedUser.keys());
@@ -26,7 +28,7 @@ function MemberSelectModal({trigger, title, data, onSearch, onSubmit, loading, e
         try {
             await onSubmit({name, memberIds})
         } catch (err) {
-            logger.log(err);
+            logger.error(err);
         }
     }
   
@@ -46,9 +48,9 @@ function MemberSelectModal({trigger, title, data, onSearch, onSubmit, loading, e
         debounceRef.current = debounce(async(value) => {
             if(!value.trim()) return
             try {
-                await onSearch(value);
+                const data = await onSearch(value);
             } catch (err) {
-                logger.log(err);
+                logger.error(err);
             }
         }, 800)
         return () => {
@@ -67,6 +69,10 @@ function MemberSelectModal({trigger, title, data, onSearch, onSubmit, loading, e
         reset();
     };
 
+    const friendListFiltered = listFriend?.filter(
+        (user) => user.id !== data?.id
+    );
+
   return (
     <Dialog className="h-[80vh] flex flex-col"
         onOpenChange={(open) => {
@@ -79,13 +85,14 @@ function MemberSelectModal({trigger, title, data, onSearch, onSubmit, loading, e
         </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{title || "Thêm thành viên"}</DialogTitle>
+        <DialogTitle>{title || "Thêm thành viên"}</DialogTitle>
         </DialogHeader>
             {title && <Input value={name} onChange={(e)=> setName(e.target.value)}
                 type="text"
-                autoComplete="name"
+                autoComplete="group"
                 placeholder="Nhập tên nhóm..."/>}
-            {selectedUser.size > 0 ? <div className="flex flex-wrap gap-2 mt-2">
+            {selectedUser.size > 0 ?
+            <div className="flex flex-wrap gap-2 mt-2">
                 {Array.from(selectedUser.values()).map((user) => (
                     <div
                     key={user.id}
@@ -101,20 +108,37 @@ function MemberSelectModal({trigger, title, data, onSearch, onSubmit, loading, e
                     </div>
                 ))}
             </div> : "chưa chọn thành viên nào"}
-            <Input value={value} onChange={(e)=> setValue(e.target.value)} type="text" autoComplete="name" placeholder="Nhập tên, email"/>
+            <Input value={value} onChange={(e)=> setValue(e.target.value)} type="text" autoComplete="name" placeholder="Nhập sdt, email để tìm kiếm"/>
             {loading && (<span className="text-sm text-gray-500">Đang tìm...</span>)}
-            {!loading && error && <span className="text-red-500 text-sm">{error?.data?.message || "Có lỗi xảy ra"}</span>}
-            {!loading && !error && data?.length === 0 &&  <span className="text-red-500 text-sm">Không tìm thấy</span>}
-            <div className="overflow-y-auto max-h-70">
-                {data && 
-                  <div key={data.id}
-                  onClick={() => toggleUser(data)}
-                  className={`cursor-pointer hover:bg-amber-50 px-3 py-3
-                    ${selectedUser.has(data.id) ? "bg-gray-300" : ""}
-                  `}>
-                      <p>{data.name || "undefined"} </p>
-                      <p>{data.email}</p>
-                  </div>}
+            {!loading && isError && <span className="text-red-500 text-sm">Không tìm thấy</span>}
+            {data &&
+            <>
+                <p>Kết quả tìm kiếm:</p>
+                <div className="overflow-y-auto max-h-70 rounded-2xl border">
+                      <div key={data.id}
+                      onClick={() => toggleUser(data)}
+                      className={`cursor-pointer hover:bg-amber-50 px-3 py-3
+                        ${selectedUser.has(data.id) ? "bg-gray-300" : ""}
+                      `}>
+                          <p>{data.name}</p>
+                      </div>
+                </div>
+            </>
+            }
+            <p>Danh sách ban bè:</p>
+            <div className="overflow-y-auto max-h-70 flex flex-col gap-3">
+                {friendListFiltered?.length > 0 && friendListFiltered.map((user) => {
+                    return (
+                        <div key={user.id}
+                        onClick={() => toggleUser(user)}
+                        className={`rounded-2xl border cursor-pointer hover:bg-amber-50 px-3 py-3
+                            ${selectedUser.has(user.id) ? "bg-gray-300" : ""}
+                        `}>
+                            <p>{user.name} </p>
+                            <p>{user.email}</p>
+                        </div>
+                    )}
+                )}
             </div>
         <DialogFooter className="mt-4">
           <DialogClose asChild>

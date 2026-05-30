@@ -9,6 +9,7 @@ export function useConversationSuggest({
 }) {
   const [triggerSuggest, { isFetching: suggestLoading }] =
     useLazyGetSuggestQuery();
+
   const prevConversationId = useRef(null);
   const lastMessageRef = useRef(null);
   const abortRef = useRef(null);

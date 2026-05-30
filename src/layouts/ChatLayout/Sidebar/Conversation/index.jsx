@@ -10,6 +10,8 @@ import { useSocket } from "@/contexts/SocketContext";
 import MemberSelectModal from "./MemberSelectModal";
 import { useLazyFindUserQuery } from "@/feature/User/userApi";
 import { useCreateGroupConversationMutation } from "@/feature/Conversation/conversationApi";
+import logger from "@/utils/logger";
+import { toast } from "sonner";
 
 function Conversation() {
     const socket = useSocket()
@@ -27,8 +29,8 @@ function Conversation() {
     const [triggerFindUser, {
         data: findUserData,
         isLoading: findUserLoading,
-        isError: findUserError,
-        error,
+        isError: isfindUserError,
+        error: findUserError,
         reset: resetFIndUser 
     }] = useLazyFindUserQuery();
 
@@ -88,6 +90,27 @@ function Conversation() {
             socket.off("group_event", handleGroupEvent);//
         };
     }, [conversationId, socket, dispatch, user.id, refetchConversations]);
+
+    const handleCreateGruop = async ({name, memberIds}) => {
+        console.log(name, memberIds);
+        
+        if (!name.trim()) return;
+        try {
+            await createGroupConversation({name, memberIds}).unwrap()
+            toast.success("Tạo nhóm thành công")
+        } catch (err) {
+            logger.error(err)
+            if(err.status === 403) {
+                toast.warning("Xác thực email để sử dụng đầy đủ tính năng", {
+                    duration: 5000,
+                    action: {
+                        label: "Xác thực ngay",
+                        onClick: () => navigate("/send-verify-email")
+                    }
+                });
+            }
+        }
+    }
     
     if(chatLoading) return <Skeleton/>
 
@@ -99,12 +122,9 @@ function Conversation() {
                 title="tạo nhóm"
                 trigger={<i className="fa-solid fa-users"></i>}
                 onSearch={(value) => triggerFindUser(value).unwrap()}
-                onSubmit={async({name, memberIds}) => {
-                    if (!name.trim()) return;
-                    await createGroupConversation({name, memberIds}).unwrap()}
-                }
-                
+                onSubmit={handleCreateGruop}
                 loading={findUserLoading}
+                isError={isfindUserError}
                 error={findUserError}
                 data={findUserData}
                 reset={resetFIndUser}

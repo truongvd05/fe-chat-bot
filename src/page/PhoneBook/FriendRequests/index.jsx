@@ -33,9 +33,9 @@ export default function FriendsRequests() {
     if (isError) return <p>Lỗi rồi!</p>;
     if(data.length === 0) {
         return (
-        <>
+        <PhoneBookRequestLayout  icon="fa-user" title="Lời mời kết bạn">
             <p>Bạn không có lời mời nào</p>
-        </>
+        </PhoneBookRequestLayout>
 
         )
     }

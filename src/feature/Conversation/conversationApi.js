@@ -93,7 +93,7 @@ export const conversationApi = createApi({
         url: `/conversation/${conversationId}/leaveGroup`,
         method: "POST",
       }),
-      invalidatesTags: ["Conversation"],
+      invalidatesTags: ["group"],
     }),
   }),
 });

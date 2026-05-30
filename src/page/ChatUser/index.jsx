@@ -16,7 +16,6 @@ import { selectIsUserOnline } from "@/feature/onlineUsers/onlineUsersSelector"
 import shouldShowUser from "@/utils/shouldShowUser "
 import shouldShowTime from "@/utils/shouldShowTime"
 
-// Hooks mới tách ra
 import { useChatSocket } from "@/hooks/useChatSocket"
 import { useChatActions } from "@/hooks/useChatActions"
 import { useUnreadReset } from "@/hooks/useUnreadReset"
@@ -44,7 +43,13 @@ function ChatUser() {
     const [editMessage] = useEditMessageMutation()
     const [PromoteToAdmin] = usePromoteToAdminConversationMutation()
     const [LeaveGroup] = useLeaveGroupMutation()
-    const [triggerSearchAvailableUsers, { data: searchAvailableUsersData, isLoading: searchAvailableUsersLoading, isError: searchAvailableUsersError, reset: resetSearchAvailableUsers }] = useLazySearchAvailableUsersQuery()
+    const [triggerSearchAvailableUsers, {
+        data: searchAvailableUsersData,
+        isLoading: searchAvailableUsersLoading,
+        isError: isSearchAvailableUsersError,
+        error: searchAvailableUsersError,
+        reset: resetSearchAvailableUsers,
+    }] = useLazySearchAvailableUsersQuery()
 
     const { data: conversationData, isLoading: conversatonLoading, refetch: refetchConversation } =
         useGetConversationQuery(conversationId, {
@@ -55,7 +60,6 @@ function ChatUser() {
 
     const other = conversationData?.participants?.find(u => u.user.id !== user.id)
     const isOtherOnline = useSelector(selectIsUserOnline(other?.user?.id))
-
     const { loadMore, hasMore } = useLoadMessages(conversationId, messageData)
     const rowVirtualizer = useVirtualizer({
         count: messageData?.length ?? 0,
@@ -118,6 +122,7 @@ function ChatUser() {
                                 onSearch={(value) => triggerSearchAvailableUsers({ conversationId, q: value }).unwrap()}
                                 onSubmit={async ({ memberIds }) => addMembers({ memberIds, conversationId }).unwrap()}
                                 loading={searchAvailableUsersLoading}
+                                isError={isSearchAvailableUsersError}
                                 error={searchAvailableUsersError}
                                 data={searchAvailableUsersData}
                                 reset={resetSearchAvailableUsers}
@@ -255,7 +260,7 @@ function ChatUser() {
                                 onChange={(e) => setFiles(Array.from(e.target.files))}
                                 accept="image/*,video/*,application/pdf" />
                             <button
-                                disabled={(!content.trim() && files.length === 0) || !conversationData || !["DIRECT", "GROUP"].includes(conversationData.type)}
+                                disabled={(!content.trim() && files.length === 0) || !conversationData || !["DIRECT", "GROUP", "SELF"].includes(conversationData.type)}
                                 onClick={handleSendMessage}
                                 className="p-2 absolute right-2 top-1/2 -translate-y-1/2 disabled:opacity-40 disabled:cursor-not-allowed">
                                 <i className="fa-regular fa-paper-plane"></i>

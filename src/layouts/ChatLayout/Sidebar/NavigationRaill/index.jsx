@@ -18,6 +18,8 @@ import logger from "@/utils/logger"
 import UserAvatar from "@/components/UserAvatar"
 import { selectUser } from "@/feature/User/userSelector"
 import { toast } from "sonner"
+import { conversationApi } from "@/feature/Conversation/conversationApi"
+import { messageApi } from "@/feature/Message/messageApi"
 
 function NavigationRall() {
     const dispatch = useDispatch()
@@ -28,19 +30,14 @@ function NavigationRall() {
     const [ logoutApi, {isLoading, error}] = useLogoutMutation()
     const [toggetAi] = useToggleAiSuggestMutation()
 
-    const refresh_token = localStorage.getItem("refresh_token")
-
     const type = location.pathname.split("/")[1];
-    
 
     const handleLogout = async () => {
-        if(!refresh_token) return
         try {
             disconnectSocket()
             await logoutApi().unwrap()
             dispatch(logOut());
-            localStorage.removeItem("access_token")
-            localStorage.removeItem("refresh_token")
+            dispatch(conversationApi.util.resetApiState())
             navigate("/login")
         } catch (err) {
             logger.log(err);

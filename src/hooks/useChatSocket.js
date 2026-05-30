@@ -126,6 +126,7 @@ export function useChatSocket({
     };
   }, [socket, conversationId, user?.id]);
 
+  // xử lí edit message
   useEffect(() => {
     if (!socket) return;
     const handleMessageEdited = (message) => {
