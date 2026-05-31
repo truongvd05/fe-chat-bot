@@ -28,7 +28,6 @@ export const SocketProvider = ({ children }) => {
         });
 
         s.on("online_users", (userIds) => {
-            logger.log("online_users received:", userIds)
             dispatch(setOnlineUsers(userIds))
         })
 
