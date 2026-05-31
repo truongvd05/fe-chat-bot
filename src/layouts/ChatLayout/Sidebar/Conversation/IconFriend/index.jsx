@@ -40,6 +40,9 @@ function IconFriend() {
       toast.success("Đã gửi lời mời kết bạn thành công")
       setShowProfile(true);
     } catch (err) {
+      if(err.status === 409) {
+        toast.success(err?.data?.error || "Đã là bạn bè")
+      }
       if(err.status === 429) {
         toast.error("đừng spam nữa")
       }

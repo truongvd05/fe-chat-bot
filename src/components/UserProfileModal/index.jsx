@@ -144,18 +144,18 @@ function UserProfileModal({
                   {!isSelf && (
                     <div className="mt-6 border-t pt-4">
                       <div className="flex gap-3">
-                        <button
+                        {onAddFriend && <button
                           onClick={() => onAddFriend(user.id)}
                           className="flex-1 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
                         >
                           Kết bạn
-                        </button>
-                        <button
+                        </button>}
+                        { onMessage && <button
                           onClick={() => onMessage(user.id)}
                           className="flex-1 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm"
                         >
                           Nhắn tin
-                        </button>
+                        </button>}
                       </div>
                     </div>
                   )}

@@ -134,30 +134,38 @@ function Conversation() {
             const me = item.participants.find(p => String(p.user?.id) === String(user.id))
             const other = item.participants.find(p => String(p.user?.id) !== String(user.id))
             const unreadCount = me?.unreadCount ?? 0
-            
             const friendName = other?.user?.name || null
 
            return (
                 <div key={item.id}
-                onClick={() => {
-                    navigate(`/chat/${item.id}`)
-                }}
-                className={`rounded-sm cursor-pointer relative
-                    ${theme === "light" ? "hover:bg-gray-300 text-black" : "hover:bg-gray-500 text-white"}
-                    ${conversationId === item.id ? "bg-gray-400" : ""} py-0.75 px-1.25 w-full h-15`
-                        }>
-                    {unreadCount > 0 && (
-                        <span className="absolute right-0 -top-2 text-red-500 ">{unreadCount}</span>
+                    onClick={() => navigate(`/chat/${item.id}`)}
+                    className={`rounded-sm cursor-pointer relative
+                        ${theme === "light" ? "hover:bg-gray-300 text-black" : "hover:bg-gray-500 text-white"}
+                        ${conversationId === item.id ? "bg-gray-400" : ""}
+                        ${item.status === "LOCKED" ? "opacity-60 border-l-2 border-red-500" : ""}
+                        py-0.75 px-1.25 w-full h-15`
+                    }>
+                    
+                    {item.status === "LOCKED" && (
+                        <span className="absolute right-1 top-1 text-[10px] text-red-500 flex items-center gap-0.5">
+                            🔒 bị khóa
+                        </span>
                     )}
+
+                    {unreadCount > 0 && (
+                        <span className="absolute right-0 -top-2 text-red-500">{unreadCount}</span>
+                    )}
+
                     <div className="flex items-center">
                         <div className="flex flex-col gap-2 flex-1">
-                            <span className="relative">{item.type === "DIRECT" ? friendName : item.title}</span>
-                            {item.lastMessage?.content && 
+                            <span className={item.status === "LOCKED" ? "line-through text-red-400" : ""}>
+                                {item.type === "DIRECT" ? friendName : item.title}
+                            </span>
+                            {item.lastMessage?.content &&
                             <p className="text-sm opacity-70 truncate w-45">
-                                {item.lastMessage?.userId === user.id ? "Bạn" 
-                                    : item.lastMessage.user?.name}
-                                    : {item.lastMessage.content}
-                                </p>}
+                                {item.lastMessage?.userId === user.id ? "Bạn" : item.lastMessage.user?.name}
+                                : {item.lastMessage.content}
+                            </p>}
                         </div>
                     </div>
                 </div>

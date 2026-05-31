@@ -80,7 +80,6 @@ export const messageApi = createApi({
       query: ({ conversationId, messageId, content }) => ({
         url: `/message/${messageId}/conversation/${conversationId}`,
         method: "DELETE",
-        body: { content },
       }),
       async onQueryStarted(
         { conversationId, messageId, content },
