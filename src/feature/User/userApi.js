@@ -100,7 +100,12 @@ export const userApi = createApi({
           body: formData,
         };
       },
-      invalidatesTags: ["User"],
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(updateUser(data));
+        } catch {}
+      },
     }),
     editUser: builder.mutation({
       query: (formData) => ({
