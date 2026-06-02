@@ -70,7 +70,7 @@ function Message({canModify, message, right, showName, showTime, onEdit, onDelet
                     {message.user?.name}
                 </span>
             )}
-            <div key={message.id} className={`relative group ${right ? "flex justify-end ml-auto" : "flex" } w-[70%]`}>
+            <div key={message.id} className={`relative group ${right ? "flex justify-end ml-auto" : "flex" } ${message.role === "user" ? "" : "border-b border-t"} w-[70%]`}>
                 <div className={bubbleClass}>
                     <div className={` absolute top-1 ${right ? "-left-10" : "-right-10"} opacity-0 group-hover:opacity-100 transition`}>
                     <button

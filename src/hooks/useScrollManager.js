@@ -83,10 +83,13 @@ export function useScrollManager({
       loadMore().then((loadCount) => {
         isLoadingMoreRef.current = false;
         if (!loadCount) return;
+        // 2 request giống autofill để virute đo được khoảng cách
         requestAnimationFrame(() => {
-          rowVirtualizer.scrollToIndex(loadCount, {
-            align: "start",
-            behavior: "auto",
+          requestAnimationFrame(() => {
+            rowVirtualizer.scrollToIndex(loadCount, {
+              align: "start",
+              behavior: "auto",
+            });
           });
         });
       });

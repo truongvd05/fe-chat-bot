@@ -68,7 +68,7 @@ function ChatUser() {
         count: messageData?.length ?? 0,
         getScrollElement: () => parentRef.current,
         estimateSize: () => 80,
-        overscan: 5,
+        overscan: 10,
         measureElement: (el) => el?.getBoundingClientRect().height
     })
     const { scrollBottom, handleNewMessage } = useScrollManager({
@@ -95,6 +95,7 @@ function ChatUser() {
 
     useEffect(() => {
         scrollBottom()
+        rowVirtualizer.measure()
     }, [messageData])
 
     const refCallback = useCallback((el) => {
@@ -156,27 +157,26 @@ function ChatUser() {
                 {/* Message list */}
                 <div ref={refCallback} className="flex-1 min-h-0 overflow-y-scroll pb-20 pl-2 pr-2"
                     style={{ overflowAnchor: "none" }}>
-                    <div style={{ height: rowVirtualizer.getTotalSize(), minHeight: "100%", position: "relative" }}>
+                    <div style={{ height: rowVirtualizer.getTotalSize(), position: "relative" }}>
                         {hasMore && <p className="text-center text-sm opacity-50 ">Đã tải hết tin nhắn</p>}
                         {rowVirtualizer.getVirtualItems().map((virtualRow) => {
                             const message = messageData[virtualRow.index]
                             return (
-                                <div key={message.id} ref={rowVirtualizer.measureElement}
+                                <div key={virtualRow.key}
+                                    ref={rowVirtualizer.measureElement}
                                     data-index={virtualRow.index}
-                                    className="absolute top-0 left-0 w-full mt-10"
+                                    className="absolute top-0 left-0 w-full"
                                     style={{ transform: `translateY(${virtualRow.start}px)` }}>
-                                    <div className={`${message.role === "user" ? "" : "border-b border-t"}`}>
-                                        <Message
-                                            canModify={message.role === "user" && message.userId === user?.id && conversationData?.type !== "BOT"}
-                                            message={message}
-                                            right={message.userId === user?.id}
-                                            showName={shouldShowUser(messageData, virtualRow.index)}
-                                            showTime={shouldShowTime(messageData, virtualRow.index)}
-                                            onEdit={() => setEditingMessage({ id: message.id, content: message.content })}
-                                            onDelete={() => handleDeleteMeesage({ id: message.id })}
-                                            onReply={() => setReplyingMessage({ id: message.id, content: message.content, senderName: message.user?.name })}
-                                        />
-                                    </div>
+                                    <Message
+                                        canModify={message.role === "user" && message.userId === user?.id && conversationData?.type !== "BOT"}
+                                        message={message}
+                                        right={message.userId === user?.id}
+                                        showName={shouldShowUser(messageData, virtualRow.index)}
+                                        showTime={shouldShowTime(messageData, virtualRow.index)}
+                                        onEdit={() => setEditingMessage({ id: message.id, content: message.content })}
+                                        onDelete={() => handleDeleteMeesage({ id: message.id })}
+                                        onReply={() => setReplyingMessage({ id: message.id, content: message.content, senderName: message.user?.name })}
+                                    />
                                 </div>
                             )
                         })}
