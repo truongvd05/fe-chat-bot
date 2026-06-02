@@ -1,12 +1,11 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { conversationApi } from "@/feature/Conversation/conversationApi";
 import { getSocket } from "@/socket/socket";
 import { messageApi } from "@/feature/Message/messageApi";
 import { store } from "@/store/store";
-import { selectUser } from "@/feature/User/userSelector";
 
 /**
  * Xử lý tất cả socket events trong chat:
@@ -26,29 +25,38 @@ export function useChatSocket({
   const navigate = useNavigate();
   const [typingUsers, setTypingUsers] = useState([]);
   const [isThinking, setIsThinking] = useState(false);
+  const activeConversationRef = useRef(conversationId);
+
+  useEffect(() => {
+    activeConversationRef.current = conversationId;
+    setSuggestions([]);
+    setIsThinking(false);
+  }, [conversationId]);
 
   // xử lí khi ai đang thingking
   useEffect(() => {
     if (!socket) return;
     const handleThinking = ({ conversationId: convId, thinking }) => {
-      if (String(convId) !== String(conversationId)) return;
+      if (String(convId) !== String(activeConversationRef.current)) return;
       if (thinking) setSuggestions([]);
       setIsThinking(thinking);
     };
     socket.on("bot_thinking", handleThinking);
     return () => socket.off("bot_thinking", handleThinking);
-  }, [socket, conversationId]);
+  }, [socket]);
 
   // Nhận message suggest mới từ socket
   useEffect(() => {
     if (!socket) return;
+
     const handleSuggest = ({ conversationId: convId, suggestions }) => {
-      if (String(convId) !== String(conversationId)) return;
+      if (String(convId) !== String(activeConversationRef.current)) return;
       setSuggestions(suggestions);
     };
+
     socket.on("bot_suggest", handleSuggest);
     return () => socket.off("bot_suggest", handleSuggest);
-  }, [socket, conversationId]);
+  }, [socket]);
 
   // Nhận message mới từ socket
   useEffect(() => {

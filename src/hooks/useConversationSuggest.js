@@ -1,6 +1,6 @@
 import { useLazyGetSuggestQuery } from "@/feature/Message/messageApi";
 import logger from "@/utils/logger";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // hook chỉ gọi 1 lần
 export function useConversationSuggest({
@@ -14,6 +14,10 @@ export function useConversationSuggest({
 
   const hasTriggered = useRef(false);
   const abortRef = useRef(null);
+
+  useEffect(() => {
+    setSuggestions([]);
+  }, [conversationId]);
 
   useEffect(() => {
     if (hasTriggered.current) return;
@@ -47,6 +51,10 @@ export function useConversationSuggest({
         logger.log("suggest error:", err);
         setSuggestions([]);
       });
+    // hủy request khi đổi conversation khác
+    return () => {
+      promise.abort();
+    };
   }, [conversationId, messageData]);
   return { suggestLoading };
 }
