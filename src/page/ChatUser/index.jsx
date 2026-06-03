@@ -93,11 +93,6 @@ function ChatUser() {
 
     useUnreadReset({ conversationId, userId: user?.id })
 
-    useEffect(() => {
-        scrollBottom()
-        rowVirtualizer.measure()
-    }, [messageData])
-
     const refCallback = useCallback((el) => {
         parentRef.current = el;
         setParentEl(el);

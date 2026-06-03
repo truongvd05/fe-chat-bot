@@ -55,7 +55,7 @@ export function useScrollManager({
         setTimeout(() => tryAutoFill(), 50);
       });
     });
-  }, [messageData?.length, rowVirtualizer.getTotalSize()]);
+  }, [messageData?.length]);
 
   // Scroll khi có message mới từ socket
   const handleNewMessage = useCallback(
