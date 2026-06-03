@@ -1,16 +1,10 @@
 import { lazy, Suspense  } from 'react';
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 import AuthLayout from "@/layouts/AuthLayout";
 import ChatLayout from "@/layouts/ChatLayout";
-import ChatEmpty from '../ChatEmpty';
-import NotFound from '@/page/NotFound';
-import Friends from '@/page/PhoneBook/Friends';
-import Groups from '@/page/PhoneBook/Groups';
-import FriendsRequests from '@/page/PhoneBook/FriendRequests';
-import GroupRequests from '@/page/PhoneBook/GroupRequests';
-import SendVerifyEmail from '@/page/Auth/SendVerifyEmail';
 import ChatUserWrapper from '@/page/ChatUser';
+import ChatEmpty from '../ChatEmpty';
 
 const Login = lazy(() => import("@/page/Auth/Login"))
 const Register = lazy(() => import("@/page/Auth/Register"))
@@ -19,6 +13,12 @@ const VerifyEmail = lazy(() => import("@/page/Auth/VerifyEmail"))
 const ChangePassword = lazy(() => import("@/page/Auth/ChangePassword"))
 const ForgotPassword = lazy(() => import("@/page/Auth/ForgotPassword"))
 const Profile = lazy(() => import("@/page/Profile"))
+const NotFound = lazy(() => import("@/page/NotFound"))
+const Friends = lazy(() => import("@/page/PhoneBook/Friends"))
+const FriendsRequests = lazy(() => import("@/page/PhoneBook/FriendRequests"))
+const Groups = lazy(() => import("@/page/PhoneBook/Groups"))
+const GroupRequests = lazy(() => import("@/page/PhoneBook/GroupRequests"))
+const SendVerifyEmail = lazy(() => import("@/page/Auth/SendVerifyEmail"))
 
 function AppRoutes() {
     return (

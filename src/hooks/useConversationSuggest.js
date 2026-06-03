@@ -33,9 +33,6 @@ export function useConversationSuggest({
       abortRef.current.abort();
     }
 
-    // Reset khi đổi conversation
-    console.log(lastMessage);
-
     const promise = triggerSuggest({
       conversationId,
       lastMessage: lastMessage.content,

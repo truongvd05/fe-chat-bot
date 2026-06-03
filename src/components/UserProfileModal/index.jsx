@@ -79,7 +79,7 @@ function UserProfileModal({
                   <div className="flex items-end gap-3 -mt-10 mb-4">
                     <div className="relative">
                       <img
-                        src={user.avatarUrl || "/default-avatar.png"}
+                        src={user.avatarUrl || "/default-avatar.webp"}
                         className="w-20 h-20 rounded-full border-4 border-white object-cover shadow"
                         alt={user.name}
                         onClick={() => setLightboxSrc(user.avatarUrl || "/default-avatar.png")}

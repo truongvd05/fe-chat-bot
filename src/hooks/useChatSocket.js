@@ -138,7 +138,6 @@ export function useChatSocket({
   useEffect(() => {
     if (!socket) return;
     const handleMessageEdited = (message) => {
-      console.log(message);
       if (message.conversationId !== conversationId) return;
       dispatch(
         messageApi.util.updateQueryData(

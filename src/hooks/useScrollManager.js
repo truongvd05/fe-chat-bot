@@ -27,6 +27,7 @@ export function useScrollManager({
   }, []);
 
   scrollBottomRef.current = scrollBottom;
+
   // lấy thêm message nếu chưa đủ thanh cuộn
   const tryAutoFill = useCallback(() => {
     const el = parentRef.current;
@@ -44,7 +45,6 @@ export function useScrollManager({
 
   useEffect(() => {
     if (!messageData?.length || isInitializedRef.current) return;
-    if (!rowVirtualizer.getTotalSize()) return;
     // 2 reques vì dom không kịp thêm element nên không scroll xuống đáy được
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -70,10 +70,12 @@ export function useScrollManager({
     [scrollBottom],
   );
 
+  // lấy dủ data để có thanh cuộn
   useEffect(() => {
     if (!isAutoFillingRef.current) return;
     tryAutoFill();
   }, [messageData?.length]);
+
   // Scroll lên để load thêm
   const handleScroll = useCallback(() => {
     const el = parentRef.current;
@@ -99,6 +101,7 @@ export function useScrollManager({
   const handleScrollRef = useRef(null);
   handleScrollRef.current = handleScroll;
 
+  // gán sự kiển scroll cho thẻ parentEl
   useEffect(() => {
     if (!parentEl) return;
     const handler = () => handleScrollRef.current();

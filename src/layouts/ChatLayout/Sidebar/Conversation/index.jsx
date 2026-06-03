@@ -1,5 +1,5 @@
 import { conversationApi, useGetConversationsQuery } from "@/feature/Conversation/conversationApi";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, NavLink } from "react-router-dom";
 import Skeleton from "./Skeleton";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,6 +12,7 @@ import { useLazyFindUserQuery } from "@/feature/User/userApi";
 import { useCreateGroupConversationMutation } from "@/feature/Conversation/conversationApi";
 import logger from "@/utils/logger";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
 
 function Conversation() {
     const socket = useSocket()
@@ -80,7 +81,7 @@ function Conversation() {
         
        // THÊM: Khi có member bị kick/rời nhóm
         const handleGroupEvent = ({ conversationId: convId }) => {
-            console.log("Member removed event:", convId);
+            logger.log("Member removed event:", convId);
             refetchConversations();
         };
         
@@ -92,8 +93,6 @@ function Conversation() {
     }, [conversationId, socket, dispatch, user.id, refetchConversations]);
 
     const handleCreateGruop = async ({name, memberIds}) => {
-        console.log(name, memberIds);
-        
         if (!name.trim()) return;
         try {
             await createGroupConversation({name, memberIds}).unwrap()
@@ -115,37 +114,38 @@ function Conversation() {
     if(chatLoading) return <Skeleton/>
 
     return (
-    <div className="w-full">
-        <>
-            <IconFriend/>
-            <MemberSelectModal
-                title="tạo nhóm"
-                trigger={<i className="fa-solid fa-users"></i>}
-                onSearch={(value) => triggerFindUser(value).unwrap()}
-                onSubmit={handleCreateGruop}
-                loading={findUserLoading}
-                isError={isfindUserError}
-                error={findUserError}
-                data={findUserData}
-                reset={resetFIndUser}
-                />
-        </>
+    <div className="w-full flex flex-col gap-2">
+        <div className="flex gap-5">
+            <Input type="text" placehodel="tìm kiếm"></Input>
+            <div className="flex gap-5">
+                <IconFriend/>
+                <MemberSelectModal
+                    title="tạo nhóm"
+                    trigger={<i className="fa-solid fa-users"></i>}
+                    onSearch={(value) => triggerFindUser(value).unwrap()}
+                    onSubmit={handleCreateGruop}
+                    loading={findUserLoading}
+                    isError={isfindUserError}
+                    error={findUserError}
+                    data={findUserData}
+                    reset={resetFIndUser}
+                    />
+            </div>
+        </div>
         {(chatData?.map((item)=> {
             const me = item.participants.find(p => String(p.user?.id) === String(user.id))
             const other = item.participants.find(p => String(p.user?.id) !== String(user.id))
             const unreadCount = me?.unreadCount ?? 0
             const friendName = other?.user?.name || null
-
            return (
-                <div key={item.id}
-                    onClick={() => navigate(`/chat/${item.id}`)}
-                    className={`rounded-sm cursor-pointer relative
+                <NavLink
+                    key={item.id}
+                    to={`/chat/${item.id}`}
+                    className={({ isActive }) => `rounded-sm cursor-pointer relative block
                         ${theme === "light" ? "hover:bg-gray-300 text-black" : "hover:bg-gray-500 text-white"}
-                        ${conversationId === item.id ? "bg-gray-400" : ""}
+                        ${isActive ? "bg-gray-400" : ""}
                         ${item.status === "LOCKED" ? "opacity-60 border-l-2 border-red-500" : ""}
-                        py-0.75 px-1.25 w-full h-15`
-                    }>
-                    
+                        py-0.75 px-1.25 w-full h-15 `}>
                     {item.status === "LOCKED" && (
                         <span className="absolute right-1 top-1 text-[10px] text-red-500 flex items-center gap-0.5">
                             🔒 bị khóa
@@ -168,7 +168,7 @@ function Conversation() {
                             </p>}
                         </div>
                     </div>
-                </div>
+                </NavLink>
             )
         })
         )}

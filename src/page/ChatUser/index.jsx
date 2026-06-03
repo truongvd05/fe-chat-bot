@@ -121,9 +121,9 @@ function ChatUser() {
                 onLeave={() => LeaveGroup({ conversationId }).unwrap()}
                 owner={conversationData?.ownerId}
             />
-            <div className="flex flex-col h-full overflow-hidden">
+            <main className="flex flex-col h-full overflow-hidden">
                 {/* Header */}
-                <div className="sticky ml-10 md:ml-1 text-2xl py-2 border-b mb-5 top-1">
+                <header className="sticky ml-10 md:ml-1 text-2xl py-2 border-b mb-5 top-1">
                     <div className="flex items-center">
                         <p>{conversationData?.type === "DIRECT" ? other?.user?.name : conversationData?.title}</p>
                         {conversationData?.type === "DIRECT" && (
@@ -147,10 +147,10 @@ function ChatUser() {
                                 reset={resetSearchAvailableUsers}
                             />
                         </div>}
-                </div>
+                </header>
 
                 {/* Message list */}
-                <div ref={refCallback} className="flex-1 min-h-0 overflow-y-scroll pb-20 pl-2 pr-2"
+                <section ref={refCallback} className="flex-1 min-h-0 overflow-y-scroll pb-20 pl-2 pr-2"
                     style={{ overflowAnchor: "none" }}>
                     <div style={{ height: rowVirtualizer.getTotalSize(), position: "relative" }}>
                         {hasMore && <p className="text-center text-sm opacity-50 ">Đã tải hết tin nhắn</p>}
@@ -176,7 +176,7 @@ function ChatUser() {
                             )
                         })}
                     </div>
-                </div>
+                </section>
 
                 {/* Typing indicator */}
                 {typingUsers.length > 0 && (
@@ -196,7 +196,7 @@ function ChatUser() {
                 </div>
                 )}
                 {/* Input area */}
-                <div className="sticky mr-auto ml-auto w-[70%] md:w-[70%] lg:w-[70%]">
+                <footer className="sticky mr-auto ml-auto w-[70%] md:w-[70%] lg:w-[70%]">
                     {files.length > 0 && (
                         <div className="flex gap-2 px-2 pb-2 flex-wrap">
                             {files.map((file, i) => (
@@ -275,8 +275,8 @@ function ChatUser() {
                             </button>
                         </div>
                     </div>
-                </div>
-            </div>
+                </footer>
+            </main>
         </>
     )
 }
